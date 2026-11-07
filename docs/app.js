@@ -40,6 +40,7 @@ const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 
 /* ---------- state ---------- */
+let balanceHook = null;
 const state = {
   balance: Number(store.get('gr2_bal', 1000)) || 0,
   inv: store.get('gr2_inv', []),
@@ -49,6 +50,7 @@ state.inv = state.inv.filter(g => g && g.id && BY[g.n]);
 function save() {
   store.set('gr2_bal', state.balance); store.set('gr2_inv', state.inv);
   $('#bal').textContent = fmt(state.balance);
+  if (balanceHook) balanceHook();
 }
 function bump() { const b = $('.balance'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
 function addGift(n) { const g = { id: uid(), n }; state.inv.push(g); save(); return g; }
@@ -65,7 +67,18 @@ function spend(n) {
 }
 let toastT = 0;
 function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('show'), 1900); }
-$('#topup').onclick = () => { state.balance += 500; save(); bump(); toast('+500 ⭐ (демо-пополнение)'); haptic('medium'); };
+$('#topup').onclick = () => {
+  const COOL = 3 * 3600e3, last = Number(store.get('gr2_topup', 0)) || 0, left = last + COOL - Date.now();
+  if (left > 0) { const h = Math.floor(left / 3600e3), m = Math.ceil(left % 3600e3 / 60e3); return toast(`Бонус будет через ${h ? h + ' ч ' : ''}${m} мин`); }
+  store.set('gr2_topup', Date.now()); state.balance += 500; save(); bump(); toast('+500 ⭐ бонус (раз в 3 часа)'); haptic('medium');
+};
+
+/* лёгкий режим для слабых телефонов и пауза анимаций в фоне */
+try {
+  const weak = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 4) <= 3;
+  if (weak) document.documentElement.classList.add('lite');
+  document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
+} catch (e) {}
 
 /* ticker */
 $('#tickerTrack').innerHTML = [...ITEMS, ...ITEMS].map(i => `<span>${i.e}</span>`).join('');
@@ -91,12 +104,15 @@ const CASES = [
 ].sort((a, b) => a.price - b.price);
 
 function buildOdds(c) {
-  const P = c.price, TARGET = 0.9;
-  const items = ITEMS.filter(i => i.p / P >= 0.08 && i.p / P <= 25);
+  const P = c.price, TARGET = 0.72;
+  const items = ITEMS.filter(i => i.p / P >= 0.015 && i.p / P <= 25);
   const ev = k => { let s = 0, e = 0; items.forEach(i => { const w = Math.pow(i.p / P, -k); s += w; e += w * i.p; }); return e / s / P; };
   let lo = -3, hi = 6;
   for (let t = 0; t < 50; t++) { const m = (lo + hi) / 2; if (ev(m) > TARGET) lo = m; else hi = m; }
-  const k = (lo + hi) / 2;
+  let k = (lo + hi) / 2;
+  // у дорогих кейсов шанс получить подарок не дешевле цены кейса не должен быть слишком высоким
+  const hit = kk => { let s = 0, h = 0; items.forEach(i => { const w = Math.pow(i.p / P, -kk); s += w; if (i.p >= P) h += w; }); return h / s; };
+  if (hit(k) > 0.28) { let l = k, h2 = 12; for (let t = 0; t < 50; t++) { const m = (l + h2) / 2; if (hit(m) > 0.28) l = m; else h2 = m; } k = (l + h2) / 2; }
   c.pool = items.map(i => ({ it: i, w: Math.pow(i.p / P, -k) }));
   c.sum = c.pool.reduce((a, o) => a + o.w, 0);
   c.rtp = ev(k);
@@ -264,84 +280,242 @@ function pickScreen(el, kind) {
   });
 }
 
-/* ---------- crash ---------- */
+/* ---------- crash (онлайн, общий сервер) ---------- */
+const CRASH_K = 0.1425;
+const crashMult = ms => Math.floor(Math.exp(CRASH_K * Math.max(0, ms) / 1000) * 100) / 100;
+const apiBase = () => { try { return new URLSearchParams(location.search).get('api') || ''; } catch (e) { return ''; } };
+
+/* офлайн-сервер: тот же протокол, но раунды крутятся прямо в телефоне */
+function localServer(onMsg) {
+  let phase = 'wait', round = 0, until = 0, t0 = 0, crashAt = 2, crashMs = 0, bet = null, closed = false;
+  const timers = [], hist = [1.24, 3.8, 1.05, 2.1, 1.77];
+  const T = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const emit = m => { if (!closed) onMsg(m); };
+  const me = { uid: 'me', name: TGU ? (TGU.username ? '@' + TGU.username : TGU.first_name || 'Вы') : 'Вы', photo: (TGU && TGU.photo_url) || '' };
+  const newRound = first => {
+    round++; phase = 'wait'; bet = null;
+    crashAt = Math.max(1, +(0.95 / (1 - Math.random() * 0.99)).toFixed(2)); crashMs = Math.log(crashAt) / CRASH_K * 1000; until = Date.now() + 6000;
+    if (!first) emit({ t: 'round', round, until, now: Date.now() });
+    T(() => {
+      phase = 'fly'; t0 = Date.now(); emit({ t: 'fly', t0 });
+      T(() => { phase = 'crash'; hist.push(crashAt); emit({ t: 'crash', at: crashAt }); T(() => newRound(false), 3500); }, crashMs);
+    }, 6000);
+  };
+  newRound(true);
+  T(() => emit({ t: 'welcome', now: Date.now(), you: 'me', online: 1, phase, round, until, t0, crash_at: null, history: hist.slice(-9), bets: [] }), 0);
+  return {
+    local: true,
+    send(m) {
+      if (m.t === 'bet') {
+        if (phase !== 'wait' || bet || !(m.amount >= 1)) return emit({ t: 'err', code: 'bet', msg: 'Ставка не принята' });
+        bet = { amount: m.amount, mult: null }; emit({ t: 'bet', uid: me.uid, name: me.name, photo: me.photo, amount: m.amount });
+      } else if (m.t === 'cancel') {
+        if (phase === 'wait' && bet) { const a = bet.amount; bet = null; emit({ t: 'refund', amount: a }); emit({ t: 'unbet', uid: me.uid }); }
+      } else if (m.t === 'cash') {
+        if (phase !== 'fly' || !bet || bet.mult != null) return;
+        const el = Date.now() - t0; if (el >= crashMs) return emit({ t: 'err', code: 'late', msg: 'Слишком поздно' });
+        const mu = crashMult(el); bet.mult = mu;
+        emit({ t: 'cash_ok', mult: mu, payout: Math.floor(bet.amount * mu) }); emit({ t: 'cash', uid: me.uid, mult: mu });
+      }
+    },
+    close() { closed = true; timers.forEach(clearTimeout); },
+  };
+}
+
+/* подключение к общему серверу; null — если сервера нет или он недоступен */
+function connectServer(onMsg, onClose) {
+  return new Promise(res => {
+    const api = apiBase(); if (!api) return res(null);
+    let ws, done = false, opened = false, helloAt = 0;
+    const fin = v => { if (!done) { done = true; res(v); } };
+    const timer = setTimeout(() => { try { ws && ws.close(); } catch (e) {} fin(null); }, 5000);
+    try { ws = new WebSocket(api.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws'); } catch (e) { clearTimeout(timer); return fin(null); }
+    ws.onopen = () => { helloAt = Date.now(); ws.send(JSON.stringify({ t: 'hello', init: (tg && tg.initData) || '' })); };
+    ws.onmessage = e => {
+      let m; try { m = JSON.parse(e.data); } catch (x) { return; }
+      if (m.t === 'welcome' && !opened) {
+        opened = true; clearTimeout(timer); m.rtt = Date.now() - helloAt;
+        fin({ send: o => { if (ws.readyState === 1) ws.send(JSON.stringify(o)); }, close: () => { ws.onclose = null; try { ws.close(); } catch (x) {} } });
+      }
+      onMsg(m);
+    };
+    ws.onerror = () => {};
+    ws.onclose = () => { clearTimeout(timer); if (!opened) fin(null); else onClose && onClose(); };
+  });
+}
+
 function crashScreen(el) {
   bar(el, 'Краш');
-  el.insertAdjacentHTML('beforeend', `<div class="hist" id="hist"></div>
+  el.insertAdjacentHTML('beforeend', `<div class="net" id="net"><i></i><span id="netTxt">Подключение…</span></div>
+    <div class="hist" id="hist"></div>
     <div class="crash-box"><canvas id="cv"></canvas><div class="mult" id="mult">Старт…</div></div>
     <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="1"><button data-m="0.5">½</button><button data-m="2">×2</button></div>
-    <button class="btn" id="go">Сделать ставку</button>`);
-  const cv = $('#cv'), ctx = cv.getContext('2d'), multEl = $('#mult'), goBtn = $('#go'), hist = $('#hist'), betIn = $('#bet');
+    <button class="btn" id="go" disabled>Подключение…</button>
+    <div class="bhd"><h4 class="sec" style="margin:0">Ставки</h4><span id="bcount"></span></div>
+    <div class="bets" id="bets"></div>`);
+  const cv = $('#cv'), ctx = cv.getContext('2d'), multEl = $('#mult'), goBtn = $('#go'), histEl = $('#hist'), betIn = $('#bet'), betsEl = $('#bets');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  cv.width = cv.offsetWidth * dpr; cv.height = cv.offsetHeight * dpr;
+  cv.width = Math.max(10, cv.offsetWidth) * dpr; cv.height = Math.max(10, cv.offsetHeight) * dpr;
   const W = cv.width, H = cv.height;
-  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { betIn.value = Math.max(1, Math.floor((Number(betIn.value) || 1) * b.dataset.m)); });
-  let phase = 'wait', t0 = 0, crashAt = 2, bet = 0, cashed = false, until = 0, tail = [], alive = true, raf = 0;
-  const addHist = (v, w) => { hist.insertAdjacentHTML('afterbegin', `<span class="${w ? 'h' : 'l'}">${v.toFixed(2)}x</span>`); while (hist.children.length > 9) hist.lastChild.remove(); };
-  [1.24, 3.8, 1.05, 2.1, 1.77].forEach(v => addHist(v, v >= 1.9));
-  const newCrash = () => Math.max(1, +(0.97 / (1 - Math.random() * 0.99)).toFixed(2));
-  const cur = now => Math.exp(0.1425 * (now - t0) / 1000);
-  const stars = Array.from({ length: 36 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
-  const reset = now => {
-    phase = 'wait'; until = now + 5000; bet = 0; cashed = false; tail = []; crashAt = newCrash();
-    multEl.classList.remove('lose'); goBtn.className = 'btn'; goBtn.disabled = false; goBtn.textContent = 'Сделать ставку'; betIn.disabled = false;
+  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) betIn.value = Math.max(1, Math.floor((Number(betIn.value) || 1) * b.dataset.m)); });
+
+  const G = { phase: 'wait', until: 0, t0: 0, crashAt: 1, offset: 0, me: null };
+  const bets = new Map();
+  let myBet = 0, myCashed = false, myPayout = 0, pending = 0, cashSent = false, net = null, alive = true, raf = 0, tail = [], lastBtn = '';
+  const srv = () => Date.now() + G.offset;
+  const fl = v => (Math.floor(v * 100) / 100).toFixed(2);
+
+  const addHist = v => { histEl.insertAdjacentHTML('afterbegin', `<span class="${v >= 2 ? 'h' : 'l'}">${fl(v)}x</span>`); while (histEl.children.length > 9) histEl.lastChild.remove(); };
+  const setNet = (online, n) => {
+    $('#net').className = 'net ' + (online ? 'on' : 'off');
+    $('#netTxt').textContent = online ? `Онлайн · игроков: ${n || 1}` : 'Офлайн-режим · сервер не найден';
   };
+
+  function renderBets() {
+    const arr = [...bets.entries()].sort((a, b) => b[1].amount - a[1].amount).slice(0, 40);
+    const sum = [...bets.values()].reduce((s, b) => s + b.amount, 0);
+    $('#bcount').textContent = bets.size ? `${bets.size} · ⭐ ${fmt(sum)}` : '';
+    betsEl.innerHTML = arr.length ? arr.map(([uid, b]) => {
+      const st = b.mult != null ? 'win' : b.lost ? 'lose' : '';
+      const right = b.mult != null ? `x${fl(b.mult)}<br>+⭐ ${fmt(b.amount * b.mult - b.amount)}` : b.lost ? `−⭐ ${fmt(b.amount)}` : '';
+      const ini = esc((b.name.replace('@', '')[0] || '?').toUpperCase());
+      return `<div class="brow ${st}"><span class="bav"><b>${ini}</b>${b.photo ? `<img src="${esc(b.photo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>
+        <span class="bn">${esc(b.name)}${uid === G.me ? ' (вы)' : ''}<small>⭐ ${fmt(b.amount)}</small></span><span class="br">${right}</span></div>`;
+    }).join('') : '<div class="empty" style="padding:16px 0">Ставок пока нет</div>';
+  }
+
+  function onMsg(m) {
+    if (!alive) return;
+    switch (m.t) {
+      case 'welcome': {
+        G.me = m.you; G.offset = m.now + (m.rtt || 0) / 2 - Date.now();
+        G.phase = m.phase; G.until = m.until; G.t0 = m.t0; G.crashAt = m.crash_at || 1;
+        bets.clear(); (m.bets || []).forEach(b => bets.set(b.uid, { name: b.name, photo: b.photo, amount: b.amount, mult: b.mult, lost: m.phase === 'crash' && b.mult == null }));
+        histEl.innerHTML = ''; (m.history || []).forEach(addHist);
+        const mine = bets.get(G.me); myBet = mine ? mine.amount : 0; myCashed = !!(mine && mine.mult != null); myPayout = myCashed ? Math.floor(mine.amount * mine.mult) : 0; pending = 0; cashSent = false;
+        if (G.phase === 'crash') { multEl.textContent = fl(G.crashAt) + 'x'; multEl.classList.add('lose'); }
+        setNet(!net || !net.local, m.online); renderBets(); break;
+      }
+      case 'round':
+        G.phase = 'wait'; G.until = m.until; bets.clear(); myBet = 0; myCashed = false; myPayout = 0; cashSent = false; tail = [];
+        multEl.classList.remove('lose'); renderBets(); break;
+      case 'fly': G.phase = 'fly'; G.t0 = m.t0; break;
+      case 'crash':
+        G.phase = 'crash'; G.crashAt = m.at; bets.forEach(b => { if (b.mult == null) b.lost = true; });
+        addHist(m.at); multEl.textContent = fl(m.at) + 'x'; multEl.classList.add('lose');
+        if (myBet && !myCashed) notify('error'); renderBets(); break;
+      case 'bet':
+        bets.set(m.uid, { name: m.name, photo: m.photo, amount: m.amount, mult: null, lost: false });
+        if (m.uid === G.me) { myBet = m.amount; pending = 0; }
+        renderBets(); break;
+      case 'unbet': bets.delete(m.uid); if (m.uid === G.me) myBet = 0; renderBets(); break;
+      case 'refund': state.balance += m.amount; save(); break;
+      case 'cash': { const b = bets.get(m.uid); if (b) b.mult = m.mult; renderBets(); break; }
+      case 'cash_ok':
+        state.balance += m.payout; save(); bump(); myCashed = true; myPayout = m.payout;
+        notify('success'); toast(`+${fmt(m.payout - myBet)} ⭐`); break;
+      case 'online': setNet(!net || !net.local, m.n); break;
+      case 'err':
+        if (m.code === 'bet' && pending) { state.balance += pending; save(); pending = 0; }
+        toast(m.msg || 'Ошибка'); break;
+    }
+  }
+
+  function renderBtn() {
+    let txt, cls = 'btn', dis = false;
+    if (!net) { txt = 'Подключение…'; dis = true; }
+    else if (G.phase === 'wait') {
+      if (myBet) { txt = `Отменить ставку ⭐ ${fmt(myBet)}`; cls = 'btn red'; }
+      else if (pending) { txt = 'Отправка…'; dis = true; }
+      else txt = 'Сделать ставку';
+    } else if (G.phase === 'fly') {
+      if (myBet && !myCashed) { txt = `Забрать ⭐ ${fmt(myBet * crashMult(srv() - G.t0))}`; cls = 'btn green'; dis = cashSent; }
+      else if (myBet) { txt = `Забрано ⭐ ${fmt(myPayout)}`; cls = 'btn green'; dis = true; }
+      else { txt = 'Раунд идёт'; dis = true; }
+    } else {
+      if (myBet && !myCashed) { txt = 'Проигрыш'; cls = 'btn red'; }
+      else txt = myBet ? `Забрано ⭐ ${fmt(myPayout)}` : 'Ждём раунд';
+      dis = true;
+    }
+    betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0;
+    const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
+    goBtn.textContent = txt; goBtn.className = cls; goBtn.disabled = dis;
+  }
+
   goBtn.onclick = () => {
-    if (phase === 'wait' && !bet) {
-      const v = Math.floor(Number(betIn.value));
-      if (spend(v)) { bet = v; betIn.disabled = true; goBtn.textContent = 'Ставка принята'; goBtn.disabled = true; haptic('medium'); }
-    } else if (phase === 'fly' && bet && !cashed) {
-      cashed = true; const w = Math.floor(bet * cur(performance.now()));
-      state.balance += w; save(); bump(); goBtn.textContent = `Забрано ⭐ ${fmt(w)}`; goBtn.className = 'btn green'; goBtn.disabled = true;
-      notify('success'); toast(`+${fmt(w - bet)} ⭐`);
+    if (!net) return;
+    if (G.phase === 'wait') {
+      if (!myBet && !pending) {
+        const v = Math.floor(Number(betIn.value));
+        if (!(v >= 1)) return toast('Введите ставку');
+        if (!spend(v)) return;
+        pending = v; net.send({ t: 'bet', amount: v }); haptic('medium');
+      } else if (myBet && !pending) net.send({ t: 'cancel' });
+    } else if (G.phase === 'fly' && myBet && !myCashed && !cashSent) { cashSent = true; net.send({ t: 'cash' }); haptic('medium'); }
+  };
+
+  cleanup = () => {
+    alive = false; cancelAnimationFrame(raf);
+    if (net) {
+      if ((myBet && G.phase === 'wait' && !myCashed) || pending) { state.balance += (myBet || pending); save(); net.send({ t: 'cancel' }); }
+      setTimeout(() => net && net.close(), 150);
     }
   };
-  cleanup = () => { alive = false; cancelAnimationFrame(raf); if (bet && !cashed && phase === 'wait') { state.balance += bet; save(); } };
-  const frame = now => {
+
+  /* подключение: сначала общий сервер, если нет — офлайн */
+  const startLocal = () => { net = localServer(onMsg); setNet(false); };
+  (async () => {
+    const n = await connectServer(onMsg, () => {
+      if (!alive) return;
+      toast('Связь с сервером потеряна — офлайн-режим');
+      bets.clear(); myBet = 0; pending = 0; myCashed = false; startLocal();
+    });
+    if (!alive) { n && n.close(); return; }
+    if (n) net = n; else startLocal();
+  })();
+
+  /* отрисовка */
+  const stars = Array.from({ length: 34 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
+  const frame = () => {
     if (!alive) return;
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#fff';
-    stars.forEach(s => { s.y += s.v * (phase === 'fly' ? 5 : 1); if (s.y > H) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = .55; ctx.fillRect(s.x, s.y, s.s, s.s); });
+    stars.forEach(s => { s.y += s.v * (G.phase === 'fly' ? 5 : 1); if (s.y > H) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = .55; ctx.fillRect(s.x, s.y, s.s, s.s); });
     ctx.globalAlpha = 1;
-    if (phase === 'wait') {
-      const left = Math.max(0, (until - now) / 1000); multEl.textContent = left.toFixed(1) + 'с';
-      if (left <= 0) {
-        phase = 'fly'; t0 = now;
-        if (bet) { goBtn.disabled = false; goBtn.textContent = 'Забрать'; goBtn.className = 'btn green'; }
-        else { goBtn.disabled = true; goBtn.textContent = 'Раунд идёт'; }
-      }
-    }
-    if (phase === 'fly') {
-      const m = cur(now); multEl.textContent = m.toFixed(2) + 'x';
-      const p = Math.min(1, (m - 1) / 4), x = W * .12 + p * W * .7, y = H * .86 - Math.pow(p, .8) * H * .6 + Math.sin(now / 90) * 2;
+    if (G.phase === 'wait') multEl.textContent = Math.max(0, (G.until - srv()) / 1000).toFixed(1) + 'с';
+    if (G.phase === 'fly') {
+      const m = crashMult(srv() - G.t0); multEl.textContent = fl(m) + 'x';
+      const p = Math.min(1, (m - 1) / 4), x = W * .12 + p * W * .7, y = H * .86 - Math.pow(p, .8) * H * .6 + Math.sin(Date.now() / 90) * 2;
       tail.push([x, y]); if (tail.length > 60) tail.shift();
-      const g = ctx.createLinearGradient(0, H, W, 0); g.addColorStop(0, '#5b7cff00'); g.addColorStop(1, '#7b96ff');
-      ctx.strokeStyle = g; ctx.lineWidth = 4 * dpr; ctx.lineCap = 'round'; ctx.shadowColor = '#5b7cff'; ctx.shadowBlur = 16;
-      ctx.beginPath(); tail.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.stroke(); ctx.shadowBlur = 0;
-      ctx.font = `${34 * dpr}px serif`; ctx.save(); ctx.translate(x, y); ctx.rotate(-.6); ctx.fillText('🚀', -17 * dpr, 12 * dpr); ctx.restore();
-      if (m >= crashAt) {
-        phase = 'boom'; multEl.textContent = crashAt.toFixed(2) + 'x'; multEl.classList.add('lose'); addHist(crashAt, false);
-        if (bet && !cashed) { goBtn.textContent = 'Проигрыш'; goBtn.className = 'btn red'; goBtn.disabled = true; notify('error'); }
-        until = now + 2400;
-      }
     }
-    if (phase === 'boom' && now > until) reset(now);
+    if (tail.length && (G.phase === 'fly' || G.phase === 'crash')) {
+      const g = ctx.createLinearGradient(0, H, W, 0); g.addColorStop(0, '#5b7cff00'); g.addColorStop(1, G.phase === 'crash' ? '#ff6b7a' : '#7b96ff');
+      ctx.strokeStyle = g; ctx.lineWidth = 4 * dpr; ctx.lineCap = 'round'; ctx.shadowColor = G.phase === 'crash' ? '#ff4d5e' : '#5b7cff'; ctx.shadowBlur = 14;
+      ctx.beginPath(); tail.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.stroke(); ctx.shadowBlur = 0;
+      const [x, y] = tail[tail.length - 1];
+      ctx.font = `${34 * dpr}px serif`; ctx.save(); ctx.translate(x, y);
+      if (G.phase === 'crash') ctx.fillText('💥', -17 * dpr, 12 * dpr); else { ctx.rotate(-.6); ctx.fillText('🚀', -17 * dpr, 12 * dpr); }
+      ctx.restore();
+    }
+    renderBtn();
     raf = requestAnimationFrame(frame);
   };
-  reset(performance.now()); raf = requestAnimationFrame(frame);
+  raf = requestAnimationFrame(frame);
 }
 
 /* ---------- mines ---------- */
+const MINE_OPTS = { 3: [1, 2, 3], 5: [3, 5, 8, 12], 7: [5, 10, 15, 20] };
+const MINE_EDGE = 0.88; // комиссия игры: множители ниже «честных»
 function minesScreen(el) {
   bar(el, 'Мины');
-  let size = 5, mcount = 3, grid = [], opened = 0, bet = 50, live = false;
+  let size = 5, mcount = 5, grid = [], opened = 0, bet = 50, live = false, alive = true;
   el.insertAdjacentHTML('beforeend', `<div class="live"><span class="dot"></span>LIVE <span id="mx" style="margin-left:auto;color:var(--gold)">1.00x</span></div>
     <div class="mgrid" id="mg"></div>
     <div class="chips" id="sizes"></div><div class="chips" id="mc"></div>
     <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="1"></div>
     <button class="btn" id="go">Сделать ставку</button>`);
   const mg = $('#mg'), mx = $('#mx'), goB = $('#go'), betIn = $('#bet');
-  const mult = () => { let m = 1; const T = size * size; for (let i = 0; i < opened; i++) m *= (T - i) / (T - mcount - i); return m * .97; };
+  const mult = () => { let m = 1; const T = size * size; for (let i = 0; i < opened; i++) m *= (T - i) / (T - mcount - i); return m * MINE_EDGE; };
   const draw = () => {
     mg.style.gridTemplateColumns = `repeat(${size},1fr)`; mg.innerHTML = '';
     for (let i = 0; i < size * size; i++) { const c = document.createElement('button'); c.className = 'cell'; c.textContent = '?'; c.onclick = () => click(i, c); mg.append(c); }
@@ -351,19 +525,26 @@ function minesScreen(el) {
     arr.forEach(v => { const b = document.createElement('button'); b.className = 'chip' + (v[0] === cur ? ' on' : ''); b.textContent = v[1]; b.onclick = () => { if (live) return toast('Игра идёт'); cb(v[0]); haptic(); }; e.append(b); });
   };
   const ui = () => {
-    chips('#sizes', [[3, '3x3'], [5, '5x5'], [7, '7x7']], size, v => { size = v; mcount = Math.min(mcount, v * v - 1); draw(); ui(); });
-    chips('#mc', [1, 3, 5, 8].filter(v => v < size * size).map(v => [v, '💣 ' + v]), mcount, v => { mcount = v; ui(); });
+    chips('#sizes', [[3, '3x3'], [5, '5x5'], [7, '7x7']], size, v => { size = v; mcount = MINE_OPTS[v][1]; draw(); ui(); });
+    chips('#mc', MINE_OPTS[size].map(v => [v, '💣 ' + v]), mcount, v => { mcount = v; ui(); });
   };
-  const end = won => {
-    live = false; betIn.disabled = false;
-    grid.forEach((b, i) => { const c = mg.children[i]; if (c && !c.classList.contains('safe') && !c.classList.contains('bomb')) { c.classList.add(b ? 'bomb' : 'dim'); c.textContent = b ? '💣' : '👑'; } });
-    goB.className = 'btn'; goB.textContent = 'Сделать ставку';
-    if (!won) { notify('error'); toast('💥 Мина!'); }
+  const end = (won, hit) => {
+    live = false; betIn.disabled = false; goB.className = 'btn'; goB.textContent = 'Сделать ставку';
+    if (!won) { mg.classList.remove('shake'); void mg.offsetWidth; mg.classList.add('shake'); notify('error'); toast('💥 Мина!'); }
+    const cells = [...mg.children]; let k = 0;
+    grid.forEach((b, i) => {
+      const c = cells[i]; if (!c || c.classList.contains('safe') || i === hit) return;
+      const d = b && !won ? 160 + Math.min(k++, 12) * 70 : 0; // цепная реакция
+      setTimeout(() => { if (!alive) return; c.classList.add(b ? 'bomb' : 'dim'); c.textContent = b ? '💣' : '👑'; if (b && !won) c.classList.add('boom'); }, d);
+    });
   };
-  const cash = () => { const w = Math.floor(bet * mult()); state.balance += w; save(); bump(); toast(`+${fmt(w - bet)} ⭐`); notify('success'); end(true); };
+  const cash = () => { const w = Math.floor(bet * mult()); state.balance += w; save(); bump(); toast(`${w >= bet ? '+' : ''}${fmt(w - bet)} ⭐`); notify('success'); end(true); };
   const click = (i, c) => {
     if (!live || c.classList.contains('safe')) return;
-    if (grid[i]) { c.classList.add('bomb'); c.textContent = '💣'; return end(false); }
+    if (grid[i]) {
+      c.classList.add('boom'); c.textContent = '💥'; setTimeout(() => { if (alive) { c.classList.add('bomb'); c.textContent = '💣'; } }, 450);
+      return end(false, i);
+    }
     c.classList.add('safe'); c.textContent = '👑'; opened++; mx.textContent = mult().toFixed(2) + 'x'; haptic();
     goB.textContent = `Забрать ⭐ ${fmt(bet * mult())}`;
     if (opened === size * size - mcount) cash();
@@ -375,18 +556,64 @@ function minesScreen(el) {
     while (k < mcount) { const r = Math.floor(Math.random() * grid.length); if (!grid[r]) { grid[r] = 1; k++; } }
     opened = 0; live = true; betIn.disabled = true; mx.textContent = '1.00x'; draw(); goB.className = 'btn green'; goB.textContent = 'Забрать';
   };
-  cleanup = () => { live = false; };
+  cleanup = () => { live = false; alive = false; };
   draw(); ui();
 }
 
 /* ---------- tournament ---------- */
 function tourScreen(el) {
+  const rows = [
+    ['#4', '🐙', 'w1', 'radial-gradient(circle at 30% 25%,#5eead4,#0f766e 75%)'],
+    ['#5', '🦇', 'омутх', 'radial-gradient(circle at 30% 25%,#c084fc,#581c87 75%)'],
+    ['#6', '🙂', ':)', 'radial-gradient(circle at 30% 25%,#fde68a,#d97706 75%)'],
+    ...[7, 8, 9, 10].map(() => ['#--', '?', 'NOBODY', null]),
+  ];
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>🏆 Турнир</h2><p class="sub" style="margin-top:6px">Лучшие игроки</p>
     <div class="podium">
       <div class="pl p2"><div class="av">🖤</div><div class="nk">PUPSYA</div><div class="step s2">2</div></div>
       <div class="pl p1"><div class="crown">👑</div><div class="av">🦁</div><div class="nk">WENZOR</div><div class="step s1">1</div></div>
-      <div class="pl p3"><div class="av">🐺</div><div class="nk">ONIX</div><div class="step s3">3</div></div>
-    </div></div>`);
+      <div class="pl p3"><div class="av">🐺</div><div class="nk">ONYX</div><div class="step s3">3</div></div>
+    </div>
+    <div class="ranks">${rows.map((r, i) => `<div class="rk" style="animation-delay:${0.5 + i * 0.06}s"><span class="n">${r[0]}</span>
+      <span class="a ${r[3] ? '' : 'q'}" ${r[3] ? `style="background:${r[3]}"` : ''}>${r[1]}</span><span class="t">${esc(r[2])}</span></div>`).join('')}</div></div>`);
+}
+
+/* ---------- tasks ---------- */
+const TASK_GOAL = 25000;
+const TASK_LINK = 'https://t.me/xdsold';
+let tasks = store.get('gr2_tasks', {}); if (!tasks || typeof tasks !== 'object') tasks = {};
+const saveTasks = () => store.set('gr2_tasks', tasks);
+function grant(n) { state.balance += n; save(); bump(); notify('success'); toast(`+${fmt(n)} ⭐ на баланс`); }
+function openTG(url) { try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {} window.open(url, '_blank'); }
+
+function tasksScreen(el) {
+  el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай звёзды</p></div>
+    <div class="task" id="t1"><div class="ti"><h3>Стать крутым типом</h3><span class="rew">+⭐ 5 000</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
+    <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
+    <div class="task" id="t3"><div class="ti"><h3>Апнуть 25 000 ⭐</h3><span class="rew">+⭐ 50 000</span>
+      <div class="prog"><i id="t3p"></i></div><div class="pt" id="t3t"></div></div><div class="ta"><button class="pbtn" id="t3b">Забрать</button></div></div>`);
+  const b1 = $('#t1b'), b2a = $('#t2a'), b2b = $('#t2b'), b3 = $('#t3b');
+  const paint = () => {
+    // 1
+    b1.textContent = tasks.t1 ? 'Выполнено ✓' : 'Проверить'; b1.disabled = !!tasks.t1; b1.classList.toggle('done', !!tasks.t1);
+    // 2
+    b2a.disabled = tasks.t2 === 'claimed';
+    b2b.textContent = tasks.t2 === 'claimed' ? 'Получено ✓' : tasks.t2 === 'done' ? 'Забрать' : 'Проверить';
+    b2b.disabled = tasks.t2 === 'claimed'; b2b.classList.toggle('done', tasks.t2 === 'claimed');
+    // 3
+    const bal = Math.floor(state.balance), pct = Math.min(100, bal / TASK_GOAL * 100);
+    $('#t3p').style.width = pct + '%'; $('#t3t').textContent = `Баланс: ⭐ ${fmt(bal)} / ${fmt(TASK_GOAL)}`;
+    b3.textContent = tasks.t3 ? 'Получено ✓' : 'Забрать'; b3.disabled = !!tasks.t3 || bal < TASK_GOAL; b3.classList.toggle('done', !!tasks.t3);
+  };
+  b1.onclick = () => { if (tasks.t1) return; tasks.t1 = 'claimed'; saveTasks(); grant(5000); paint(); };
+  b2a.onclick = () => { openTG(TASK_LINK); if (!tasks.t2) { tasks.t2 = 'done'; saveTasks(); toast('Задание выполнено — нажмите «Забрать»'); paint(); } };
+  b2b.onclick = () => {
+    if (!tasks.t2) return toast('Сначала нажмите «Выполнить»');
+    if (tasks.t2 === 'claimed') return; tasks.t2 = 'claimed'; saveTasks(); grant(10000); paint();
+  };
+  b3.onclick = () => { if (tasks.t3 || state.balance < TASK_GOAL) return; tasks.t3 = 'claimed'; saveTasks(); grant(50000); paint(); };
+  balanceHook = paint; cleanup = () => { balanceHook = null; };
+  paint();
 }
 
 /* ---------- profile ---------- */
@@ -425,9 +652,9 @@ function openGift(g) {
 }
 
 /* ---------- tabs ---------- */
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, mines: minesScreen, tour: tourScreen, profile: profileScreen, soon };
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-  const t = b.dataset.tab; go(t === 'games' || t === 'tour' || t === 'profile' ? t : 'soon');
+  const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile'].includes(t) ? t : 'soon');
 });
 save(); go('games');
