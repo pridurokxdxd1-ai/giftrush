@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>GiftRush</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div class="brand">🎁 GiftRush</div>
+    <div class="balance"><span class="star">⭐</span><b id="bal">0</b><button id="topup">Пополнить</button></div>
+  </header>
+  <div id="ticker"><div class="track" id="tickerTrack"></div></div>
+  <main id="view"></main>
+  <nav id="nav">
+    <button data-tab="games" class="on"><i>🎮</i>Игры</button>
+    <button data-tab="contests"><i>🏆</i>Конкурсы</button>
+    <button data-tab="tasks"><i>✅</i>Задания<em>3</em></button>
+    <button data-tab="tour"><i>🌍</i>Турнир</button>
+    <button data-tab="profile"><i>👤</i>Профиль</button>
+  </nav>
+</div>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
