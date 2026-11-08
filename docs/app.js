@@ -169,9 +169,9 @@ function home(el) {
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
   el.innerHTML = `<div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
-    <div class="row2">${T('crash', 'sq t-crash', 'CRASH', '<span class="live">ONLINE</span>')}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
+    <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
-    <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', '<span class="live">ONLINE</span>')}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="dev">В РАЗРАБОТКЕ</span>')}</div>
+    <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="dev">В РАЗРАБОТКЕ</span>')}</div>
   </div>`;
   el.querySelectorAll('.tile').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
@@ -288,6 +288,10 @@ function pickScreen(el, kind) {
 /* ---------- crash (онлайн, общий сервер) ---------- */
 const CRASH_K = 0.1425;
 const crashMult = ms => Math.floor(Math.exp(CRASH_K * Math.max(0, ms) / 1000) * 100) / 100;
+/* Онлайн-режим (общие раунды на сервере) временно выключен. Чтобы вернуть: ONLINE = true */
+const ONLINE = false;
+const OFFLINE_TXT = ONLINE ? 'Офлайн-режим · сервер не найден' : 'Офлайн-режим';
+const LIVE_BADGE = ONLINE ? '<span class="live">ONLINE</span>' : '';
 const apiBase = () => { try { return new URLSearchParams(location.search).get('api') || ''; } catch (e) { return ''; } };
 
 /* офлайн-сервер: тот же протокол, но раунды крутятся прямо в телефоне */
@@ -330,7 +334,7 @@ function localServer(onMsg) {
 /* подключение к общему серверу; null — если сервера нет или он недоступен */
 function connectServer(onMsg, onClose, game, room) {
   return new Promise(res => {
-    const api = apiBase(); if (!api) return res(null);
+    const api = ONLINE ? apiBase() : ''; if (!api) return res(null);
     let ws, done = false, opened = false, helloAt = 0;
     const fin = v => { if (!done) { done = true; res(v); } };
     const timer = setTimeout(() => { try { ws && ws.close(); } catch (e) {} fin(null); }, 5000);
@@ -358,7 +362,7 @@ function crashScreen(el) {
     <button class="btn" id="go" disabled>Подключение…</button>
     <div class="bhd"><h4 class="sec" style="margin:0">Ставки</h4><span id="bcount"></span></div>
     <div class="bets" id="bets"></div>`);
-  const room = getRoom(); roomChips($('#rooms'), room, () => go('crash'));
+  const room = getRoom(); if (ONLINE) roomChips($('#rooms'), room, () => go('crash'));
   const cv = $('#cv'), ctx = cv.getContext('2d'), multEl = $('#mult'), goBtn = $('#go'), histEl = $('#hist'), betIn = $('#bet'), betsEl = $('#bets');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.max(10, cv.offsetWidth) * dpr; cv.height = Math.max(10, cv.offsetHeight) * dpr;
@@ -374,7 +378,7 @@ function crashScreen(el) {
   const addHist = v => { histEl.insertAdjacentHTML('afterbegin', `<span class="${v >= 2 ? 'h' : 'l'}">${fl(v)}x</span>`); while (histEl.children.length > 9) histEl.lastChild.remove(); };
   const setNet = (online, n) => {
     $('#net').className = 'net ' + (online ? 'on' : 'off');
-    $('#netTxt').textContent = online ? `Сервер ${room} · онлайн: ${n || 1}` : 'Офлайн-режим · сервер не найден';
+    $('#netTxt').textContent = online ? `Сервер ${room} · онлайн: ${n || 1}` : OFFLINE_TXT;
   };
 
   function renderBets() {
@@ -577,7 +581,7 @@ function rouletteScreen(el) {
       <button class="rb black" data-c="black"><b>ЧЁРНОЕ</b><span>x2</span><small></small></button></div>
     <div class="odds">Шансы: красное 49.3% · чёрное 49.3% · зелёное 1.5% · мин. ставка 20 ⭐</div>
     <div class="bhd"><h4 class="sec" style="margin:0">Ставки</h4><span id="bcount"></span></div><div class="bets" id="bets"></div>`);
-  roomChips($('#rooms'), room, () => go('roulette'));
+  if (ONLINE) roomChips($('#rooms'), room, () => go('roulette'));
   const wrap = $('#rwheel'), cv = $('#rcv'), ctx = cv.getContext('2d'), cen = $('#rcen'), amt = $('#ramt'), betsEl = $('#bets'), rbtns = [...el.querySelectorAll('.rb')];
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -615,7 +619,7 @@ function rouletteScreen(el) {
 
   const setNet = (online, n) => {
     $('#net').className = 'net ' + (online ? 'on' : 'off');
-    $('#netTxt').textContent = online ? `Сервер ${room} · онлайн: ${n || 1}` : 'Офлайн-режим · сервер не найден';
+    $('#netTxt').textContent = online ? `Сервер ${room} · онлайн: ${n || 1}` : OFFLINE_TXT;
   };
   const addHist = r => { const h = $('#rhist'); h.insertAdjacentHTML('afterbegin', `<span class="${rColor(r.n)}">${r.n}</span>`); while (h.children.length > 12) h.lastChild.remove(); };
 
@@ -865,10 +869,15 @@ function openGift(g) {
   };
 }
 
+/* ---------- contests ---------- */
+function contestsScreen(el) {
+  el.innerHTML = '<div class="tour"><h2>🏆 Конкурсы</h2></div><div class="soon"><b>🎁</b>Сейчас нет активных конкурсов, попробуйте позже</div>';
+}
+
 /* ---------- tabs ---------- */
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, soon };
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, contests: contestsScreen, profile: profileScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-  const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile'].includes(t) ? t : 'soon');
+  const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'contests'].includes(t) ? t : 'soon');
 });
 save(); go('games');
