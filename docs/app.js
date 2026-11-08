@@ -188,11 +188,11 @@ function home(el) {
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
-    <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="dev">В РАЗРАБОТКЕ</span>')}</div>
+    <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="new">NEW</span>')}</div>
   </div>`;
   el.querySelectorAll('.tile').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
-    b.onclick = () => b.dataset.id === 'plinko' ? (haptic('rigid'), toast('В разработке.')) : go(b.dataset.id);
+    b.onclick = () => go(b.dataset.id);
   });
 }
 
@@ -207,16 +207,23 @@ function casesList(el) {
     d.onclick = () => go('case', c); g.append(d);
   });
 }
+const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
+const isTurbo = () => !!store.get('gr2_turbo', false);
+function bindTurbo(el) {
+  const b = $('#turbo', el); if (!b) return;
+  const set = () => b.classList.toggle('on', isTurbo());
+  set(); b.onclick = () => { store.set('gr2_turbo', !isTurbo()); set(); haptic('medium'); };
+}
 function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${it.e}</div>`;
   const sorted = c.pool.map(o => o.it).sort((a, b) => a.p - b.p);
   el.insertAdjacentHTML('beforeend', `<div class="reel-wrap"><div class="reel" id="reel"></div></div>
     <div class="win" id="win">Цена: ⭐ ${fmt(c.price)}</div><div id="act"></div>
-    <button class="btn" id="go">Открыть за ⭐ ${fmt(c.price)}</button>
+    <div class="openrow"><button class="btn" id="go">Открыть за ⭐ ${fmt(c.price)}</button>${TURBO_BTN}</div>
     <h4 class="sec">Содержимое кейса</h4>
     <div class="contents">${sorted.map(i => `<div class="ci" style="--c:${i.c}"><b>${i.e}</b>⭐ ${fmt(i.p)}</div>`).join('')}</div>`);
-  const reel = $('#reel'), win = $('#win'), act = $('#act'), btn = $('#go');
+  const reel = $('#reel'), win = $('#win'), act = $('#act'), btn = $('#go'); bindTurbo(el);
   const filler = () => rollCase(c);
   reel.innerHTML = Array.from({ length: 14 }, () => mk(filler())).join('');
   let busy = false;
@@ -231,10 +238,11 @@ function caseScreen(el, c) {
     reel.innerHTML = arr.map(mk).join(''); void reel.offsetWidth;
     const w = reel.parentElement.offsetWidth, tgt = reel.children[stop];   // реальная позиция призового предмета (на узких экранах размер другой)
     const off = tgt.offsetLeft + tgt.offsetWidth / 2 - w / 2 + rnd(-tgt.offsetWidth * .3, tgt.offsetWidth * .3);
-    reel.style.transition = 'transform 5s cubic-bezier(.1,.75,.12,1)';
+    const fast = isTurbo();
+    reel.style.transition = fast ? 'transform .95s cubic-bezier(.2,.7,.15,1)' : 'transform 5s cubic-bezier(.1,.75,.12,1)';
     reel.style.transform = `translate3d(${-off}px,0,0)`;
-    const iv = setInterval(() => haptic('light'), 170);
-    await sleep(5150); clearInterval(iv);
+    const iv = fast ? 0 : setInterval(() => haptic('light'), 170);
+    await sleep(fast ? 1100 : 5150); clearInterval(iv);
     if (!el.isConnected) return;
     notify('success');
     win.innerHTML = `<div class="pop" style="color:${prize.c}">${prize.e} ${prize.n} · ⭐ ${fmt(prize.p)}</div>`;
@@ -267,7 +275,8 @@ function upgradeScreen(el) {
       <defs><linearGradient id="ug" gradientUnits="userSpaceOnUse" x1="94" y1="0" x2="6" y2="0"><stop offset="0" stop-color="#c6ff4a"/><stop offset=".5" stop-color="#6fe66a"/><stop offset="1" stop-color="#0fae52"/></linearGradient></defs><circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="url(#ug)" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
       <div class="hand" id="hand"><i class="head"></i></div><div class="num"><b id="rnum">—</b><small id="rx"></small></div></div>
     <div class="slot"><h4>Желаемый подарок</h4><button class="pick" id="want"></button></div>
-    <button class="btn" id="go"></button>`);
+    <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>`);
+  bindTurbo(el);
   const ubal = $('#ubal'), rnum = $('#rnum'), rx = $('#rx'), goB = $('#go'), wantB = $('#want');
   let chance = 0;
   const paint = () => {
@@ -305,9 +314,10 @@ function upgradeScreen(el) {
     const mg6 = Math.min(6, arc / 3);                       // отступ от краёв, чтобы кончик стрелки не «касался» границы
     const th = ok ? rnd(mg6, arc - mg6) : rnd(arc + 6, 354);
     hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)'; void hand.offsetWidth;
-    hand.style.willChange = 'transform'; hand.style.transition = 'transform 4.6s cubic-bezier(.25,.55,.35,1)'; hand.style.transform = `rotate(${360 * 5 + th}deg)`;
+    const fast = isTurbo();
+    hand.style.willChange = 'transform'; hand.style.transition = fast ? 'transform 1.3s cubic-bezier(.25,.55,.35,1)' : 'transform 4.6s cubic-bezier(.25,.55,.35,1)'; hand.style.transform = `rotate(${360 * (fast ? 3 : 5) + th}deg)`;
     ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {}
-    await sleep(4800);
+    await sleep(fast ? 1450 : 4800);
     hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
     toast(ok ? `🎉 Успех! ${wi.e} ${wi.n}` : '💥 Неудача, ставка сгорела');
@@ -341,9 +351,9 @@ function pickScreen(el, kind) {
 }
 
 /* ---------- ракета (спрайт из видео) ---------- */
-const RK = { img: null, ok: false, FR: 288, COLS: 8, N: 48, FPS: 15.6 };
+const RK = { img: null, ok: false, FR: 224, COLS: 12, N: 96, FPS: 31.17 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=10';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=11';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -817,6 +827,141 @@ function rouletteScreen(el) {
   try { document.fonts && document.fonts.load('800 20px Rubik').then(() => { if (alive) buildWheel(); }); } catch (e) {}
 }
 
+/* ---------- plinko ---------- */
+const PL_ROWS = 10, PL_MULT = [11, 5.5, 2.5, 1, 0.4, 0.2, 0.4, 1, 2.5, 5.5, 11];
+const plCol = m => m >= 5 ? '#ff4d5e' : m >= 2 ? '#ff9a3d' : m >= 1 ? '#3ee48f' : '#ffd23f';
+let plHist = store.get('gr2_phist', []); if (!Array.isArray(plHist)) plHist = []; plHist = plHist.filter(x => typeof x === 'number').slice(-10);
+function plinkoScreen(el) {
+  bar(el, 'PLINKO');
+  el.insertAdjacentHTML('beforeend', `<div class="hist" id="phist"></div><div class="pl-box"><canvas id="pcv"></canvas></div>
+    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-m="0.5">½</button><button data-m="2">×2</button><button data-max>MAX</button></div>
+    <button class="btn" id="drop">Бросить шар</button>
+    <div class="odds">Шар отскакивает от шипов и падает в одну из ячеек · мин. ставка 20 ⭐ · можно бросать несколько шаров подряд</div>`);
+  const cv = $('#pcv'), ctx = cv.getContext('2d'), betIn = $('#bet'), hist = $('#phist');
+  const dpr = Math.min(window.devicePixelRatio || 1, document.documentElement.classList.contains('lite') ? 1.5 : 2);
+  const W = Math.max(10, Math.round(cv.offsetWidth * dpr)), H = Math.max(10, Math.round(cv.offsetHeight * dpr));
+  cv.width = W; cv.height = H;
+  let alive = true, raf = 0, lastHap = 0, dirty = true;
+  const paintHist = () => { hist.innerHTML = plHist.slice().reverse().map(m => `<span class="${m >= 1 ? 'h' : 'l'}">x${m}</span>`).join(''); };
+  paintHist();
+  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); });
+
+  /* геометрия */
+  const COLS = PL_ROWS + 2, dx = W / (COLS + 1), PR = dx * .13, BR = dx * .2;
+  const y0 = H * .2, y1 = H * .76, dy = (y1 - y0) / (PL_ROWS - 1), slotTop = H * .87, slotH = H * .1;
+  const pegX = (i, j) => W / 2 + (j - (i + 2) / 2) * dx, pegY = i => y0 + i * dy;
+  const pegs = []; for (let i = 0; i < PL_ROWS; i++) { pegs[i] = []; for (let j = 0; j < i + 3; j++) pegs[i][j] = { x: pegX(i, j), y: pegY(i), hit: 0 }; }
+  const slotX = k => W / 2 + (k - 5) * dx;
+
+  /* статичный слой: шипы + труба */
+  const layer = document.createElement('canvas'); layer.width = W; layer.height = H; const lx = layer.getContext('2d');
+  const peg = document.createElement('canvas'); const ps = Math.ceil(PR * 7); peg.width = peg.height = ps; { const g = peg.getContext('2d'), c = ps / 2;
+    const gr = g.createRadialGradient(c, c, 0, c, c, c); gr.addColorStop(0, '#5cc8ff66'); gr.addColorStop(1, '#5cc8ff00'); g.fillStyle = gr; g.fillRect(0, 0, ps, ps);
+    const pg = g.createRadialGradient(c - PR * .3, c - PR * .35, PR * .1, c, c, PR); pg.addColorStop(0, '#d8f4ff'); pg.addColorStop(.45, '#46b9ff'); pg.addColorStop(1, '#1f6dff');
+    g.fillStyle = pg; g.beginPath(); g.arc(c, c, PR, 0, 7); g.fill(); }
+  pegs.forEach(r => r.forEach(p => lx.drawImage(peg, p.x - ps / 2, p.y - ps / 2)));
+  { const tw = W * .17, tx = W / 2 - tw / 2, th = H * .09, g = lx.createLinearGradient(tx, 0, tx + tw, 0);
+    g.addColorStop(0, '#1d4ed8'); g.addColorStop(.35, '#5aa2ff'); g.addColorStop(1, '#1b3fb5');
+    lx.fillStyle = g; lx.fillRect(tx, -4, tw, th + 4);
+    const cw = tw * 1.45, cx = W / 2 - cw / 2; lx.fillStyle = '#2a5fe0'; lx.beginPath();
+    if (lx.roundRect) lx.roundRect(cx, th - 2, cw, H * .028, H * .014); else lx.rect(cx, th - 2, cw, H * .028); lx.fill();
+    lx.fillStyle = '#0d2a80'; lx.fillRect(cx + cw * .08, th + H * .008, cw * .84, H * .008); }
+
+  /* шарики и эффекты */
+  const balls = [], rings = [], sparks = [], floats = [], flash = Array(PL_MULT.length).fill(0);
+  const T_IN = 450, T_OUT = 450;
+  function launch(bet) {
+    const d = Array.from({ length: PL_ROWS }, () => Math.random() < .5 ? -1 : 1);
+    const s = d.reduce((x, y) => x + y, 0), k = s / 2 + 5, mult = PL_MULT[k], win = Math.floor(bet * mult);
+    const durs = d.map(() => 500 * (.92 + Math.random() * .16)); const t = [T_IN]; durs.forEach(x => t.push(t[t.length - 1] + x));
+    balls.push({ t0: performance.now(), d, k, mult, win, bet, durs, t, seg: -1, done: false, paid: false, trail: [] });
+  }
+  const payBall = b => { if (b.paid) return; b.paid = true; state.balance += b.win; save(); };
+  const ballPos = (b, el_) => {
+    const hop = dy * .6, cy = i => pegY(i) - PR - BR * .9;
+    let xi = 0; const X = i => { let x = 0; for (let n = 0; n < i; n++) x += b.d[n] * .5; return W / 2 + x * dx; };
+    if (el_ < T_IN) { const u = el_ / T_IN; return [W / 2, H * .115 + (cy(0) - H * .115) * u * u, 0]; }
+    const i = b.t.findIndex((v, n) => n > 0 && el_ < v) - 1;                    // сегмент между шипами
+    if (i < 0 || i >= PL_ROWS) {
+      const u = Math.min(1, (el_ - b.t[PL_ROWS]) / T_OUT);                     // падение в ячейку
+      return [X(PL_ROWS), (slotTop - BR) + (slotH * .45 + BR) * u * u, 1];
+    }
+    const u = (el_ - b.t[i]) / b.durs[i], xa = X(i), xb = X(i + 1);
+    const ya = cy(i), yb = i + 1 < PL_ROWS ? cy(i + 1) : slotTop - BR;
+    return [xa + (xb - xa) * (u < .5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u)), ya + (yb - ya) * u * u - hop * 4 * u * (1 - u), 0];
+  };
+  const bsp = document.createElement('canvas'); const bs = Math.ceil(BR * 5); bsp.width = bsp.height = bs; { const g = bsp.getContext('2d'), c = bs / 2;
+    const gr = g.createRadialGradient(c, c, 0, c, c, c); gr.addColorStop(0, '#ffffffaa'); gr.addColorStop(.4, '#9fd8ff44'); gr.addColorStop(1, '#9fd8ff00'); g.fillStyle = gr; g.fillRect(0, 0, bs, bs);
+    const bg = g.createRadialGradient(c - BR * .3, c - BR * .3, BR * .1, c, c, BR); bg.addColorStop(0, '#fff'); bg.addColorStop(1, '#cfe6ff'); g.fillStyle = bg; g.beginPath(); g.arc(c, c, BR, 0, 7); g.fill(); }
+
+  const slotColors = PL_MULT.map(plCol);
+  const fmtM = m => String(m);
+  function drawSlots(now) {
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `800 ${Math.round(dx * .32)}px Rubik, Arial, sans-serif`;
+    for (let k = 0; k < PL_MULT.length; k++) {
+      const x = slotX(k) - dx / 2 + dx * .05, w = dx * .9, f = Math.max(0, 1 - (now - flash[k]) / 700), lift = f * H * .012;
+      ctx.globalAlpha = .28 + f * .6; ctx.fillStyle = slotColors[k]; ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, slotTop - lift, w, slotH, dx * .16); else ctx.rect(x, slotTop - lift, w, slotH); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = f > 0 ? '#fff' : slotColors[k]; ctx.fillText(fmtM(PL_MULT[k]), x + w / 2, slotTop - lift + slotH / 2 + 1);
+    }
+  }
+  function finish(b, now) {
+    b.done = true; flash[b.k] = now; payBall(b); bump(); haptic('medium');
+    plHist.push(b.mult); plHist = plHist.slice(-10); store.set('gr2_phist', plHist); paintHist();
+    floats.push({ x: slotX(b.k), y: slotTop - H * .02, t: now, txt: b.win >= b.bet ? `+${fmt(b.win - b.bet)}` : `−${fmt(b.bet - b.win)}`, c: b.win >= b.bet ? '#3ee48f' : '#ff8a96' });
+    if (b.win >= b.bet * 2) notify('success');
+    for (let n = 0; n < 8; n++) sparks.push({ x: slotX(b.k), y: slotTop, vx: rnd(-1, 1) * dx * .04, vy: -rnd(.4, 1.2) * dx * .08, t: now, c: slotColors[b.k] });
+  }
+  function frame(now) {
+    if (!alive) return;
+    const act = balls.length || rings.length || sparks.length || floats.length || flash.some(f => now - f < 700);
+    if (act || dirty) {
+      dirty = false;
+      ctx.clearRect(0, 0, W, H); ctx.drawImage(layer, 0, 0);
+      // отклик шипов
+      for (let i = 0; i < PL_ROWS; i++) for (const p of pegs[i]) { const f = 1 - (now - p.hit) / 420; if (f > 0) {
+        ctx.globalAlpha = f; const sc = 1 + f * .9; ctx.drawImage(peg, p.x - ps * sc / 2, p.y - ps * sc / 2, ps * sc, ps * sc);
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, PR * (1 + f * .35), 0, 7); ctx.fill(); ctx.globalAlpha = 1; } }
+      for (let n = rings.length - 1; n >= 0; n--) { const r = rings[n], f = (now - r.t) / 520; if (f >= 1) { rings.splice(n, 1); continue; }
+        ctx.strokeStyle = `rgba(140,215,255,${1 - f})`; ctx.lineWidth = 2 * dpr; ctx.beginPath(); ctx.arc(r.x, r.y, PR * (1.2 + f * 3.2), 0, 7); ctx.stroke(); }
+      drawSlots(now);
+      for (let n = balls.length - 1; n >= 0; n--) {
+        const b = balls[n], el_ = now - b.t0;
+        // момент касания шипа: сегмент i начинается ударом о шип ряда i
+        let cur = -1; for (let i = 0; i < PL_ROWS; i++) if (el_ >= b.t[i] - 0) cur = i;
+        if (cur > b.seg) { for (let i = b.seg + 1; i <= cur; i++) { let xo = 0; for (let q = 0; q < i; q++) xo += b.d[q] * .5; const j = Math.round(xo + (i + 2) / 2), p = pegs[i][j];
+            if (p) { p.hit = now; rings.push({ x: p.x, y: p.y, t: now }); for (let q = 0; q < 3; q++) sparks.push({ x: p.x, y: p.y - PR, vx: rnd(-1, 1) * dx * .03, vy: -rnd(.3, 1) * dx * .05, t: now, c: '#bfe8ff' }); }
+            if (now - lastHap > 70) { lastHap = now; haptic('light'); } } b.seg = cur; }
+        const [x, y, fin] = ballPos(b, el_);
+        b.trail.push([x, y]); if (b.trail.length > 7) b.trail.shift();
+        b.trail.forEach(([tx, ty], q) => { ctx.globalAlpha = (q / b.trail.length) * .22; ctx.drawImage(bsp, tx - bs / 2, ty - bs / 2, bs, bs); });
+        ctx.globalAlpha = 1;
+        ctx.drawImage(bsp, x - bs / 2, y - bs / 2, bs, bs);
+        if (!b.done && el_ >= b.t[PL_ROWS] + T_OUT) { finish(b, now); }
+        if (b.done) balls.splice(n, 1);
+      }
+      for (let n = sparks.length - 1; n >= 0; n--) { const s = sparks[n], f = (now - s.t) / 600; if (f >= 1) { sparks.splice(n, 1); continue; }
+        s.x += s.vx; s.y += s.vy; s.vy += dx * .004; ctx.globalAlpha = 1 - f; ctx.fillStyle = s.c; ctx.beginPath(); ctx.arc(s.x, s.y, 2 * dpr, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+      ctx.textAlign = 'center'; ctx.font = `900 ${Math.round(dx * .34)}px Rubik, Arial, sans-serif`;
+      for (let n = floats.length - 1; n >= 0; n--) { const f0 = floats[n], f = (now - f0.t) / 1100; if (f >= 1) { floats.splice(n, 1); continue; }
+        ctx.globalAlpha = 1 - f; ctx.fillStyle = f0.c; ctx.fillText(f0.txt, f0.x, f0.y - f * H * .09); ctx.globalAlpha = 1; }
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+  try { document.fonts && document.fonts.load('800 20px Rubik').then(() => { dirty = true; }); } catch (e) {}
+
+  $('#drop').onclick = () => {
+    if (balls.length >= 8) return toast('Слишком много шаров в игре');
+    const v = Math.floor(Number(betIn.value));
+    if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); }
+    if (!spend(v)) return;
+    launch(v); haptic('medium');
+  };
+  cleanup = () => { alive = false; cancelAnimationFrame(raf); balls.forEach(b => { if (!b.paid) { payBall(b); plHist.push(b.mult); } }); plHist = plHist.slice(-10); store.set('gr2_phist', plHist); };
+}
+
 /* ---------- mines ---------- */
 const MINE_OPTS = { 3: [1, 2, 3], 5: [3, 5, 8, 12], 7: [5, 10, 15, 20] };
 const MINE_EDGE = 0.88; // комиссия игры: множители ниже «честных»
@@ -1061,7 +1206,7 @@ function contestsScreen(el) {
 }
 
 /* ---------- tabs ---------- */
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, contests: contestsScreen, profile: profileScreen, soon };
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, contests: contestsScreen, profile: profileScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'contests'].includes(t) ? t : 'soon');
