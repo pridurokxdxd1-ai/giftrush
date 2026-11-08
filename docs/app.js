@@ -43,6 +43,19 @@ const ITEMS = [
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 
+/* ---------- иконка Rushcoin (вместо ⭐) ---------- */
+function iconify(root) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.indexOf('⭐') >= 0 ? 1 : 3 }), list = [];
+  while (w.nextNode()) list.push(w.currentNode);
+  list.forEach(n => {
+    const f = document.createDocumentFragment();
+    n.nodeValue.split('⭐').forEach((p, i) => { if (i) { const s = document.createElement('i'); s.className = 'rc'; f.append(s); } if (p) f.append(document.createTextNode(p)); });
+    n.replaceWith(f);
+  });
+}
+{ let sched = 0;
+  new MutationObserver(() => { if (!sched) { sched = 1; requestAnimationFrame(() => { sched = 0; iconify(document.body); }); } }).observe(document.body, { childList: true, subtree: true, characterData: true }); }
+
 /* ---------- state ---------- */
 let balanceHook = null;
 const state = {
@@ -70,10 +83,10 @@ function spend(n) {
   state.balance -= n; save(); return true;
 }
 let toastT = 0;
-function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('show'), 1900); }
+function toast(t) { const e = $('#toast'); e.textContent = t; iconify(e); e.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('show'), 1900); }
 /* лёгкий режим для слабых телефонов и пауза анимаций в фоне */
 try {
-  const weak = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 4) <= 3;
+  const weak = (navigator.hardwareConcurrency || 8) <= 6 || (navigator.deviceMemory || 8) <= 4;
   if (weak) document.documentElement.classList.add('lite');
   document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
 } catch (e) {}
@@ -102,8 +115,8 @@ const CASES = [
 ].sort((a, b) => a.price - b.price);
 
 function buildOdds(c) {
-  const P = c.price, RTP = 0.65;                                   // средний возврат игроку 65%
-  const H = Math.min(0.17, Math.max(0.08, 0.17 - 0.012 * Math.log2(P / 79))); // шанс «окупиться» (приз >= цены кейса)
+  const P = c.price, RTP = 0.70;                                   // средний возврат игроку 65%
+  const H = Math.min(0.32, Math.max(0.16, 0.32 - 0.016 * Math.log2(P / 79))); // шанс «окупиться» (приз >= цены кейса)
   const items = ITEMS.filter(i => !i.nc && i.p / P >= 0.02 && i.p / P <= 25);
   const win = items.filter(i => i.p >= P), lose = items.filter(i => i.p < P);
   const stat = k => {
@@ -164,7 +177,7 @@ function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
     cases: '<div class="art a-cases"><span class="f f1">🧸</span><span class="f f2">💎</span><span class="f f3">🍀</span><span class="f f4">🏆</span><b class="box">🎁</b><i class="spark s1">✦</i><i class="spark s2">✦</i></div>',
-    crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt">🚀</span><em>x2.45</em></div>',
+    crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
     upgrade: '<div class="art a-up"><span class="u u1">🧸</span><b>»»</b><span class="u u2">🍀</span><b>»»</b><span class="u u3">👑</span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
@@ -216,7 +229,8 @@ function caseScreen(el, c) {
     const arr = Array.from({ length: N }, (_, i) => i === stop ? prize : filler());
     reel.style.transition = 'none'; reel.style.transform = 'translate3d(0,0,0)';
     reel.innerHTML = arr.map(mk).join(''); void reel.offsetWidth;
-    const w = reel.parentElement.offsetWidth, off = stop * 110 + 50 - w / 2 + rnd(-32, 32);
+    const w = reel.parentElement.offsetWidth, tgt = reel.children[stop];   // реальная позиция призового предмета (на узких экранах размер другой)
+    const off = tgt.offsetLeft + tgt.offsetWidth / 2 - w / 2 + rnd(-tgt.offsetWidth * .3, tgt.offsetWidth * .3);
     reel.style.transition = 'transform 5s cubic-bezier(.1,.75,.12,1)';
     reel.style.transform = `translate3d(${-off}px,0,0)`;
     const iv = setInterval(() => haptic('light'), 170);
@@ -246,11 +260,11 @@ function upgradeScreen(el) {
   let wi = up.want ? ITEM(up.want) : null;
   if (wi && wi.p <= S) { wi = null; up.want = null; }
   const slot = i => i ? `${i.e}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
-  el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или звёзды. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
+  el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или Rushcoin. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
     <div class="slot"><h4>Ваш подарок (необязательно)</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
-    <div class="slot"><h4>Добавить звёзды</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
+    <div class="slot"><h4>Добавить Rushcoin</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
     <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
-      <circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="#35d07f" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 276.46" style="filter:drop-shadow(0 0 6px #35d07f);transition:stroke-dasharray .5s var(--ease)"/></svg>
+      <circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="#35d07f" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
       <div class="hand" id="hand"><i class="head"></i></div><div class="num"><b id="rnum">—</b><small id="rx"></small></div></div>
     <div class="slot"><h4>Желаемый подарок</h4><button class="pick" id="want"></button></div>
     <button class="btn" id="go"></button>`);
@@ -263,20 +277,20 @@ function upgradeScreen(el) {
     chance = mi || up.bal ? (wi ? chanceOf(S, wi) : 0) : 0;
     $('#rarc').style.strokeDasharray = `${chance / 100 * 276.46} 276.46`;
     rnum.textContent = chance ? chance.toFixed(1) + '%' : '—'; rx.textContent = chance ? `x${(wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
-    goB.textContent = !S ? 'Добавьте подарок или звёзды' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
+    goB.textContent = !S ? 'Добавьте подарок или Rushcoin' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
   };
   const setBal = v => { up.bal = Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.floor(state.balance)); paint(); };
   ubal.addEventListener('input', () => setBal(ubal.value));
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { setBal(Math.max(20, (up.bal || 20) * b.dataset.q)); ubal.value = up.bal || ''; });
   $('#umax').onclick = () => { setBal(state.balance); ubal.value = up.bal || ''; haptic(); };
   $('#mine').onclick = () => go('pick', 'mine');
-  wantB.onclick = () => S ? go('pick', 'want') : toast('Сначала добавьте подарок или звёзды');
+  wantB.onclick = () => S ? go('pick', 'want') : toast('Сначала добавьте подарок или Rushcoin');
   paint();
   let busy = false;
   goB.onclick = async () => {
     if (busy) return;
-    if (!S) return toast('Добавьте подарок или звёзды');
-    if (up.bal > 0 && up.bal < 20) return toast('Минимум 20 ⭐ звёздами');
+    if (!S) return toast('Добавьте подарок или Rushcoin');
+    if (up.bal > 0 && up.bal < 20) return toast('Минимум 20 ⭐ Rushcoin');
     if (!wi) return go('pick', 'want');
     if (mg && !invGift(mg.id)) return toast('Подарок уже недоступен');
     if (up.bal > state.balance) return toast('Недостаточно ⭐');
@@ -288,12 +302,13 @@ function upgradeScreen(el) {
     const hand = $('#hand'), ring = $('.ring'); hand.classList.add('on');
     const arc = chance / 100 * 360;
     // при проигрыше чаще останавливаемся совсем рядом с зелёной зоной — «чуть-чуть не хватило»
-    const th = ok ? rnd(Math.min(4, arc / 3), arc - Math.min(4, arc / 3)) : (Math.random() < .55 ? Math.min(358, arc + rnd(1.5, 9)) : rnd(Math.min(354, arc + 6), 354));
+    const mg6 = Math.min(6, arc / 3);                       // отступ от краёв, чтобы кончик стрелки не «касался» границы
+    const th = ok ? rnd(mg6, arc - mg6) : rnd(arc + 6, 354);
     hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)'; void hand.offsetWidth;
-    hand.style.transition = 'transform 5.4s cubic-bezier(.06,.62,.08,1)'; hand.style.transform = `rotate(${360 * 6 + th}deg)`;
+    hand.style.willChange = 'transform'; hand.style.transition = 'transform 4.6s cubic-bezier(.25,.55,.35,1)'; hand.style.transform = `rotate(${360 * 5 + th}deg)`;
     ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {}
-    await sleep(5600);
-    ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
+    await sleep(4800);
+    hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
     toast(ok ? `🎉 Успех! ${wi.e} ${wi.n}` : '💥 Неудача, ставка сгорела');
     up.mine = null; up.want = null; up.bal = 0;
@@ -301,7 +316,7 @@ function upgradeScreen(el) {
   };
 }
 function burst(host) {
-  for (let i = 0; i < 22; i++) {
+  for (let i = 0; i < 14; i++) {
     const s = document.createElement('span'); s.className = 'spark';
     const ang = Math.random() * 6.283, d = 80 + Math.random() * 70;
     s.style.setProperty('--x', Math.cos(ang) * d + 'px'); s.style.setProperty('--y', Math.sin(ang) * d + 'px');
@@ -323,6 +338,19 @@ function pickScreen(el, kind) {
     b.onclick = () => { if (kind === 'mine') { up.mine = o.id; up.want = null; } else up.want = o.id; go('upgrade'); };
     g.append(b);
   });
+}
+
+/* ---------- ракета (спрайт из видео) ---------- */
+const RK = { img: null, ok: false, FR: 256, COLS: 8, N: 48, FPS: 16 };
+function loadRocket() {
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=9';
+}
+function drawRocket(ctx, x, y, size, t, alpha, rot) {
+  if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
+  const f = Math.floor(t / 1000 * RK.FPS) % RK.N, sx = (f % RK.COLS) * RK.FR, sy = Math.floor(f / RK.COLS) * RK.FR;
+  ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.globalAlpha = alpha;
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(RK.img, sx, sy, RK.FR, RK.FR, -size / 2, -size / 2, size, size); ctx.restore();
 }
 
 /* ---------- crash (онлайн, общий сервер) ---------- */
@@ -410,9 +438,10 @@ function crashScreen(el) {
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
   el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
 
-  const G = { phase: 'wait', until: 0, t0: 0, crashAt: 1, offset: 0, me: null };
+  loadRocket();
+  const G = { phase: 'wait', until: 0, t0: 0, crashAt: 1, offset: 0, me: null, crashTs: 0 };
   const bets = new Map();
-  let myBet = 0, myCashed = false, myPayout = 0, pending = 0, cashSent = false, net = null, alive = true, raf = 0, tail = [], lastBtn = '';
+  let rkx = 0, rky = 0, myBet = 0, myCashed = false, myPayout = 0, pending = 0, cashSent = false, net = null, alive = true, raf = 0, tail = [], lastBtn = '';
   const srv = () => Date.now() + G.offset;
   const fl = v => (Math.floor(v * 100) / 100).toFixed(2);
 
@@ -448,11 +477,11 @@ function crashScreen(el) {
         setNet(!net || !net.local, m.online); renderBets(); break;
       }
       case 'round':
-        G.phase = 'wait'; G.until = m.until; bets.clear(); myBet = 0; myCashed = false; myPayout = 0; cashSent = false; tail = [];
+        G.phase = 'wait'; G.crashTs = 0; G.until = m.until; bets.clear(); myBet = 0; myCashed = false; myPayout = 0; cashSent = false; tail = [];
         multEl.classList.remove('lose'); renderBets(); break;
       case 'fly': G.phase = 'fly'; G.t0 = m.t0; break;
       case 'crash':
-        G.phase = 'crash'; G.crashAt = m.at; bets.forEach(b => { if (b.mult == null) b.lost = true; });
+        G.phase = 'crash'; G.crashTs = Date.now(); G.crashAt = m.at; bets.forEach(b => { if (b.mult == null) b.lost = true; });
         addHist(m.at); multEl.textContent = fl(m.at) + 'x'; multEl.classList.add('lose');
         if (myBet && !myCashed) notify('error'); renderBets(); break;
       case 'bet':
@@ -526,28 +555,41 @@ function crashScreen(el) {
   })();
 
   /* отрисовка */
-  const stars = Array.from({ length: 34 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
+  const stars = Array.from({ length: 26 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
+  const RS = Math.min(W * .46, 128 * dpr);               // размер ракеты
+  const X0 = W * .17, Y0 = H * .76, X1 = W * .5, Y1 = H * .5; // старт слева-снизу → центр (дальше она не уходит)
+  let burst = null;
   const frame = () => {
     if (!alive) return;
+    const now = Date.now();
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#fff';
-    stars.forEach(s => { s.y += s.v * (G.phase === 'fly' ? 5 : 1); if (s.y > H) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = .55; ctx.fillRect(s.x, s.y, s.s, s.s); });
+    const boost = G.phase === 'fly' ? 5 : 1;
+    stars.forEach(s => { s.y += s.v * boost; if (s.y > H) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = .55; ctx.fillRect(s.x, s.y, s.s, s.s); });
     ctx.globalAlpha = 1;
-    if (G.phase === 'wait') multEl.textContent = Math.max(0, (G.until - srv()) / 1000).toFixed(1) + 'с';
+    if (G.phase === 'wait') { multEl.textContent = Math.max(0, (G.until - srv()) / 1000).toFixed(1) + 'с'; rkx = X0; rky = Y0 + Math.sin(now / 420) * 4 * dpr; }
     if (G.phase === 'fly') {
       const m = crashMult(srv() - G.t0); multEl.textContent = fl(m) + 'x';
-      const p = Math.min(1, (m - 1) / 4), x = W * .12 + p * W * .7, y = H * .86 - Math.pow(p, .8) * H * .6 + Math.sin(Date.now() / 90) * 2;
-      tail.push([x, y]); if (tail.length > 60) tail.shift();
+      const p = Math.min(1, (m - 1) / 2.4), e = 1 - Math.pow(1 - p, 2.2);
+      rkx = X0 + (X1 - X0) * e; rky = Y0 + (Y1 - Y0) * e + (p >= 1 ? Math.sin(now / 260) * 5 * dpr : Math.sin(now / 90) * 1.5 * dpr);
+      if (p >= 1) tail.forEach(t => { t[0] -= 3.2 * dpr; t[1] += 2.2 * dpr; });   // у центра ракета «стоит», а мир уезжает назад
+      tail.push([rkx, rky + RS * .12]); if (tail.length > 46) tail.shift();
     }
-    if (tail.length && (G.phase === 'fly' || G.phase === 'crash')) {
-      const g = ctx.createLinearGradient(0, H, W, 0); g.addColorStop(0, '#5b7cff00'); g.addColorStop(1, G.phase === 'crash' ? '#ff6b7a' : '#7b96ff');
-      ctx.strokeStyle = g; ctx.lineWidth = 4 * dpr; ctx.lineCap = 'round'; ctx.shadowColor = G.phase === 'crash' ? '#ff4d5e' : '#5b7cff'; ctx.shadowBlur = 14;
-      ctx.beginPath(); tail.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.stroke(); ctx.shadowBlur = 0;
-      const [x, y] = tail[tail.length - 1];
-      ctx.font = `${34 * dpr}px serif`; ctx.save(); ctx.translate(x, y);
-      if (G.phase === 'crash') ctx.fillText('💥', -17 * dpr, 12 * dpr); else { ctx.rotate(-.6); ctx.fillText('🚀', -17 * dpr, 12 * dpr); }
-      ctx.restore();
+    const crashing = G.phase === 'crash';
+    if (tail.length > 1 && (G.phase === 'fly' || crashing)) {
+      const g = ctx.createLinearGradient(tail[0][0], tail[0][1], rkx, rky); g.addColorStop(0, '#5b7cff00'); g.addColorStop(1, crashing ? '#ff6b7a' : '#7b96ff');
+      ctx.strokeStyle = g; ctx.lineWidth = 4 * dpr; ctx.lineCap = 'round';
+      ctx.beginPath(); tail.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.stroke();
     }
+    if (crashing && G.crashTs) {
+      const ct = now - G.crashTs, k = Math.min(1, ct / 900);
+      if (!burst) burst = Array.from({ length: 14 }, () => ({ a: Math.random() * 6.283, v: rnd(2, 6) * dpr }));
+      if (k < 1) {
+        drawRocket(ctx, rkx + ct * .05 * dpr, rky + ct * ct * .0004 * dpr, RS, now, 1 - k, ct * .004);
+        ctx.fillStyle = `rgba(255,120,60,${(1 - k) * .55})`; ctx.beginPath(); ctx.arc(rkx, rky, RS * (.25 + k * .5), 0, 7); ctx.fill();
+        burst.forEach(b => { ctx.fillStyle = `rgba(255,200,80,${1 - k})`; ctx.beginPath(); ctx.arc(rkx + Math.cos(b.a) * b.v * ct * .06, rky + Math.sin(b.a) * b.v * ct * .06, 3 * dpr, 0, 7); ctx.fill(); });
+      }
+    } else { burst = null; if (G.phase === 'wait' || G.phase === 'fly') drawRocket(ctx, rkx, rky, RS, now, 1, 0); }
     renderBtn();
     raf = requestAnimationFrame(frame);
   };
@@ -850,18 +892,24 @@ function tourScreen(el) {
 /* ---------- tasks ---------- */
 const TASK_GOAL = 25000;
 const TASK_LINK = 'https://t.me/xdsold';
-const SUBS = [{ id: 't4', ch: 'omutxwin', link: 'https://t.me/omutxwin' }, { id: 't5', ch: 'w1npros', link: 'https://t.me/w1npros' }];
+const SUBS = [
+  { id: 't6', title: 'Подписаться на Gift Rush News', link: 'https://t.me/Gifts_Rush_News', rew: 25000 },
+  { id: 't7', title: 'Забустить Gift Rush News', link: 'https://t.me/boost/Gifts_Rush_News', rew: 20000 },
+  { id: 't4', title: 'Подпишись на омутх', link: 'https://t.me/omutxwin', rew: 10000 },
+  { id: 't5', title: 'Подпишись на w1npros', link: 'https://t.me/w1npros', rew: 10000 },
+];
+const subTask = s => `<div class="task wide" id="${s.id}"><div class="ti"><h3>${s.title}</h3><span class="rew">+⭐ ${fmt(s.rew)}</span></div><div class="ta two"><button class="pbtn ghost" id="${s.id}a">Выполнить</button><button class="pbtn" id="${s.id}b"></button></div></div>`;
 let tasks = store.get('gr2_tasks', {}); if (!tasks || typeof tasks !== 'object') tasks = {};
 const saveTasks = () => store.set('gr2_tasks', tasks);
 function grant(n) { state.balance += n; save(); bump(); notify('success'); toast(`+${fmt(n)} ⭐ на баланс`); }
 function openTG(url) { try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {} window.open(url, '_blank'); }
 
 function tasksScreen(el) {
-  el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай звёзды</p></div>
+  el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай Rushcoin</p></div>
+    ${subTask(SUBS[0])}${subTask(SUBS[1])}
     <div class="task" id="t1"><div class="ti"><h3>Стать крутым типом</h3><span class="rew">+⭐ 5 000</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
     <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
-    <div class="task wide" id="t4"><div class="ti"><h3>Подпишись на омутх</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t4a">Выполнить</button><button class="pbtn" id="t4b"></button></div></div>
-    <div class="task wide" id="t5"><div class="ti"><h3>Подпишись на w1npros</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t5a">Выполнить</button><button class="pbtn" id="t5b"></button></div></div>
+    ${subTask(SUBS[2])}${subTask(SUBS[3])}
     <div class="task" id="t3"><div class="ti"><h3>Апнуть 25 000 ⭐</h3><span class="rew">+⭐ 50 000</span>
       <div class="prog"><i id="t3p"></i></div><div class="pt" id="t3t"></div></div><div class="ta"><button class="pbtn" id="t3b">Забрать</button></div></div>`);
   const b1 = $('#t1b'), b2a = $('#t2a'), b2b = $('#t2b'), b3 = $('#t3b');
@@ -887,19 +935,11 @@ function tasksScreen(el) {
   };
   b3.onclick = () => { if (tasks.t3 || state.balance < TASK_GOAL) return; tasks.t3 = 'claimed'; saveTasks(); grant(50000); paint(); };
   SUBS.forEach(s => {
-    $('#' + s.id + 'a').onclick = () => openTG(s.link);
-    let busy = false;
-    $('#' + s.id + 'b').onclick = async () => {
-      if (tasks[s.id] === 'claimed' || busy) return;
-      if (!(tg && tg.initData)) return toast('Откройте игру через Telegram');
-      busy = true; const bb = $('#' + s.id + 'b'); bb.textContent = 'Проверка…';
-      try {
-        const d = await api('/api/check', { ch: s.ch });
-        if (d && d.ok && d.sub) { tasks[s.id] = 'claimed'; saveTasks(); if (d.done) toast('Награда за это задание уже была получена'); else grant(10000); }
-        else if (d && d.ok) { notify('error'); toast('Подписка не найдена. Подпишитесь и нажмите «Проверить»'); }
-        else toast(d && d.err === 'noadmin' ? 'Проверка пока недоступна (бот не админ канала)' : 'Не удалось проверить, попробуйте позже');
-      } catch (e) { toast('Нет связи с сервером'); }
-      busy = false; if (el.isConnected) paint();
+    $('#' + s.id + 'a').onclick = () => { openTG(s.link); if (!tasks[s.id]) { tasks[s.id] = 'done'; saveTasks(); toast('Задание выполнено — нажмите «Проверить»'); } };
+    $('#' + s.id + 'b').onclick = () => {
+      if (tasks[s.id] === 'claimed') return;
+      if (!tasks[s.id]) return toast('Сначала нажмите «Выполнить»');
+      tasks[s.id] = 'claimed'; saveTasks(); grant(s.rew); paint();
     };
   });
   balanceHook = paint; cleanup = () => { balanceHook = null; };
@@ -911,10 +951,14 @@ const API = 'https://giftrush-bot.thekerv666.workers.dev';
 const ADMIN_ID = 5093384439;
 const TGU = tg && tg.initDataUnsafe && tg.initDataUnsafe.user || null;
 async function api(path, body) {
-  const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  // text/plain — «простой» запрос без предварительного CORS-запроса (работает надёжнее в Telegram)
+  const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(Object.assign({ initData: (tg && tg.initData) || '' }, body || {})) });
-  return r.json();
+  let d; try { d = await r.json(); } catch (e) { throw new Error('http ' + r.status); }
+  return d;
 }
+const apiErr = (d, e) => e ? 'Сервер недоступен. Вставь новый worker.js в Cloudflare и нажми Deploy' :
+  d && d.err === 'nokv' ? 'К воркеру не привязан KV (имя DB)' : d && d.err === 'auth' ? 'Открой игру через бота в Telegram' : d && d.err === 'forbidden' ? 'Нет прав' : 'Ошибка, попробуйте ещё раз';
 let syncing = false;
 async function syncAccount() {
   if (syncing || !TGU || !(tg && tg.initData)) return;
@@ -926,21 +970,22 @@ async function syncAccount() {
 }
 function autoIncome() {
   const now = Date.now(), parts = []; let add = 0;
-  const l6 = Number(store.get('gr2_b6', 0)) || 0;           // бонус 500 ⭐ раз в 6 часов
+  const l6 = Number(store.get('gr2_b6', 0)) || 0;           // бонус 500 раз в 6 часов
   if (now - l6 >= 6 * 3600e3) { store.set('gr2_b6', now); add += 500; parts.push('+500 ⭐ бонус (раз в 6 часов)'); }
-  if (TGU && TGU.id === ADMIN_ID) {                          // владелец: 1 000 000 ⭐ каждый час
-    const lh = Number(store.get('gr2_h1m', 0)) || 0, n = lh ? Math.floor((now - lh) / 3600e3) : 1;
-    if (n > 0) { store.set('gr2_h1m', lh ? lh + n * 3600e3 : now); add += n * 1e6; parts.push(`+${fmt(n * 1e6)} ⭐ (почасовой доход)`); }
+  if (!store.get('gr2_v9_1m', 0)) { store.set('gr2_v9_1m', 1); add += 1e6; parts.push('+1 000 000 ⭐ подарок всем игрокам'); }
+  if (TGU && TGU.id === ADMIN_ID) {                          // владелец: 50 000 000 каждые 5 минут
+    const lh = Number(store.get('gr2_5m', 0)) || 0, n = lh ? Math.min(288, Math.floor((now - lh) / 300e3)) : 1;
+    if (n > 0) { store.set('gr2_5m', lh ? Math.min(lh + n * 300e3, now) : now); add += n * 50e6; parts.push(`+${fmt(n * 50e6)} ⭐ (каждые 5 минут)`); }
     if (!store.get('gr2_v8_100m', 0)) { store.set('gr2_v8_100m', 1); add += 1e8; parts.push('+100 000 000 ⭐'); }
   }
-  if (add > 0) { state.balance += add; save(); bump(); notify('success'); toast(parts.join(' · ')); }
+  if (add > 0) { state.balance += add; save(); bump(); notify('success'); toast(parts.length > 1 ? `🎁 Начислено +${fmt(add)} ⭐` : parts[0]); }
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } });
 setInterval(() => { if (!document.hidden) autoIncome(); }, 60000);
 
 /* ---------- profile ---------- */
 function adminBox(el) {
-  el.insertAdjacentHTML('beforeend', `<div class="adm"><h4>Перевод звёзд игроку</h4><div class="row">
+  el.insertAdjacentHTML('beforeend', `<div class="adm"><h4>Перевод Rushcoin игроку</h4><div class="row">
     <input id="xfq" placeholder="ID или @username из профиля" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ok" id="xfok">ОК</button></div></div>`);
   const ok = $('#xfok');
   const run = async () => {
@@ -948,10 +993,10 @@ function adminBox(el) {
     ok.disabled = true;
     try {
       const d = await api('/api/lookup', { q });
-      if (!d || !d.ok) return toast(d && d.err === 'nf' ? 'Игрок не найден — пусть откроет бота' : 'Ошибка, попробуйте ещё раз');
+      if (!d || !d.ok) return toast(d && d.err === 'nf' ? 'Игрок не найден — пусть откроет игру хотя бы раз' : apiErr(d));
       const amounts = [100, 500, 1000, 5000, 10000, 50000];
       let sel = 1000;
-      const m = modal(`<div class="g-n">Перевод звёзд</div><div class="g-p">${esc(d.name)} · ID ${esc(d.id)}</div>
+      const m = modal(`<div class="g-n">Перевод Rushcoin</div><div class="g-p">${esc(d.name)} · ID ${esc(d.id)}</div>
         <div class="xf-amt">${amounts.map(x => `<button data-a="${x}" class="${x === sel ? 'on' : ''}">⭐ ${fmt(x)}</button>`).join('')}</div>
         <input class="xf-in" id="xfa" type="number" inputmode="numeric" min="1" value="${sel}">
         <div class="g-act"><button class="btn green" id="xfgo">Перевести</button></div>`);
@@ -965,10 +1010,10 @@ function adminBox(el) {
         try {
           const r = await api('/api/give', { to: d.id, amount: amt });
           if (r && r.ok) { m.close(); toast(`✅ ${fmt(amt)} ⭐ отправлено: ${d.name}`); notify('success'); $('#xfq').value = ''; }
-          else { toast('Не удалось перевести'); g.disabled = false; }
-        } catch (e) { toast('Нет связи с сервером'); g.disabled = false; }
+          else { toast(apiErr(r)); g.disabled = false; }
+        } catch (e) { toast(apiErr(null, e)); g.disabled = false; }
       };
-    } catch (e) { toast('Нет связи с сервером'); } finally { ok.disabled = false; }
+    } catch (e) { toast(apiErr(null, e)); } finally { ok.disabled = false; }
   };
   ok.onclick = run; $('#xfq').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
 }
