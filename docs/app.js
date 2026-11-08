@@ -137,6 +137,7 @@ function closeModals() { document.querySelectorAll('.ovl').forEach(o => o.remove
 function go(name, arg) {
   if (cleanup) { try { cleanup(); } catch (e) {} cleanup = null; }
   closeModals(); setBack(null);
+  document.body.classList.toggle('home', name === 'games');
   view.innerHTML = '';
   const d = document.createElement('div'); d.className = 'screen'; view.append(d);
   (SCREENS[name] || soon)(d, arg);
@@ -233,46 +234,69 @@ function caseScreen(el, c) {
 }
 
 /* ---------- upgrade ---------- */
-const up = { mine: null, want: null };
-const chanceOf = (m, w) => Math.min(75, Math.max(1, (m.p / w.p) * 92));
+const up = { mine: null, want: null, bal: 0 };
+const UP_MAX = 80;
+const stakeOf = () => { const g = up.mine && invGift(up.mine), gi = g ? ITEM(g.n) : null; return { g, gi, S: (gi ? gi.p : 0) + (up.bal || 0) }; };
+const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(1, (S / w.p) * 92));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
-  const mg = up.mine && invGift(up.mine); if (!mg) up.mine = null;
-  const mi = mg ? ITEM(mg.n) : null;
+  if (up.mine && !invGift(up.mine)) up.mine = null;
+  up.bal = Math.min(Math.max(0, Math.floor(up.bal || 0)), Math.floor(state.balance));
+  let { g: mg, gi: mi, S } = stakeOf();
   let wi = up.want ? ITEM(up.want) : null;
-  if (wi && mi && wi.p <= mi.p) { wi = null; up.want = null; }
-  const chance = mi && wi ? chanceOf(mi, wi) : 0;
+  if (wi && wi.p <= S) { wi = null; up.want = null; }
   const slot = i => i ? `${i.e}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
-  el.insertAdjacentHTML('beforeend', `<p class="sub">Преобразуйте свои подарки в более ценные!</p>
-    <div class="slot"><h4>Ваш подарок</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
+  el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или звёзды. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
+    <div class="slot"><h4>Ваш подарок (необязательно)</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
+    <div class="slot"><h4>Добавить звёзды</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
     <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
-      <circle cx="50" cy="50" r="44" fill="none" stroke="#35d07f" stroke-width="9" stroke-linecap="round" stroke-dasharray="${chance / 100 * 276.46} 276.46" style="filter:drop-shadow(0 0 6px #35d07f);transition:stroke-dasharray .6s var(--ease)"/></svg>
-      <div class="hand" id="hand"><i class="trail"></i><i class="shaft"></i><i class="head"></i></div><div class="hub"></div><div class="num">${chance ? chance.toFixed(1) + '%' : '—'}</div></div>
-    <div class="slot"><h4>Желаемый подарок</h4><button class="pick ${wi ? 'has' : ''}" id="want">${slot(wi)}</button></div>
-    <button class="btn" id="go">${mi && wi ? 'Апгрейд' : 'Выбрать свой подарок'}</button>`);
+      <circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="#35d07f" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 276.46" style="filter:drop-shadow(0 0 6px #35d07f);transition:stroke-dasharray .5s var(--ease)"/></svg>
+      <div class="hand" id="hand"><i class="head"></i></div><div class="num"><b id="rnum">—</b><small id="rx"></small></div></div>
+    <div class="slot"><h4>Желаемый подарок</h4><button class="pick" id="want"></button></div>
+    <button class="btn" id="go"></button>`);
+  const ubal = $('#ubal'), rnum = $('#rnum'), rx = $('#rx'), goB = $('#go'), wantB = $('#want');
+  let chance = 0;
+  const paint = () => {
+    ({ g: mg, gi: mi, S } = stakeOf());
+    if (wi && wi.p <= S) { wi = null; up.want = null; }
+    wantB.className = 'pick ' + (wi ? 'has' : ''); wantB.innerHTML = slot(wi);
+    chance = mi || up.bal ? (wi ? chanceOf(S, wi) : 0) : 0;
+    $('#rarc').style.strokeDasharray = `${chance / 100 * 276.46} 276.46`;
+    rnum.textContent = chance ? chance.toFixed(1) + '%' : '—'; rx.textContent = chance ? `x${(wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
+    goB.textContent = !S ? 'Добавьте подарок или звёзды' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
+  };
+  const setBal = v => { up.bal = Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.floor(state.balance)); paint(); };
+  ubal.addEventListener('input', () => setBal(ubal.value));
+  el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { setBal(Math.max(20, (up.bal || 20) * b.dataset.q)); ubal.value = up.bal || ''; });
+  $('#umax').onclick = () => { setBal(state.balance); ubal.value = up.bal || ''; haptic(); };
   $('#mine').onclick = () => go('pick', 'mine');
-  $('#want').onclick = () => mi ? go('pick', 'want') : toast('Сначала выберите свой подарок');
+  wantB.onclick = () => S ? go('pick', 'want') : toast('Сначала добавьте подарок или звёзды');
+  paint();
   let busy = false;
-  $('#go').onclick = async () => {
+  goB.onclick = async () => {
     if (busy) return;
-    if (!mi) return go('pick', 'mine');
+    if (!S) return toast('Добавьте подарок или звёзды');
+    if (up.bal > 0 && up.bal < 20) return toast('Минимум 20 ⭐ звёздами');
     if (!wi) return go('pick', 'want');
-    if (!invGift(mg.id)) return toast('Подарок уже недоступен');
-    busy = true; $('#go').disabled = true;
+    if (mg && !invGift(mg.id)) return toast('Подарок уже недоступен');
+    if (up.bal > state.balance) return toast('Недостаточно ⭐');
+    if (up.bal > 0 && !spend(up.bal)) return;
+    busy = true; goB.disabled = true; ubal.disabled = true;
     const ok = Math.random() * 100 < chance;
-    state.inv = state.inv.filter(g => g.id !== mg.id); if (ok) addGift(wi.n); save(); // результат сохраняем сразу
+    if (mg) state.inv = state.inv.filter(x => x.id !== mg.id);
+    if (ok) addGift(wi.n); save(); // результат сохраняем сразу
     const hand = $('#hand'), ring = $('.ring'); hand.classList.add('on');
     const arc = chance / 100 * 360;
     // при проигрыше чаще останавливаемся совсем рядом с зелёной зоной — «чуть-чуть не хватило»
-    const th = ok ? rnd(Math.min(4, arc / 3), arc - Math.min(4, arc / 3)) : (Math.random() < .55 ? arc + rnd(1.5, 9) : rnd(arc + 6, 354));
+    const th = ok ? rnd(Math.min(4, arc / 3), arc - Math.min(4, arc / 3)) : (Math.random() < .55 ? Math.min(358, arc + rnd(1.5, 9)) : rnd(Math.min(354, arc + 6), 354));
     hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)'; void hand.offsetWidth;
     hand.style.transition = 'transform 5.4s cubic-bezier(.06,.62,.08,1)'; hand.style.transform = `rotate(${360 * 6 + th}deg)`;
     ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {}
     await sleep(5600);
     ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
-    toast(ok ? `🎉 Успех! ${wi.e} ${wi.n}` : '💥 Неудача, подарок сгорел');
-    up.mine = null; up.want = null;
+    toast(ok ? `🎉 Успех! ${wi.e} ${wi.n}` : '💥 Неудача, ставка сгорела');
+    up.mine = null; up.want = null; up.bal = 0;
     if (el.isConnected) { await sleep(1500); if (el.isConnected) go('upgrade'); }
   };
 }
@@ -286,12 +310,13 @@ function burst(host) {
 }
 function pickScreen(el, kind) {
   bar(el, kind === 'mine' ? 'Ваш подарок' : 'Желаемый подарок', 'upgrade');
-  const mi = up.mine && invGift(up.mine) ? ITEM(invGift(up.mine).n) : null;
+  const { S } = stakeOf();
+  if (kind === 'mine' && up.mine) { const r = document.createElement('button'); r.className = 'btn'; r.style.marginBottom = '12px'; r.textContent = 'Убрать подарок'; r.onclick = () => { up.mine = null; up.want = null; go('upgrade'); }; el.append(r); }
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   let list;
   if (kind === 'mine') list = state.inv.map(x => ({ id: x.id, it: ITEM(x.n) })).sort((a, b) => b.it.p - a.it.p);
-  else list = ITEMS.filter(i => !mi || i.p > mi.p).map(i => ({ id: i.n, it: i }));
-  if (!list.length) { g.innerHTML = '<div class="empty"><b>📭</b>Пока пусто. Откройте кейс.</div>'; return; }
+  else list = ITEMS.filter(i => i.p > S).map(i => ({ id: i.n, it: i }));
+  if (!list.length) { g.innerHTML = kind === 'mine' ? '<div class="empty"><b>📭</b>Пока пусто. Откройте кейс.</div>' : '<div class="empty"><b>📭</b>Нет подарков дороже вашей ставки.</div>'; return; }
   list.forEach((o, i) => {
     const b = document.createElement('button'); b.className = 'case'; b.style.animationDelay = Math.min(i, 8) * 35 + 'ms';
     b.innerHTML = `<span class="em" style="font-size:52px;animation:none">${o.it.e}</span><div class="nm"><span>${o.it.n}</span><span class="pr">⭐ ${fmt(o.it.p)}</span></div>`;
@@ -312,7 +337,7 @@ const apiBase = () => { try { return new URLSearchParams(location.search).get('a
 /* офлайн-сервер: тот же протокол, но раунды крутятся прямо в телефоне */
 function localServer(onMsg) {
   let phase = 'wait', round = 0, until = 0, t0 = 0, crashAt = 2, crashMs = 0, bet = null, closed = false;
-  const timers = [], hist = [1.24, 3.8, 1.05, 2.1, 1.77];
+  const timers = [], hist = Array.from({ length: 9 }, () => Math.min(80, Math.max(1, +(0.95 / (1 - Math.random() * 0.99)).toFixed(2))));
   const T = (fn, ms) => timers.push(setTimeout(fn, ms));
   const emit = m => { if (!closed) onMsg(m); };
   const me = { uid: 'me', name: TGU ? (TGU.username ? '@' + TGU.username : TGU.first_name || 'Игрок') : 'Игрок', photo: (TGU && TGU.photo_url) || '' };
@@ -331,7 +356,7 @@ function localServer(onMsg) {
     local: true,
     send(m) {
       if (m.t === 'bet') {
-        if (phase !== 'wait' || bet || !(m.amount >= 1)) return emit({ t: 'err', code: 'bet', msg: 'Ставка не принята' });
+        if (phase !== 'wait' || bet || !(m.amount >= 20)) return emit({ t: 'err', code: 'bet', msg: 'Ставка не принята' });
         bet = { amount: m.amount, mult: null }; emit({ t: 'bet', uid: me.uid, name: me.name, photo: me.photo, amount: m.amount });
       } else if (m.t === 'cancel') {
         if (phase === 'wait' && bet) { const a = bet.amount; bet = null; emit({ t: 'refund', amount: a }); emit({ t: 'unbet', uid: me.uid }); }
@@ -373,7 +398,7 @@ function crashScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div id="rooms"></div><div class="net" id="net"><i></i><span id="netTxt">Подключение…</span></div>
     <div class="hist" id="hist"></div>
     <div class="crash-box"><canvas id="cv"></canvas><div class="mult" id="mult">Старт…</div></div>
-    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="1"><button data-m="0.5">½</button><button data-m="2">×2</button></div>
+    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-m="0.5">½</button><button data-m="2">×2</button><button data-max>MAX</button></div>
     <button class="btn" id="go" disabled>Подключение…</button>
     <div class="bhd"><h4 class="sec" style="margin:0">Ставки</h4><span id="bcount"></span></div>
     <div class="bets" id="bets"></div>`);
@@ -382,7 +407,8 @@ function crashScreen(el) {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.max(10, cv.offsetWidth) * dpr; cv.height = Math.max(10, cv.offsetHeight) * dpr;
   const W = cv.width, H = cv.height;
-  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) betIn.value = Math.max(1, Math.floor((Number(betIn.value) || 1) * b.dataset.m)); });
+  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
 
   const G = { phase: 'wait', until: 0, t0: 0, crashAt: 1, offset: 0, me: null };
   const bets = new Map();
@@ -472,7 +498,7 @@ function crashScreen(el) {
     if (G.phase === 'wait') {
       if (!myBet && !pending) {
         const v = Math.floor(Number(betIn.value));
-        if (!(v >= 1)) return toast('Введите ставку');
+        if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); }
         if (!spend(v)) return;
         pending = v; net.send({ t: 'bet', amount: v }); haptic('medium');
       } else if (myBet && !pending) net.send({ t: 'cancel' });
@@ -539,8 +565,12 @@ function roomChips(host, cur, onPick) {
 
 /* ---------- roulette (онлайн) ---------- */
 const R_N = 37, R_SEG = 360 / 37, R_MIN = 20, R_WAIT = 12000, R_SPIN = 7000, R_SHOW = 4500, R_P_GREEN = 0.015;
-const R_MULT = { red: 2, black: 2, green: 12 };
-const R_NAME = { red: 'Красное', black: 'Чёрное', green: 'Зелёное' };
+const R_MULT = { red: 2, black: 2, green: 12, odd: 2, even: 2 };
+const R_NAME = { red: 'Красное', black: 'Чёрное', green: 'Зелёное', odd: 'Нечётное', even: 'Чётное' };
+const rWin = (k, n) => k === 'green' ? n === 0 : k === 'red' ? n > 0 && n % 2 === 1 : k === 'black' ? n > 0 && n % 2 === 0 : k === 'odd' ? n > 0 && n % 2 === 1 : k === 'even' ? n > 0 && n % 2 === 0 : false;
+const rGroup = k => (k === 'odd' || k === 'even') ? 'p' : 'c';
+let rHist = store.get('gr2_rhist', []); if (!Array.isArray(rHist)) rHist = []; rHist = rHist.filter(n => Number.isInteger(n) && n >= 0 && n <= 36).slice(-12);
+const rHistPush = n => { rHist.push(n); rHist = rHist.slice(-12); store.set('gr2_rhist', rHist); };
 const R_COL = { red: '#e0203f', black: '#12162b', green: '#12a150' };
 const rColor = n => n === 0 ? 'green' : n % 2 ? 'red' : 'black';
 /* угол колеса (по часовой от стрелки), при котором число n окажется под стрелкой; 0 лежит напротив стрелки */
@@ -558,15 +588,16 @@ function localRoulette(onMsg, name, photo) {
       const [n, c] = roll(), off = +(Math.random() * 0.76 - 0.38).toFixed(3), t0 = Date.now(); phase = 'spin';
       emit({ t: 'spin', n, c, t0, dur: R_SPIN, off, now: t0 });
       T(() => {
-        phase = 'result'; const pay = bets[c] ? bets[c] * R_MULT[c] : 0;
-        emit({ t: 'result', n, c, wins: pay ? [{ uid: 'me', color: c, payout: pay }] : [] });
-        if (pay) emit({ t: 'win', color: c, payout: pay, mult: R_MULT[c] });
+        phase = 'result'; rHistPush(n);
+        const wins = []; Object.keys(bets).forEach(k => { if (rWin(k, n)) wins.push({ uid: 'me', color: k, payout: bets[k] * R_MULT[k] }); });
+        emit({ t: 'result', n, c, wins });
+        wins.forEach(w => emit({ t: 'win', color: w.color, payout: w.payout, mult: R_MULT[w.color] }));
         T(() => loop(false), R_SHOW);
       }, R_SPIN);
     }, R_WAIT);
   };
   loop(true);
-  T(() => emit({ t: 'welcome', now: Date.now(), you: 'me', online: 1, room: 'local', phase, round, until, t0: 0, dur: R_SPIN, result: null, off: 0, history: [], bets: [], owed: 0 }), 0);
+  T(() => emit({ t: 'welcome', now: Date.now(), you: 'me', online: 1, room: 'local', phase, round, until, t0: 0, dur: R_SPIN, result: null, off: 0, history: rHist.map(n => ({ n })), bets: [], owed: 0 }), 0);
   return {
     local: true,
     send(m) {
@@ -589,12 +620,15 @@ function rouletteScreen(el) {
     <div class="rhist" id="rhist"></div>
     <div class="rwheel" id="rwheel"><div class="rptr"></div><canvas id="rcv"></canvas><div class="rcenter" id="rcen">…</div></div>
     <div class="betrow"><input id="ramt" type="number" inputmode="numeric" value="20" min="20"><button data-q="0.5">½</button><button data-q="2">×2</button></div>
-    <div class="qamt"><button data-v="20">20</button><button data-v="100">100</button><button data-v="500">500</button><button data-v="1000">1K</button></div>
+    <div class="qamt"><button data-v="20">20</button><button data-v="100">100</button><button data-v="500">500</button><button data-v="max">MAX</button></div>
     <div class="rbtns" id="rbtns">
       <button class="rb red" data-c="red"><b>КРАСНОЕ</b><span>x2</span><small></small></button>
       <button class="rb green" data-c="green"><b>ЗЕРО</b><span>x12</span><small></small></button>
       <button class="rb black" data-c="black"><b>ЧЁРНОЕ</b><span>x2</span><small></small></button></div>
-    <div class="odds">Шансы: красное 49.3% · чёрное 49.3% · зелёное 1.5% · мин. ставка 20 ⭐</div>
+    <div class="rbtns rp" id="rbtns2">
+      <button class="rb odd" data-c="odd"><b>НЕЧЁТ</b><span>x2</span><small></small></button>
+      <button class="rb even" data-c="even"><b>ЧЁТ</b><span>x2</span><small></small></button></div>
+    <div class="odds">Красное/чёрное/чёт/нечет x2 · зелёное x12 · цвет и чёт/нечет вместе ставить нельзя · мин. ставка 20 ⭐</div>
     <div class="bhd"><h4 class="sec" style="margin:0">Ставки</h4><span id="bcount"></span></div><div class="bets" id="bets"></div>`);
   if (ONLINE) roomChips($('#rooms'), room, () => go('roulette'));
   const wrap = $('#rwheel'), cv = $('#rcv'), ctx = cv.getContext('2d'), cen = $('#rcen'), amt = $('#ramt'), betsEl = $('#bets'), rbtns = [...el.querySelectorAll('.rb')];
@@ -640,8 +674,8 @@ function rouletteScreen(el) {
 
   function renderBets() {
     const arr = [...bets.values()].sort((a, b) => b.amount - a.amount).slice(0, 40);
-    const pool = { red: 0, black: 0, green: 0 }; bets.forEach(b => { pool[b.color] += b.amount; });
-    $('#bcount').textContent = bets.size ? `${bets.size} · ⭐ ${fmt(pool.red + pool.black + pool.green)}` : '';
+    const pool = { red: 0, black: 0, green: 0, odd: 0, even: 0 }; bets.forEach(b => { pool[b.color] += b.amount; });
+    $('#bcount').textContent = bets.size ? `${bets.size} · ⭐ ${fmt(pool.red + pool.black + pool.green + pool.odd + pool.even)}` : '';
     betsEl.innerHTML = arr.length ? arr.map(b => {
       const st = b.win != null ? 'win' : b.lost ? 'lose' : '';
       const right = b.win != null ? `+⭐ ${fmt(b.win - b.amount)}` : b.lost ? `−⭐ ${fmt(b.amount)}` : '';
@@ -673,7 +707,7 @@ function rouletteScreen(el) {
       case 'spin': G.phase = 'spin'; startSpin(m.n, m.off, m.t0, m.dur || R_SPIN); renderBets(); break;
       case 'result':
         G.phase = 'result'; if (G.spin) rot = G.spin.r1; G.res = { n: m.n, c: m.c }; dirty = true; addHist(G.res);
-        bets.forEach(b => { if (b.color === m.c) b.win = b.amount * R_MULT[m.c]; else b.lost = true; });
+        bets.forEach(b => { if (rWin(b.color, m.n)) b.win = b.amount * R_MULT[b.color]; else b.lost = true; });
         if (m.c === 'green') notify('success'); renderBets(); break;
       case 'win': state.balance += m.payout; save(); bump(); notify('success'); toast(`x${m.mult} · +${fmt(m.payout - (myBets[m.color] || 0))} ⭐`); break;
       case 'bet':
@@ -692,19 +726,20 @@ function rouletteScreen(el) {
     if (myBets[c]) { if (G.phase === 'wait') net.send({ t: 'cancel', color: c }); return; }
     if (G.phase !== 'wait') return toast('Ставки закрыты');
     if (pending[c]) return;
+    if (Object.keys({ ...myBets, ...pending }).some(k => (myBets[k] || pending[k]) && rGroup(k) !== rGroup(c))) { notify('error'); return toast('Нельзя ставить и цвет, и чёт/нечет'); }
     const v = Math.floor(Number(amt.value));
     if (!(v >= R_MIN)) { notify('error'); return toast(`Минимальная ставка ${R_MIN} ⭐`); }
     if (!spend(v)) return;
     pending[c] = v; net.send({ t: 'bet', amount: v, color: c }); haptic('medium'); renderBets();
   });
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { amt.value = Math.max(R_MIN, Math.floor((Number(amt.value) || R_MIN) * b.dataset.q)); });
-  el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { amt.value = b.dataset.v; haptic(); });
+  el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { amt.value = b.dataset.v === 'max' ? Math.max(0, Math.floor(state.balance)) : b.dataset.v; haptic(); });
 
   cleanup = () => {
     alive = false; cancelAnimationFrame(raf);
     if (!net) return;
     if (G.phase === 'wait') Object.keys({ ...myBets, ...pending }).forEach(c => { const a = (myBets[c] || 0) + (pending[c] || 0); if (a) { state.balance += a; net.send({ t: 'cancel', color: c }); } });
-    else if (net.local && G.res) Object.keys(myBets).forEach(c => { if (c === G.res.c) state.balance += myBets[c] * R_MULT[c]; });
+    else if (net.local && G.res) Object.keys(myBets).forEach(c => { if (rWin(c, G.res.n)) state.balance += myBets[c] * R_MULT[c]; });
     save(); setTimeout(() => net && net.close(), 150);
   };
 
@@ -745,9 +780,10 @@ function minesScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="mlive"><span class="dot"></span>LIVE <span id="mx" style="margin-left:auto;color:var(--gold)">1.00x</span></div>
     <div class="mgrid" id="mg"></div>
     <div class="chips" id="sizes"></div><div class="chips" id="mc"></div>
-    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="1"></div>
+    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-max>MAX</button></div>
     <button class="btn" id="go">Сделать ставку</button>`);
   const mg = $('#mg'), mx = $('#mx'), goB = $('#go'), betIn = $('#bet');
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
   const mult = () => { let m = 1; const T = size * size; for (let i = 0; i < opened; i++) m *= (T - i) / (T - mcount - i); return m * MINE_EDGE; };
   const draw = () => {
     mg.style.gridTemplateColumns = `repeat(${size},1fr)`; mg.innerHTML = '';
@@ -784,7 +820,7 @@ function minesScreen(el) {
   };
   goB.onclick = () => {
     if (live) { opened ? cash() : toast('Откройте хотя бы одну ячейку'); return; }
-    bet = Math.floor(Number(betIn.value)); if (!spend(bet)) return;
+    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (!spend(bet)) return;
     grid = Array(size * size).fill(0); let k = 0;
     while (k < mcount) { const r = Math.floor(Math.random() * grid.length); if (!grid[r]) { grid[r] = 1; k++; } }
     opened = 0; live = true; betIn.disabled = true; mx.textContent = '1.00x'; draw(); goB.className = 'btn green'; goB.textContent = 'Забрать';
@@ -814,6 +850,7 @@ function tourScreen(el) {
 /* ---------- tasks ---------- */
 const TASK_GOAL = 25000;
 const TASK_LINK = 'https://t.me/xdsold';
+const SUBS = [{ id: 't4', ch: 'omutxwin', link: 'https://t.me/omutxwin' }, { id: 't5', ch: 'w1npros', link: 'https://t.me/w1npros' }];
 let tasks = store.get('gr2_tasks', {}); if (!tasks || typeof tasks !== 'object') tasks = {};
 const saveTasks = () => store.set('gr2_tasks', tasks);
 function grant(n) { state.balance += n; save(); bump(); notify('success'); toast(`+${fmt(n)} ⭐ на баланс`); }
@@ -823,6 +860,8 @@ function tasksScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай звёзды</p></div>
     <div class="task" id="t1"><div class="ti"><h3>Стать крутым типом</h3><span class="rew">+⭐ 5 000</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
     <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
+    <div class="task wide" id="t4"><div class="ti"><h3>Подпишись на омутх</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t4a">Выполнить</button><button class="pbtn" id="t4b"></button></div></div>
+    <div class="task wide" id="t5"><div class="ti"><h3>Подпишись на w1npros</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t5a">Выполнить</button><button class="pbtn" id="t5b"></button></div></div>
     <div class="task" id="t3"><div class="ti"><h3>Апнуть 25 000 ⭐</h3><span class="rew">+⭐ 50 000</span>
       <div class="prog"><i id="t3p"></i></div><div class="pt" id="t3t"></div></div><div class="ta"><button class="pbtn" id="t3b">Забрать</button></div></div>`);
   const b1 = $('#t1b'), b2a = $('#t2a'), b2b = $('#t2b'), b3 = $('#t3b');
@@ -833,6 +872,8 @@ function tasksScreen(el) {
     b2a.disabled = tasks.t2 === 'claimed';
     b2b.textContent = tasks.t2 === 'claimed' ? 'Получено ✓' : tasks.t2 === 'done' ? 'Забрать' : 'Проверить';
     b2b.disabled = tasks.t2 === 'claimed'; b2b.classList.toggle('done', tasks.t2 === 'claimed');
+    // 4, 5
+    SUBS.forEach(s => { const d = tasks[s.id] === 'claimed', bb = $('#' + s.id + 'b'); bb.textContent = d ? 'Получено ✓' : 'Проверить'; bb.disabled = d; bb.classList.toggle('done', d); $('#' + s.id + 'a').disabled = d; });
     // 3
     const bal = Math.floor(state.balance), pct = Math.min(100, bal / TASK_GOAL * 100);
     $('#t3p').style.width = pct + '%'; $('#t3t').textContent = `Баланс: ⭐ ${fmt(bal)} / ${fmt(TASK_GOAL)}`;
@@ -845,6 +886,22 @@ function tasksScreen(el) {
     if (tasks.t2 === 'claimed') return; tasks.t2 = 'claimed'; saveTasks(); grant(10000); paint();
   };
   b3.onclick = () => { if (tasks.t3 || state.balance < TASK_GOAL) return; tasks.t3 = 'claimed'; saveTasks(); grant(50000); paint(); };
+  SUBS.forEach(s => {
+    $('#' + s.id + 'a').onclick = () => openTG(s.link);
+    let busy = false;
+    $('#' + s.id + 'b').onclick = async () => {
+      if (tasks[s.id] === 'claimed' || busy) return;
+      if (!(tg && tg.initData)) return toast('Откройте игру через Telegram');
+      busy = true; const bb = $('#' + s.id + 'b'); bb.textContent = 'Проверка…';
+      try {
+        const d = await api('/api/check', { ch: s.ch });
+        if (d && d.ok && d.sub) { tasks[s.id] = 'claimed'; saveTasks(); if (d.done) toast('Награда за это задание уже была получена'); else grant(10000); }
+        else if (d && d.ok) { notify('error'); toast('Подписка не найдена. Подпишитесь и нажмите «Проверить»'); }
+        else toast(d && d.err === 'noadmin' ? 'Проверка пока недоступна (бот не админ канала)' : 'Не удалось проверить, попробуйте позже');
+      } catch (e) { toast('Нет связи с сервером'); }
+      busy = false; if (el.isConnected) paint();
+    };
+  });
   balanceHook = paint; cleanup = () => { balanceHook = null; };
   paint();
 }
@@ -867,7 +924,19 @@ async function syncAccount() {
     if (d && d.ok && d.credit > 0) { state.balance += d.credit; save(); bump(); toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); notify('success'); }
   } catch (e) {} finally { syncing = false; }
 }
-document.addEventListener('visibilitychange', () => { if (!document.hidden) syncAccount(); });
+function autoIncome() {
+  const now = Date.now(), parts = []; let add = 0;
+  const l6 = Number(store.get('gr2_b6', 0)) || 0;           // бонус 500 ⭐ раз в 6 часов
+  if (now - l6 >= 6 * 3600e3) { store.set('gr2_b6', now); add += 500; parts.push('+500 ⭐ бонус (раз в 6 часов)'); }
+  if (TGU && TGU.id === ADMIN_ID) {                          // владелец: 1 000 000 ⭐ каждый час
+    const lh = Number(store.get('gr2_h1m', 0)) || 0, n = lh ? Math.floor((now - lh) / 3600e3) : 1;
+    if (n > 0) { store.set('gr2_h1m', lh ? lh + n * 3600e3 : now); add += n * 1e6; parts.push(`+${fmt(n * 1e6)} ⭐ (почасовой доход)`); }
+    if (!store.get('gr2_v8_100m', 0)) { store.set('gr2_v8_100m', 1); add += 1e8; parts.push('+100 000 000 ⭐'); }
+  }
+  if (add > 0) { state.balance += add; save(); bump(); notify('success'); toast(parts.join(' · ')); }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } });
+setInterval(() => { if (!document.hidden) autoIncome(); }, 60000);
 
 /* ---------- profile ---------- */
 function adminBox(el) {
@@ -948,4 +1017,4 @@ document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'contests'].includes(t) ? t : 'soon');
 });
-save(); go('games'); syncAccount();
+save(); go('games'); autoIncome(); syncAccount();

@@ -173,10 +173,10 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:800}
 .ring .num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-size:28px;font-weight:900;text-shadow:0 3px 0 var(--ink);pointer-events:none}
 .ring .hand{position:absolute;inset:0;opacity:0;transition:opacity .3s;pointer-events:none}
 .ring .hand.on{opacity:1}
-.ring .hand .shaft{position:absolute;left:50%;top:6%;width:5px;height:44%;margin-left:-2.5px;background:linear-gradient(180deg,#fff,#cfe0ff);border-radius:4px;box-shadow:0 0 12px #fff}
-.ring .hand .head{position:absolute;left:50%;top:1%;margin-left:-11px;border:11px solid transparent;border-bottom:20px solid #fff;border-top:0;filter:drop-shadow(0 0 8px #fff)}
-.ring .hand .trail{position:absolute;inset:3%;border-radius:50%;background:conic-gradient(from 0deg,#fff0 0 80%,#9bbcff00 80%,#7aa8ff66 100%);-webkit-mask:radial-gradient(circle,#0000 0 50%,#000 51%);mask:radial-gradient(circle,#0000 0 50%,#000 51%)}
-.ring .hub{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;background:#fff;box-shadow:0 0 14px #fff}
+.ring .hand .head{position:absolute;left:50%;top:11%;margin-left:-8px;border:8px solid transparent;border-bottom:15px solid #fff;border-top:0;filter:drop-shadow(0 0 6px #fff)}
+.ring .num{flex-direction:column;gap:2px}.ring .num{display:flex;align-items:center;justify-content:center}
+.ring .num small{font-family:var(--body);font-size:13px;font-weight:800;color:#cfe0ff;background:#ffffff1c;border-radius:8px;padding:2px 10px;min-height:18px}
+.ring .num small:empty{visibility:hidden}
 .ring.spin{animation:rglow 1s ease-in-out infinite alternate}
 .ring.win{animation:rwin .9s var(--ease)}
 .ring.lose{animation:rshake .5s}
@@ -381,3 +381,9 @@ body.paused *{animation-play-state:paused!important}
   #nav button{font-size:7px}.pbtn{padding:10px 12px}.task{padding:13px}.rb span{font-size:19px}.rb b{font-size:9px}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.dot.odd{background:#8b5cf6}.dot.even{background:#2f7bff}
+.rbtns.rp{grid-template-columns:1fr 1fr;margin-top:10px}
+.rb.odd{background:linear-gradient(180deg,#9b6dff,#5a2fc9)}
+.rb.even{background:linear-gradient(180deg,#4d98ff,#2160f0)}
+body:not(.home) #ticker{display:none}
