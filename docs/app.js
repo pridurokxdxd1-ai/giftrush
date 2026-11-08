@@ -251,7 +251,7 @@ function caseScreen(el, c) {
 const up = { mine: null, want: null, bal: 0 };
 const UP_MAX = 80;
 const stakeOf = () => { const g = up.mine && invGift(up.mine), gi = g ? ITEM(g.n) : null; return { g, gi, S: (gi ? gi.p : 0) + (up.bal || 0) }; };
-const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(1, (S / w.p) * 92));
+const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(1, (S / w.p) * 97));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
   if (up.mine && !invGift(up.mine)) up.mine = null;
@@ -264,7 +264,7 @@ function upgradeScreen(el) {
     <div class="slot"><h4>Ваш подарок (необязательно)</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
     <div class="slot"><h4>Добавить Rushcoin</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
     <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
-      <circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="#35d07f" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
+      <defs><linearGradient id="ug" gradientUnits="userSpaceOnUse" x1="94" y1="0" x2="6" y2="0"><stop offset="0" stop-color="#c6ff4a"/><stop offset=".5" stop-color="#6fe66a"/><stop offset="1" stop-color="#0fae52"/></linearGradient></defs><circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="url(#ug)" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
       <div class="hand" id="hand"><i class="head"></i></div><div class="num"><b id="rnum">—</b><small id="rx"></small></div></div>
     <div class="slot"><h4>Желаемый подарок</h4><button class="pick" id="want"></button></div>
     <button class="btn" id="go"></button>`);
@@ -329,7 +329,7 @@ function pickScreen(el, kind) {
   if (kind === 'mine' && up.mine) { const r = document.createElement('button'); r.className = 'btn'; r.style.marginBottom = '12px'; r.textContent = 'Убрать подарок'; r.onclick = () => { up.mine = null; up.want = null; go('upgrade'); }; el.append(r); }
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   let list;
-  if (kind === 'mine') list = state.inv.map(x => ({ id: x.id, it: ITEM(x.n) })).sort((a, b) => b.it.p - a.it.p);
+  if (kind === 'mine') list = state.inv.map(x => ({ id: x.id, it: ITEM(x.n) })).sort((a, b) => a.it.p - b.it.p);
   else list = ITEMS.filter(i => i.p > S).map(i => ({ id: i.n, it: i }));
   if (!list.length) { g.innerHTML = kind === 'mine' ? '<div class="empty"><b>📭</b>Пока пусто. Откройте кейс.</div>' : '<div class="empty"><b>📭</b>Нет подарков дороже вашей ставки.</div>'; return; }
   list.forEach((o, i) => {
@@ -341,16 +341,17 @@ function pickScreen(el, kind) {
 }
 
 /* ---------- ракета (спрайт из видео) ---------- */
-const RK = { img: null, ok: false, FR: 256, COLS: 8, N: 48, FPS: 16 };
+const RK = { img: null, ok: false, FR: 288, COLS: 8, N: 48, FPS: 15.6 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=9';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=10';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
-  const f = Math.floor(t / 1000 * RK.FPS) % RK.N, sx = (f % RK.COLS) * RK.FR, sy = Math.floor(f / RK.COLS) * RK.FR;
-  ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.globalAlpha = alpha;
+  const ff = t / 1000 * RK.FPS, f = Math.floor(ff) % RK.N, g = (f + 1) % RK.N, fr = ff - Math.floor(ff);   // плавное перетекание кадров (без дёрганья)
+  ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot);
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(RK.img, sx, sy, RK.FR, RK.FR, -size / 2, -size / 2, size, size); ctx.restore();
+  ctx.globalAlpha = alpha; ctx.drawImage(RK.img, (f % RK.COLS) * RK.FR, Math.floor(f / RK.COLS) * RK.FR, RK.FR, RK.FR, -size / 2, -size / 2, size, size);
+  ctx.globalAlpha = alpha * fr; ctx.drawImage(RK.img, (g % RK.COLS) * RK.FR, Math.floor(g / RK.COLS) * RK.FR, RK.FR, RK.FR, -size / 2, -size / 2, size, size); ctx.restore();
 }
 
 /* ---------- crash (онлайн, общий сервер) ---------- */
@@ -556,7 +557,7 @@ function crashScreen(el) {
 
   /* отрисовка */
   const stars = Array.from({ length: 26 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
-  const RS = Math.min(W * .46, 128 * dpr);               // размер ракеты
+  const RS = Math.min(W * .4, 104 * dpr);               // размер ракеты
   const X0 = W * .17, Y0 = H * .76, X1 = W * .5, Y1 = H * .5; // старт слева-снизу → центр (дальше она не уходит)
   let burst = null;
   const frame = () => {
@@ -589,7 +590,10 @@ function crashScreen(el) {
         ctx.fillStyle = `rgba(255,120,60,${(1 - k) * .55})`; ctx.beginPath(); ctx.arc(rkx, rky, RS * (.25 + k * .5), 0, 7); ctx.fill();
         burst.forEach(b => { ctx.fillStyle = `rgba(255,200,80,${1 - k})`; ctx.beginPath(); ctx.arc(rkx + Math.cos(b.a) * b.v * ct * .06, rky + Math.sin(b.a) * b.v * ct * .06, 3 * dpr, 0, 7); ctx.fill(); });
       }
-    } else { burst = null; if (G.phase === 'wait' || G.phase === 'fly') drawRocket(ctx, rkx, rky, RS, now, 1, 0); }
+    } else {
+      burst = null;
+      if (G.phase === 'fly') { const k = Math.min(1, (now - (G.t0 - G.offset)) / 350); drawRocket(ctx, rkx, rky, RS * (.55 + .45 * (1 - Math.pow(1 - k, 3))), now, k, 0); }  // ракета появляется, когда начинается полёт
+    }
     renderBtn();
     raf = requestAnimationFrame(frame);
   };
