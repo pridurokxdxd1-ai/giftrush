@@ -24,8 +24,6 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:800}
 .brand{font-family:var(--disp);font-weight:900;font-size:15px;letter-spacing:.6px;color:#fff;text-shadow:0 2px 0 var(--ink),0 0 18px #4b8bff}
 .balance{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#14267c,#0a1450);border:2px solid #fff;border-radius:999px;padding:6px 6px 6px 16px;box-shadow:0 4px 0 var(--ink),0 8px 22px #0007}
 .balance b{font-family:var(--disp);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
-.balance #topup{background:linear-gradient(180deg,#4d98ff,#2160f0);border:2px solid #fff;padding:6px 13px;border-radius:999px;font-family:var(--disp);font-size:10px;font-weight:800;text-shadow:0 1px 0 #0006;transition:transform .2s var(--ease)}
-.balance #topup:active{transform:scale(.93)}
 .balance.bump{animation:bump .45s var(--ease)}
 @keyframes bump{40%{transform:scale(1.07);box-shadow:0 4px 0 var(--ink),0 0 28px #ffd23f99}}
 
@@ -169,12 +167,36 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:800}
 .pick small{font-size:12px;color:var(--mut);display:block}
 .pick.has{border-color:#fff;background:linear-gradient(160deg,#6a3be8,#2a1a8f);box-shadow:0 0 26px #7a4bff77}
 .pick.has small{color:var(--gold);font-weight:800;margin-top:4px}
-.ring{position:relative;width:176px;height:176px;margin:6px auto 16px}
+.ring{position:relative;width:236px;height:236px;margin:10px auto 20px;border-radius:50%;background:radial-gradient(circle closest-side,#0a1650 0 92%,#0000 93%);box-shadow:0 0 40px #2a5bff44}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring svg circle:first-child{stroke:#10206f}
-.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-size:24px;font-weight:900;text-shadow:0 3px 0 var(--ink)}
-.ring .arrow{position:absolute;left:50%;top:50%;width:5px;height:78px;background:#fff;border-radius:4px;transform-origin:50% 0;transform:translate(-50%,0) rotate(180deg);box-shadow:0 0 12px #fff;opacity:0;transition:opacity .3s}
-.ring .arrow.on{opacity:1}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-size:28px;font-weight:900;text-shadow:0 3px 0 var(--ink);pointer-events:none}
+.ring .hand{position:absolute;inset:0;opacity:0;transition:opacity .3s;pointer-events:none}
+.ring .hand.on{opacity:1}
+.ring .hand .shaft{position:absolute;left:50%;top:6%;width:5px;height:44%;margin-left:-2.5px;background:linear-gradient(180deg,#fff,#cfe0ff);border-radius:4px;box-shadow:0 0 12px #fff}
+.ring .hand .head{position:absolute;left:50%;top:1%;margin-left:-11px;border:11px solid transparent;border-bottom:20px solid #fff;border-top:0;filter:drop-shadow(0 0 8px #fff)}
+.ring .hand .trail{position:absolute;inset:3%;border-radius:50%;background:conic-gradient(from 0deg,#fff0 0 80%,#9bbcff00 80%,#7aa8ff66 100%);-webkit-mask:radial-gradient(circle,#0000 0 50%,#000 51%);mask:radial-gradient(circle,#0000 0 50%,#000 51%)}
+.ring .hub{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;background:#fff;box-shadow:0 0 14px #fff}
+.ring.spin{animation:rglow 1s ease-in-out infinite alternate}
+.ring.win{animation:rwin .9s var(--ease)}
+.ring.lose{animation:rshake .5s}
+@keyframes rglow{to{box-shadow:0 0 62px #5b8bff99}}
+@keyframes rwin{0%{transform:scale(1)}40%{transform:scale(1.07);box-shadow:0 0 70px #35d07f}100%{transform:scale(1)}}
+@keyframes rshake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.ring .spark{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;animation:spark 1s ease-out forwards;pointer-events:none}
+@keyframes spark{to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+/* перевод звёзд (только админ) */
+.adm{margin:6px 0 16px;padding:12px;border:2px solid #ffffff44;border-radius:20px;background:var(--glass)}
+.adm h4{font-size:10px;color:#dbe5ff;text-transform:uppercase;margin-bottom:8px}
+.adm .row{display:flex;gap:8px}
+.adm input{flex:1;min-width:0;height:48px;border-radius:14px;border:2px solid #ffffff55;background:#0a1650;color:#fff;padding:0 14px;font:700 14px var(--body);outline:none}
+.adm input:focus{border-color:#fff}
+.adm .ok{width:48px;height:48px;flex:none;border-radius:12px;border:2px solid #fff;background:linear-gradient(180deg,#4fe08f,#1fa85b);font:900 13px var(--disp);box-shadow:0 4px 0 #000}
+.adm .ok:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+.xf-amt{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.xf-amt button{padding:10px 14px;border-radius:12px;border:2px solid #ffffff66;background:#10206f;font:800 13px var(--body)}
+.xf-amt button.on{background:#2160f0;border-color:#fff}
+.xf-in{width:100%;height:46px;border-radius:12px;border:2px solid #ffffff55;background:#0a1650;color:#fff;padding:0 14px;font:800 16px var(--body);text-align:center;outline:none;margin-bottom:12px}
 
 /* ---------- crash ---------- */
 .crash-box{position:relative;height:280px;border-radius:26px;overflow:hidden;background:radial-gradient(circle at 50% 110%,#2742c9,#080f45 70%);border:3px solid #fff;box-shadow:0 0 0 3px var(--ink);margin-bottom:16px}

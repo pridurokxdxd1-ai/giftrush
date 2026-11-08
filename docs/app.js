@@ -26,16 +26,20 @@ const store = {
 
 /* ---------- items ---------- */
 const RAR = {
-  common: '#8b8f9c', rare: '#3b82f6', epic: '#a855f7', legend: '#ffc83d', myth: '#ff4d5e',
+  common: '#8b8f9c', rare: '#3b82f6', epic: '#a855f7', legend: '#ffc83d', myth: '#ff4d5e', divine: '#ff6bf0',
 };
-function rar(p) { return p < 100 ? 'common' : p < 400 ? 'rare' : p < 1500 ? 'epic' : p < 5000 ? 'legend' : 'myth'; }
+function rar(p) { return p < 100 ? 'common' : p < 400 ? 'rare' : p < 1500 ? 'epic' : p < 5000 ? 'legend' : p < 30000 ? 'myth' : 'divine'; }
 const ITEMS = [
   ['🍭', 'Lollipop', 10], ['🧸', 'Bear', 15], ['🍪', 'Cookie', 20], ['🌹', 'Rose', 25], ['🎈', 'Balloon', 35],
   ['🎂', 'Cake', 50], ['🧁', 'Cupcake', 65], ['💐', 'Bouquet', 80], ['🍀', 'Clover', 100], ['🎃', 'Pumpkin', 130],
   ['🚀', 'Rocket', 170], ['🏆', 'Trophy', 220], ['🎮', 'Joystick', 300], ['💍', 'Ring', 400], ['🔮', 'Orb', 550],
   ['⌚', 'Watch', 750], ['💎', 'Diamond', 1000], ['🗿', 'Moai', 1400], ['🐉', 'Dragon', 2000], ['🦄', 'Unicorn', 2750],
   ['🏰', 'Castle', 3500], ['🛸', 'UFO', 5000], ['👑', 'Crown', 7500], ['🌌', 'Galaxy', 10000],
-].map(([e, n, p]) => ({ e, n, p, r: rar(p), c: RAR[rar(p)] }));
+  ['🌋', 'Volcano', 12000], ['💠', 'Crystal', 15000], ['🔱', 'Trident', 20000],
+  // 6-й элемент = 1: подарок НЕ выпадает из кейсов, его можно получить только апгрейдом
+  ['🏝️', 'Island', 30000, 1], ['🛰️', 'Satellite', 40000, 1], ['🌠', 'Meteor', 50000, 1], ['🪐', 'Saturn', 75000, 1],
+  ['☄️', 'Comet', 100000, 1], ['🌍', 'Earth', 150000, 1], ['☀️', 'Sun', 250000, 1], ['💫', 'Nova', 500000, 1], ['🎆', 'Big Bang', 1000000, 1],
+].map(([e, n, p, nc]) => ({ e, n, p, nc: !!nc, r: rar(p), c: RAR[rar(p)] }));
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 
@@ -67,12 +71,6 @@ function spend(n) {
 }
 let toastT = 0;
 function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('show'), 1900); }
-$('#topup').onclick = () => {
-  const COOL = 3 * 3600e3, last = Number(store.get('gr2_topup', 0)) || 0, left = last + COOL - Date.now();
-  if (left > 0) { const h = Math.floor(left / 3600e3), m = Math.ceil(left % 3600e3 / 60e3); return toast(`Бонус будет через ${h ? h + ' ч ' : ''}${m} мин`); }
-  store.set('gr2_topup', Date.now()); state.balance += 500; save(); bump(); toast('+500 ⭐ бонус (раз в 3 часа)'); haptic('medium');
-};
-
 /* лёгкий режим для слабых телефонов и пауза анимаций в фоне */
 try {
   const weak = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 4) <= 3;
@@ -104,18 +102,23 @@ const CASES = [
 ].sort((a, b) => a.price - b.price);
 
 function buildOdds(c) {
-  const P = c.price, TARGET = 0.72;
-  const items = ITEMS.filter(i => i.p / P >= 0.015 && i.p / P <= 25);
-  const ev = k => { let s = 0, e = 0; items.forEach(i => { const w = Math.pow(i.p / P, -k); s += w; e += w * i.p; }); return e / s / P; };
-  let lo = -3, hi = 6;
-  for (let t = 0; t < 50; t++) { const m = (lo + hi) / 2; if (ev(m) > TARGET) lo = m; else hi = m; }
-  let k = (lo + hi) / 2;
-  // у дорогих кейсов шанс получить подарок не дешевле цены кейса не должен быть слишком высоким
-  const hit = kk => { let s = 0, h = 0; items.forEach(i => { const w = Math.pow(i.p / P, -kk); s += w; if (i.p >= P) h += w; }); return h / s; };
-  if (hit(k) > 0.28) { let l = k, h2 = 12; for (let t = 0; t < 50; t++) { const m = (l + h2) / 2; if (hit(m) > 0.28) l = m; else h2 = m; } k = (l + h2) / 2; }
-  c.pool = items.map(i => ({ it: i, w: Math.pow(i.p / P, -k) }));
-  c.sum = c.pool.reduce((a, o) => a + o.w, 0);
-  c.rtp = ev(k);
+  const P = c.price, RTP = 0.65;                                   // средний возврат игроку 65%
+  const H = Math.min(0.17, Math.max(0.08, 0.17 - 0.012 * Math.log2(P / 79))); // шанс «окупиться» (приз >= цены кейса)
+  const items = ITEMS.filter(i => !i.nc && i.p / P >= 0.02 && i.p / P <= 25);
+  const win = items.filter(i => i.p >= P), lose = items.filter(i => i.p < P);
+  const stat = k => {
+    const wl = lose.map(i => Math.pow(i.p / P, -k)), ww = win.map(i => Math.pow(i.p / P, -k));
+    const L = wl.reduce((s, x) => s + x, 0), W = ww.reduce((s, x) => s + x, 0);
+    const f = (H / (1 - H)) * L / W;                                // множитель, дающий ровно шанс H на окупаемость
+    let e = 0; lose.forEach((i, j) => { e += wl[j] * i.p; }); win.forEach((i, j) => { e += f * ww[j] * i.p; });
+    return { f, rtp: e / (L + f * W) / P };
+  };
+  let lo = -4, hi = 10;
+  for (let t = 0; t < 60; t++) { const m = (lo + hi) / 2; if (stat(m).rtp > RTP) lo = m; else hi = m; }
+  const k = (lo + hi) / 2, st = stat(k);
+  c.pool = items.map(i => ({ it: i, w: Math.pow(i.p / P, -k) * (i.p >= P ? st.f : 1) }));
+  c.sum = c.pool.reduce((s, o) => s + o.w, 0);
+  c.rtp = st.rtp; c.hit = H;
 }
 function rollCase(c) {
   let x = Math.random() * c.sum;
@@ -231,7 +234,7 @@ function caseScreen(el, c) {
 
 /* ---------- upgrade ---------- */
 const up = { mine: null, want: null };
-const chanceOf = (m, w) => Math.min(75, Math.max(2, (m.p / w.p) * 92));
+const chanceOf = (m, w) => Math.min(75, Math.max(1, (m.p / w.p) * 92));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
   const mg = up.mine && invGift(up.mine); if (!mg) up.mine = null;
@@ -244,7 +247,7 @@ function upgradeScreen(el) {
     <div class="slot"><h4>Ваш подарок</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
     <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
       <circle cx="50" cy="50" r="44" fill="none" stroke="#35d07f" stroke-width="9" stroke-linecap="round" stroke-dasharray="${chance / 100 * 276.46} 276.46" style="filter:drop-shadow(0 0 6px #35d07f);transition:stroke-dasharray .6s var(--ease)"/></svg>
-      <div class="arrow" id="arrow"></div><div class="num">${chance ? chance.toFixed(1) + '%' : '—'}</div></div>
+      <div class="hand" id="hand"><i class="trail"></i><i class="shaft"></i><i class="head"></i></div><div class="hub"></div><div class="num">${chance ? chance.toFixed(1) + '%' : '—'}</div></div>
     <div class="slot"><h4>Желаемый подарок</h4><button class="pick ${wi ? 'has' : ''}" id="want">${slot(wi)}</button></div>
     <button class="btn" id="go">${mi && wi ? 'Апгрейд' : 'Выбрать свой подарок'}</button>`);
   $('#mine').onclick = () => go('pick', 'mine');
@@ -258,16 +261,28 @@ function upgradeScreen(el) {
     busy = true; $('#go').disabled = true;
     const ok = Math.random() * 100 < chance;
     state.inv = state.inv.filter(g => g.id !== mg.id); if (ok) addGift(wi.n); save(); // результат сохраняем сразу
-    const arrow = $('#arrow'); arrow.classList.add('on');
-    const th = ok ? rnd(6, chance / 100 * 360 - 6) : rnd(chance / 100 * 360 + 6, 354);
-    arrow.style.transition = 'none'; arrow.style.transform = 'translate(-50%,0) rotate(180deg)'; void arrow.offsetWidth;
-    arrow.style.transition = 'transform 4s cubic-bezier(.1,.75,.12,1)'; arrow.style.transform = `translate(-50%,0) rotate(${180 + 1440 + th}deg)`;
-    await sleep(4200);
+    const hand = $('#hand'), ring = $('.ring'); hand.classList.add('on');
+    const arc = chance / 100 * 360;
+    // при проигрыше чаще останавливаемся совсем рядом с зелёной зоной — «чуть-чуть не хватило»
+    const th = ok ? rnd(Math.min(4, arc / 3), arc - Math.min(4, arc / 3)) : (Math.random() < .55 ? arc + rnd(1.5, 9) : rnd(arc + 6, 354));
+    hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)'; void hand.offsetWidth;
+    hand.style.transition = 'transform 5.4s cubic-bezier(.06,.62,.08,1)'; hand.style.transform = `rotate(${360 * 6 + th}deg)`;
+    ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {}
+    await sleep(5600);
+    ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
     toast(ok ? `🎉 Успех! ${wi.e} ${wi.n}` : '💥 Неудача, подарок сгорел');
     up.mine = null; up.want = null;
-    if (el.isConnected) { await sleep(900); if (el.isConnected) go('upgrade'); }
+    if (el.isConnected) { await sleep(1500); if (el.isConnected) go('upgrade'); }
   };
+}
+function burst(host) {
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span'); s.className = 'spark';
+    const ang = Math.random() * 6.283, d = 80 + Math.random() * 70;
+    s.style.setProperty('--x', Math.cos(ang) * d + 'px'); s.style.setProperty('--y', Math.sin(ang) * d + 'px');
+    s.style.background = ['#ffc83d', '#35d07f', '#fff', '#7aa8ff'][i % 4]; host.append(s); setTimeout(() => s.remove(), 1000);
+  }
 }
 function pickScreen(el, kind) {
   bar(el, kind === 'mine' ? 'Ваш подарок' : 'Желаемый подарок', 'upgrade');
@@ -834,15 +849,68 @@ function tasksScreen(el) {
   paint();
 }
 
-/* ---------- profile ---------- */
+/* ---------- аккаунт: связь с Worker (переводы от админа) ---------- */
+const API = 'https://giftrush-bot.thekerv666.workers.dev';
+const ADMIN_ID = 5093384439;
 const TGU = tg && tg.initDataUnsafe && tg.initDataUnsafe.user || null;
+async function api(path, body) {
+  const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ initData: (tg && tg.initData) || '' }, body || {})) });
+  return r.json();
+}
+let syncing = false;
+async function syncAccount() {
+  if (syncing || !TGU || !(tg && tg.initData)) return;
+  syncing = true;
+  try {
+    const d = await api('/api/sync');
+    if (d && d.ok && d.credit > 0) { state.balance += d.credit; save(); bump(); toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); notify('success'); }
+  } catch (e) {} finally { syncing = false; }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncAccount(); });
+
+/* ---------- profile ---------- */
+function adminBox(el) {
+  el.insertAdjacentHTML('beforeend', `<div class="adm"><h4>Перевод звёзд игроку</h4><div class="row">
+    <input id="xfq" placeholder="ID или @username из профиля" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ok" id="xfok">ОК</button></div></div>`);
+  const ok = $('#xfok');
+  const run = async () => {
+    const q = $('#xfq').value.trim(); if (!q) return toast('Введите ID или юзернейм');
+    ok.disabled = true;
+    try {
+      const d = await api('/api/lookup', { q });
+      if (!d || !d.ok) return toast(d && d.err === 'nf' ? 'Игрок не найден — пусть откроет бота' : 'Ошибка, попробуйте ещё раз');
+      const amounts = [100, 500, 1000, 5000, 10000, 50000];
+      let sel = 1000;
+      const m = modal(`<div class="g-n">Перевод звёзд</div><div class="g-p">${esc(d.name)} · ID ${esc(d.id)}</div>
+        <div class="xf-amt">${amounts.map(x => `<button data-a="${x}" class="${x === sel ? 'on' : ''}">⭐ ${fmt(x)}</button>`).join('')}</div>
+        <input class="xf-in" id="xfa" type="number" inputmode="numeric" min="1" value="${sel}">
+        <div class="g-act"><button class="btn green" id="xfgo">Перевести</button></div>`);
+      m.el.querySelectorAll('.xf-amt button').forEach(b => b.onclick = () => {
+        m.el.querySelectorAll('.xf-amt button').forEach(x => x.classList.toggle('on', x === b)); $('#xfa', m.el).value = b.dataset.a;
+      });
+      $('#xfgo', m.el).onclick = async () => {
+        const amt = Math.floor(Number($('#xfa', m.el).value));
+        if (!(amt >= 1)) return toast('Введите сумму');
+        const g = $('#xfgo', m.el); g.disabled = true;
+        try {
+          const r = await api('/api/give', { to: d.id, amount: amt });
+          if (r && r.ok) { m.close(); toast(`✅ ${fmt(amt)} ⭐ отправлено: ${d.name}`); notify('success'); $('#xfq').value = ''; }
+          else { toast('Не удалось перевести'); g.disabled = false; }
+        } catch (e) { toast('Нет связи с сервером'); g.disabled = false; }
+      };
+    } catch (e) { toast('Нет связи с сервером'); } finally { ok.disabled = false; }
+  };
+  ok.onclick = run; $('#xfq').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+}
 function profileScreen(el) {
   const name = TGU ? (TGU.username ? '@' + TGU.username : [TGU.first_name, TGU.last_name].filter(Boolean).join(' ')) : 'Игрок';
   const ini = (name.replace('@', '')[0] || '?').toUpperCase();
   const list = state.inv.map(g => ({ g, it: ITEM(g.n) })).sort((a, b) => b.it.p - a.it.p);
   const total = list.reduce((s, o) => s + o.it.p, 0);
   el.insertAdjacentHTML('beforeend', `<div class="pf"><div class="pf-av" id="pfav"></div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
-    <div class="invhd"><h3>Инвентарь</h3><span>${list.length} шт · ⭐ ${fmt(total)}</span></div><div class="inv" id="inv"></div>`);
+    <div id="admslot"></div><div class="invhd"><h3>Инвентарь</h3><span>${list.length} шт · ⭐ ${fmt(total)}</span></div><div class="inv" id="inv"></div>`);
+  if (TGU && TGU.id === ADMIN_ID) adminBox($('#admslot'));
   const av = $('#pfav');
   const fallback = () => { av.innerHTML = `<span>${esc(ini)}</span>`; };
   if (TGU && TGU.photo_url) {
@@ -880,4 +948,4 @@ document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'contests'].includes(t) ? t : 'soon');
 });
-save(); go('games');
+save(); go('games'); syncAccount();
