@@ -14,7 +14,7 @@ from aiogram.types import (ErrorEvent, InlineKeyboardButton, InlineKeyboardMarku
 from aiohttp import web
 from dotenv import load_dotenv
 
-from crash_server import CrashGame, make_app
+from games_server import make_app, make_games
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -61,11 +61,11 @@ async def on_error(event: ErrorEvent):
 
 
 async def main():
-    game = CrashGame(TOKEN)
-    runner = web.AppRunner(make_app(game, DOCS_DIR))
+    games = make_games(TOKEN)
+    runner = web.AppRunner(make_app(games, DOCS_DIR))
     await runner.setup()
     await web.TCPSite(runner, "0.0.0.0", PORT).start()
-    crash_task = asyncio.create_task(game.run())
+    game_tasks = [asyncio.create_task(g.run()) for g in games.values()]
     log.info("Сервер запущен на порту %s", PORT)
 
     try:
@@ -80,7 +80,8 @@ async def main():
         await dp.start_polling(bot, drop_pending_updates=True,
                                allowed_updates=dp.resolve_used_update_types())
     finally:
-        crash_task.cancel()
+        for t in game_tasks:
+            t.cancel()
         await runner.cleanup()
 
 
