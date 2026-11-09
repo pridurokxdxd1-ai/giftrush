@@ -447,3 +447,17 @@ html.lite .case-hero{animation:none}
 .a-cases .box{width:112px;left:calc(50% - 56px);top:6px;transform:none}
 .dr .ic .cn{gap:0}.dr .ic .cn .rc{width:26px;height:26px}.dr .ic .cn b{font-size:12px;margin-top:-2px}
 .dr .ic{height:46px}
+
+/* v17: новый баннер CASES */
+.hub .tile.t-cases{background:linear-gradient(120deg,#0a1233 0,#101a4a 55%,#1a1040 100%);box-shadow:0 10px 26px #0006;text-align:left}
+.hub .tile.t-cases h3{left:22px;right:auto;top:26px;bottom:auto;text-align:left;font-size:30px;letter-spacing:1px}
+.a-cs .gb,.a-cs .gr{position:absolute;border-radius:50%;filter:blur(30px);pointer-events:none}
+.a-cs .gb{width:170px;height:170px;right:70px;top:-20px;background:#2f6bff66}
+.a-cs .gr{width:140px;height:140px;right:-30px;bottom:-30px;background:#ff3d5e55}
+.a-cs .chest{position:absolute;right:14px;top:50%;width:140px;height:auto;margin-top:-62px;filter:drop-shadow(0 8px 18px #000a);animation:float 3.6s ease-in-out infinite}
+.a-cs .txt{position:absolute;left:22px;top:72px;display:flex;flex-direction:column;gap:5px}
+.a-cs .txt small{font-size:13px;font-weight:800;color:#cfd8ff}
+.a-cs .txt em{font-style:normal;font-size:11px;font-weight:700;color:#8fa0d8;background:#ffffff12;padding:4px 9px;border-radius:999px;align-self:flex-start}
+.a-cs .dot{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;opacity:.5;animation:blink 2.4s infinite}
+.a-cs .d1{left:44%;top:22px}.a-cs .d2{left:58%;bottom:26px;animation-delay:-.8s}.a-cs .d3{left:36%;bottom:40px;animation-delay:-1.6s}
+html.lite .a-cs .chest,html.lite .a-cs .dot{animation:none}

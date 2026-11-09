@@ -149,7 +149,7 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cases"><span class="f f1"><img src="g_champagne.webp?v=14" alt=""></span><span class="f f2"><img src="g_candy.webp?v=14" alt=""></span><span class="f f3"><img src="g_swag.webp?v=14" alt=""></span><span class="f f4"><img src="g_cup.webp?v=14" alt=""></span><img class="box" src="case.webp?v=14" alt=""><i class="spark s1">✦</i><i class="spark s2">✦</i></div>',
+    cases: '<div class="art a-cs"><i class="gb"></i><i class="gr"></i><img class="chest" src="case.webp?v=17" alt=""><div class="txt"><small>Ежедневный кейс</small><em>Бесплатно · раз в сутки</em></div><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
     upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>»»</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""></span><b>»»</b><span class="u u3"><img src="g_cup.webp?v=14" alt=""></span></div>',
@@ -175,7 +175,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=16" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=17" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -195,7 +195,7 @@ function caseScreen(el, c) {
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
     <h4 class="sec">Содержимое кейса</h4>
-    <div class="drops">${c.pool.map(o => o.it).map(i => `<div class="dr"><div class="ic">${ico(i)}</div><span>${i.coin ? i.p + ' Rushcoin' : esc(i.n)}<small>⭐ ${fmt(i.p)}</small></span></div>`).join('')}</div>`);
+    <div class="drops">${c.pool.map(o => o.it).sort((x, y) => y.p - x.p).map(i => `<div class="dr"><div class="ic">${ico(i)}</div><span>${i.coin ? i.p + ' Rushcoin' : esc(i.n)}<small>⭐ ${fmt(i.p)}</small></span></div>`).join('')}</div>`);
   const reels = $('#reels'), win = $('#win'), act = $('#act'), btn = $('#go'); bindTurbo(el);
   const bw = c.bait || c.pool.map(o => [o.it, o.w]);
   const bsum = bw.reduce((t, o) => t + o[1], 0);
