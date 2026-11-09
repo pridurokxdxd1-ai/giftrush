@@ -29,19 +29,20 @@ const RAR = {
   common: '#8b8f9c', rare: '#3b82f6', epic: '#a855f7', legend: '#ffc83d', myth: '#ff4d5e', divine: '#ff6bf0',
 };
 function rar(p) { return p < 100 ? 'common' : p < 400 ? 'rare' : p < 1500 ? 'epic' : p < 5000 ? 'legend' : p < 30000 ? 'myth' : 'divine'; }
+const OLD = { Lollipop: 10, Bear: 15, Cookie: 20, Rose: 25, Balloon: 35, Cake: 50, Cupcake: 65, Bouquet: 80, Clover: 100, Pumpkin: 130, Rocket: 170, Trophy: 220, Joystick: 300, Ring: 400, Orb: 550, Watch: 750, Diamond: 1000, Moai: 1400, Dragon: 2000, Unicorn: 2750, Castle: 3500, UFO: 5000, Crown: 7500, Galaxy: 10000, Volcano: 12000, Crystal: 15000, Trident: 20000, Island: 30000, Satellite: 40000, Meteor: 50000, Saturn: 75000, Comet: 100000, Earth: 150000, Sun: 250000, Nova: 500000, 'Big Bang': 1000000 };
+/* настоящие NFT-подарки (картинки с вырезанным фоном) */
 const ITEMS = [
-  ['🍭', 'Lollipop', 10], ['🧸', 'Bear', 15], ['🍪', 'Cookie', 20], ['🌹', 'Rose', 25], ['🎈', 'Balloon', 35],
-  ['🎂', 'Cake', 50], ['🧁', 'Cupcake', 65], ['💐', 'Bouquet', 80], ['🍀', 'Clover', 100], ['🎃', 'Pumpkin', 130],
-  ['🚀', 'Rocket', 170], ['🏆', 'Trophy', 220], ['🎮', 'Joystick', 300], ['💍', 'Ring', 400], ['🔮', 'Orb', 550],
-  ['⌚', 'Watch', 750], ['💎', 'Diamond', 1000], ['🗿', 'Moai', 1400], ['🐉', 'Dragon', 2000], ['🦄', 'Unicorn', 2750],
-  ['🏰', 'Castle', 3500], ['🛸', 'UFO', 5000], ['👑', 'Crown', 7500], ['🌌', 'Galaxy', 10000],
-  ['🌋', 'Volcano', 12000], ['💠', 'Crystal', 15000], ['🔱', 'Trident', 20000],
-  // 6-й элемент = 1: подарок НЕ выпадает из кейсов, его можно получить только апгрейдом
-  ['🏝️', 'Island', 30000, 1], ['🛰️', 'Satellite', 40000, 1], ['🌠', 'Meteor', 50000, 1], ['🪐', 'Saturn', 75000, 1],
-  ['☄️', 'Comet', 100000, 1], ['🌍', 'Earth', 150000, 1], ['☀️', 'Sun', 250000, 1], ['💫', 'Nova', 500000, 1], ['🎆', 'Big Bang', 1000000, 1],
-].map(([e, n, p, nc]) => ({ e, n, p, nc: !!nc, r: rar(p), c: RAR[rar(p)] }));
+  ['Champagne', 50, 'g_champagne.webp', '#3fbf7f'], ['Cup', 100, 'g_cup.webp', '#f2c14e'],
+  ['Candy Cane', 450, 'g_candy.webp', '#ff5d8f'], ['Swag Bag', 490, 'g_swag.webp', '#8be04e'],
+].map(([n, p, img, c]) => ({ n, p, img, c, r: rar(p), nc: false }));
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
+/* монеты Rushcoin, выпадающие из кейса (сразу идут на баланс) */
+const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
+const COIN = p => COINS.find(x => x.p === p);
+const rcI = '<i class="rc"></i>';
+/* иконка предмета: картинка для подарка, монета с числом для Rushcoin */
+const ico = (it, big) => it.coin ? `<span class="cn">${rcI}<b>${it.p}</b></span>` : `<img class="gi" src="${it.img}?v=14" alt="" draggable="false">`;
 
 /* страховка: необработанная ошибка не должна «вешать» интерфейс */
 window.addEventListener('error', () => {}); window.addEventListener('unhandledrejection', e => { e.preventDefault(); });
@@ -65,7 +66,9 @@ const state = {
   inv: store.get('gr2_inv', []),
 };
 if (!Array.isArray(state.inv)) state.inv = [];
-state.inv = state.inv.filter(g => g && g.id && BY[g.n]);
+{ let refund = 0; state.inv.forEach(g => { if (g && !BY[g.n] && OLD[g.n]) refund += OLD[g.n]; });
+  state.inv = state.inv.filter(g => g && g.id && BY[g.n]);
+  if (refund) { state.balance += refund; store.set('gr2_bal', state.balance); store.set('gr2_inv', state.inv); } }
 function save() {
   store.set('gr2_bal', state.balance); store.set('gr2_inv', state.inv);
   $('#bal').textContent = fmt(state.balance);
@@ -96,49 +99,17 @@ try {
 
 /* ---------- cases & odds ---------- */
 /*ODDS_START*/
-const CASES = [
-  { n: 'Mask', e: '🎭', price: 79, glow: '#6b7bff' },
-  { n: 'Bear', e: '🧸', price: 149, glow: '#f472b6' },
-  { n: 'Player', e: '🎮', price: 199, glow: '#2f6bff' },
-  { n: 'Skull', e: '💀', price: 249, glow: '#35d07f' },
-  { n: 'Hallo', e: '🎃', price: 299, glow: '#ff8a1f' },
-  { n: 'Myth', e: '🗿', price: 489, glow: '#9ca3af' },
-  { n: 'Lucky', e: '🍀', price: 750, glow: '#22c55e' },
-  { n: 'Diamond', e: '💎', price: 1000, glow: '#38bdf8' },
-  { n: 'Gold', e: '🪙', price: 1500, glow: '#ffc83d' },
-  { n: 'Phoenix', e: '🔥', price: 2000, glow: '#fb923c' },
-  { n: 'Dragon', e: '🐉', price: 2750, glow: '#ef4444' },
-  { n: 'Castle', e: '🏰', price: 3500, glow: '#a855f7' },
-  { n: 'Cosmos', e: '🛸', price: 5000, glow: '#6366f1' },
-  { n: 'Royal', e: '👑', price: 7500, glow: '#f59e0b', tag: 'Топ' },
-  { n: 'Galaxy', e: '🌌', price: 10000, glow: '#d946ef', tag: 'Новое' },
-].sort((a, b) => a.price - b.price);
-
-function buildOdds(c) {
-  const P = c.price, RTP = 0.70;                                   // средний возврат игроку 65%
-  const H = Math.min(0.32, Math.max(0.16, 0.32 - 0.016 * Math.log2(P / 79))); // шанс «окупиться» (приз >= цены кейса)
-  const items = ITEMS.filter(i => !i.nc && i.p / P >= 0.02 && i.p / P <= 25);
-  const win = items.filter(i => i.p >= P), lose = items.filter(i => i.p < P);
-  const stat = k => {
-    const wl = lose.map(i => Math.pow(i.p / P, -k)), ww = win.map(i => Math.pow(i.p / P, -k));
-    const L = wl.reduce((s, x) => s + x, 0), W = ww.reduce((s, x) => s + x, 0);
-    const f = (H / (1 - H)) * L / W;                                // множитель, дающий ровно шанс H на окупаемость
-    let e = 0; lose.forEach((i, j) => { e += wl[j] * i.p; }); win.forEach((i, j) => { e += f * ww[j] * i.p; });
-    return { f, rtp: e / (L + f * W) / P };
-  };
-  let lo = -4, hi = 10;
-  for (let t = 0; t < 60; t++) { const m = (lo + hi) / 2; if (stat(m).rtp > RTP) lo = m; else hi = m; }
-  const k = (lo + hi) / 2, st = stat(k);
-  c.pool = items.map(i => ({ it: i, w: Math.pow(i.p / P, -k) * (i.p >= P ? st.f : 1) }));
-  c.sum = c.pool.reduce((s, o) => s + o.w, 0);
-  c.rtp = st.rtp; c.hit = H;
-}
+const CASES = [{
+  n: 'Daily', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
+  drops: [[ITEM('Champagne'), 4], [ITEM('Cup'), 1], [ITEM('Swag Bag'), 0.001], [ITEM('Candy Cane'), 0.01],
+    [COIN(10), 10.099], [COIN(5), 20], [COIN(3), 24], [COIN(2), 10], [COIN(1), 50]],
+}];
+CASES.forEach(c => { c.pool = c.drops.map(([it, w]) => ({ it, w })); c.sum = c.pool.reduce((t, o) => t + o.w, 0); });
 function rollCase(c) {
   let x = Math.random() * c.sum;
   for (const o of c.pool) { x -= o.w; if (x <= 0) return o.it; }
   return c.pool[c.pool.length - 1].it;
 }
-CASES.forEach(buildOdds);
 /*ODDS_END*/
 
 /* ---------- router ---------- */
@@ -176,10 +147,10 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cases"><span class="f f1">🧸</span><span class="f f2">💎</span><span class="f f3">🍀</span><span class="f f4">🏆</span><b class="box">🎁</b><i class="spark s1">✦</i><i class="spark s2">✦</i></div>',
+    cases: '<div class="art a-cases"><span class="f f1"><img src="g_champagne.webp?v=14" alt=""></span><span class="f f2"><img src="g_candy.webp?v=14" alt=""></span><span class="f f3"><img src="g_swag.webp?v=14" alt=""></span><span class="f f4"><img src="g_cup.webp?v=14" alt=""></span><img class="box" src="case.webp?v=14" alt=""><i class="spark s1">✦</i><i class="spark s2">✦</i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1">🧸</span><b>»»</b><span class="u u2">🍀</span><b>»»</b><span class="u u3">👑</span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>»»</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""></span><b>»»</b><span class="u u3"><img src="g_cup.webp?v=14" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
@@ -192,21 +163,12 @@ function home(el) {
   </div>`;
   el.querySelectorAll('.tile').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
-    b.onclick = () => go(b.dataset.id);
+    b.onclick = () => go(b.dataset.id === 'cases' ? 'case' : b.dataset.id, b.dataset.id === 'cases' ? CASES[0] : undefined);
   });
 }
 
 /* ---------- cases ---------- */
-function casesList(el) {
-  bar(el, 'CASES');
-  const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
-  CASES.forEach((c, i) => {
-    const d = document.createElement('button'); d.className = 'case';
-    d.style.setProperty('--glow', c.glow + '88'); d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.tag ? `<span class="tag">${c.tag}</span>` : ''}<span class="em" style="animation-delay:${-(i % 5) * .6}s">${c.e}</span><div class="nm"><span>${c.n}</span><span class="pr">⭐ ${fmt(c.price)}</span></div>`;
-    d.onclick = () => go('case', c); g.append(d);
-  });
-}
+function casesList(el) { caseScreen(el, CASES[0]); }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
 const isTurbo = () => !!store.get('gr2_turbo', false);
 function bindTurbo(el) {
@@ -215,23 +177,33 @@ function bindTurbo(el) {
   set(); b.onclick = () => { store.set('gr2_turbo', !isTurbo()); set(); haptic('medium'); };
 }
 function caseScreen(el, c) {
-  bar(el, c.n, 'cases');
-  const mk = it => `<div class="it" style="--c:${it.c}">${it.e}</div>`;
-  const sorted = c.pool.map(o => o.it).sort((a, b) => a.p - b.p);
-  let cnt = Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<div class="reels" id="reels"></div>
-    <div class="win" id="win">Цена: ⭐ ${fmt(c.price)}</div><div id="act"></div>
-    <div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>
+  bar(el, c.n, 'games');
+  const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
+  let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=14" alt=""><div class="reels" id="reels"></div>
+    <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
+    ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
     <h4 class="sec">Содержимое кейса</h4>
-    <div class="contents">${sorted.map(i => `<div class="ci" style="--c:${i.c}"><b>${i.e}</b>⭐ ${fmt(i.p)}</div>`).join('')}</div>`);
+    <div class="drops">${c.pool.map(o => o.it).map(i => `<div class="dr"><div class="ic">${ico(i)}</div><span>${i.coin ? i.p + ' Rushcoin' : esc(i.n)}<small>⭐ ${fmt(i.p)}</small></span></div>`).join('')}</div>`);
   const reels = $('#reels'), win = $('#win'), act = $('#act'), btn = $('#go'); bindTurbo(el);
   const filler = () => rollCase(c);
-  let busy = false;
+  let busy = false, tm = 0;
+  const left = () => c.daily ? Math.max(0, Number(store.get('gr2_daily', 0)) + c.cd - Date.now()) : 0;
+  const hms = ms => { const t = Math.ceil(ms / 1000), p = x => String(x).padStart(2, '0'); return `${p(Math.floor(t / 3600))}:${p(Math.floor(t % 3600 / 60))}:${p(t % 60)}`; };
+  function tick() {
+    if (busy) return;
+    const l = left();
+    btn.disabled = l > 0;
+    btn.textContent = c.daily ? (l > 0 ? `Доступен через ${hms(l)}` : 'Открыть бесплатно') : `Открыть${cnt > 1 ? ' ×' + cnt : ''} за ⭐ ${fmt(c.price * cnt)}`;
+    if (l > 0 && !tm) tm = setInterval(tick, 1000); else if (l <= 0 && tm) { clearInterval(tm); tm = 0; }
+    iconify(btn);
+  }
+  cleanup = () => { clearInterval(tm); tm = 0; };
   const paint = () => {
     reels.className = 'reels' + (cnt > 1 ? ' multi' : '');
     reels.innerHTML = Array.from({ length: cnt }, () => `<div class="reel-wrap"><div class="reel">${Array.from({ length: 14 }, () => mk(filler())).join('')}</div></div>`).join('');
-    btn.textContent = `Открыть${cnt > 1 ? ' ×' + cnt : ''} за ⭐ ${fmt(c.price * cnt)}`;
+    tick();
     el.querySelectorAll('#cnt .chip').forEach(b => b.classList.toggle('on', Number(b.dataset.n) === cnt));
     iconify(btn);
   };
@@ -240,9 +212,13 @@ function caseScreen(el, c) {
   btn.onclick = async () => {
     if (busy) return;
     const n = cnt;
-    if (!spend(c.price * n)) return;
+    if (c.daily) { if (left() > 0) return tick(); store.set('gr2_daily', Date.now()); }
+    else if (!spend(c.price * n)) return;
     busy = true; btn.disabled = true; act.innerHTML = ''; win.textContent = '';
-    const prizes = Array.from({ length: n }, () => rollCase(c)), gifts = prizes.map(p => addGift(p.n)); // выдаём сразу — призы не потеряются
+    const prizes = Array.from({ length: n }, () => rollCase(c));
+    const gifts = prizes.filter(p => !p.coin).map(p => addGift(p.n));   // подарки — в инвентарь, монеты — сразу на баланс
+    const coinSum = prizes.reduce((t, p) => t + (p.coin ? p.p : 0), 0);
+    if (coinSum) { state.balance += coinSum; save(); }
     const fast = isTurbo(), N = 52, stop = 44, strips = [...reels.querySelectorAll('.reel')];
     strips.forEach((reel, k) => {
       reel.style.transition = 'none'; reel.style.transform = 'translate3d(0,0,0)';
@@ -259,15 +235,16 @@ function caseScreen(el, c) {
     await sleep(fast ? 1100 + n * 120 : 4800 + n * 450); clearInterval(iv);
     if (!el.isConnected) return;
     notify('success');
-    const sum = prizes.reduce((s, p) => s + p.p, 0);
-    win.innerHTML = n === 1 ? `<div class="pop" style="color:${prizes[0].c}">${prizes[0].e} ${prizes[0].n} · ⭐ ${fmt(prizes[0].p)}</div>`
-      : `<div class="pop">${prizes.map(p => `<span style="color:${p.c}">${p.e}</span>`).join(' ')} · ⭐ ${fmt(sum)}</div>`;
-    act.innerHTML = `<button class="btn green sm" id="sell">${n > 1 ? 'Продать всё' : 'Продать'} за ⭐ ${fmt(sum)}</button>`;
-    $('#sell').onclick = () => {
+    const sum = prizes.reduce((s, p) => s + p.p, 0), gsum = prizes.reduce((s, p) => s + (p.coin ? 0 : p.p), 0);
+    if (coinSum) bump();
+    win.innerHTML = n === 1 ? `<div class="pop" style="color:${prizes[0].c}">${prizes[0].coin ? '+' + prizes[0].p + ' ⭐' : esc(prizes[0].n) + ' · ⭐ ' + fmt(prizes[0].p)}</div>`
+      : `<div class="pop">${prizes.map(p => `<span style="color:${p.c}">${p.coin ? '+' + p.p : esc(p.n)}</span>`).join(' · ')} · ⭐ ${fmt(sum)}</div>`;
+    act.innerHTML = gifts.length ? `<button class="btn green sm" id="sell">${gifts.length > 1 ? 'Продать всё' : 'Продать'} за ⭐ ${fmt(gsum)}</button>` : '';
+    if (gifts.length) $('#sell').onclick = () => {
       let v = 0; gifts.forEach(g => { if (invGift(g.id)) v += sellGift(g.id); });
       if (!v) return; toast(`+${fmt(v)} ⭐ на баланс`); act.innerHTML = ''; haptic('medium');
     };
-    btn.disabled = false; busy = false;
+    busy = false; tick();
   };
 }
 
@@ -283,7 +260,7 @@ function upgradeScreen(el) {
   let { g: mg, gi: mi, S } = stakeOf();
   let wi = up.want ? ITEM(up.want) : null;
   if (wi && wi.p <= S) { wi = null; up.want = null; }
-  const slot = i => i ? `${i.e}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
+  const slot = i => i ? `${ico(i)}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
   el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или Rushcoin. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
     <div class="slot"><h4>Ваш подарок (необязательно)</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
     <div class="slot"><h4>Добавить Rushcoin</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
@@ -336,7 +313,7 @@ function upgradeScreen(el) {
     await sleep(fast ? 1450 : 4800);
     hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
-    toast(ok ? `🎉 Успех! ${wi.e} ${wi.n}` : '💥 Неудача, ставка сгорела');
+    toast(ok ? `🎉 Успех! ${wi.n}` : '💥 Неудача, ставка сгорела');
     up.mine = null; up.want = null; up.bal = 0;
     if (el.isConnected) { await sleep(1500); if (el.isConnected) go('upgrade'); }
   };
@@ -360,7 +337,7 @@ function pickScreen(el, kind) {
   if (!list.length) { g.innerHTML = kind === 'mine' ? '<div class="empty"><b>📭</b>Пока пусто. Откройте кейс.</div>' : '<div class="empty"><b>📭</b>Нет подарков дороже вашей ставки.</div>'; return; }
   list.forEach((o, i) => {
     const b = document.createElement('button'); b.className = 'case'; b.style.animationDelay = Math.min(i, 8) * 35 + 'ms';
-    b.innerHTML = `<span class="em" style="font-size:52px;animation:none">${o.it.e}</span><div class="nm"><span>${o.it.n}</span><span class="pr">⭐ ${fmt(o.it.p)}</span></div>`;
+    b.innerHTML = `<span class="em" style="height:64px;animation:none">${ico(o.it)}</span><div class="nm"><span>${o.it.n}</span><span class="pr">⭐ ${fmt(o.it.p)}</span></div>`;
     b.onclick = () => { if (kind === 'mine') { up.mine = o.id; up.want = null; } else up.want = o.id; go('upgrade'); };
     g.append(b);
   });
@@ -1195,12 +1172,12 @@ function profileScreen(el) {
   if (!list.length) { inv.innerHTML = '<div class="empty"><b>🎁</b>Инвентарь пуст.<br>Откройте кейс, чтобы получить подарок.</div>'; return; }
   list.forEach((o, i) => {
     const b = document.createElement('button'); b.className = 'tile'; b.style.setProperty('--c', o.it.c); b.style.animationDelay = Math.min(i, 12) * 30 + 'ms';
-    b.innerHTML = `<b>${o.it.e}</b><small>⭐ ${fmt(o.it.p)}</small>`; b.onclick = () => openGift(o.g); inv.append(b);
+    b.innerHTML = `<b>${ico(o.it)}</b><small>⭐ ${fmt(o.it.p)}</small>`; b.onclick = () => openGift(o.g); inv.append(b);
   });
 }
 function openGift(g) {
   const it = ITEM(g.n); if (!it) return;
-  const m = modal(`<div class="g-em" style="--c:${it.c}"><span>${it.e}</span></div><div class="g-n">${it.n}</div><div class="g-p">⭐ ${fmt(it.p)}</div>
+  const m = modal(`<div class="g-em" style="--c:${it.c}"><span>${ico(it)}</span></div><div class="g-n">${it.n}</div><div class="g-p">⭐ ${fmt(it.p)}</div>
     <div class="g-act"><button class="btn red" id="wd">Вывести</button><button class="btn green" id="sl">Продать</button></div>
     <div class="wd-msg" id="wdm">ВЫВОД НЕДОСТУПЕН ДО 29.11.2026</div>`);
   const msg = $('#wdm', m.el);

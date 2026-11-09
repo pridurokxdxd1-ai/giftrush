@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Manrope:wght@600;700;800&family=Rubik:wght@800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
-<div id="splash"><video id="sv" src="intro.mp4" poster="intro.jpg" muted playsinline webkit-playsinline preload="auto" autoplay></video><canvas id="sc"></canvas></div>
+<div id="splash"><video id="sv" src="intro.mp4" poster="intro.jpg" muted playsinline webkit-playsinline preload="auto" autoplay></video></div>
 <div id="app">
   <header id="top">
     <div class="brand">🎁 GiftRush</div>
@@ -29,25 +29,13 @@
   </nav>
 </div>
 <div id="toast"></div>
-<script src="app.js?v=13"></script>
+<script src="app.js?v=15"></script>
 <script>
-(function(){var s=document.getElementById('splash'),v=document.getElementById('sv'),cv=document.getElementById('sc'),d=false,raf=0,ctx=cv.getContext('2d');
-var dpr=Math.min(window.devicePixelRatio||1,2),W=cv.width=Math.round(innerWidth*dpr),H=cv.height=Math.round(innerHeight*dpr),N=36;
-function hide(){if(d)return;d=true;cancelAnimationFrame(raf);s.classList.add('out');setTimeout(function(){s.remove()},800)}
-/* лёгкая «флаговая» волна: полоски картинки колышутся, как ткань на ветру */
-function draw(t){if(d)return;raf=requestAnimationFrame(draw);
- if(v.readyState<2||!v.videoWidth)return;
- var vw=v.videoWidth,vh=v.videoHeight,sc=Math.max(W/vw,H/vh)*1.07,dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2,sw=W/N,tt=t/1000;
- ctx.fillStyle='#02051a';ctx.fillRect(0,0,W,H);
- for(var i=0;i<N;i++){var x=i*sw,f=x/W,amp=H*0.011*(0.25+f),ph=f*7+tt*3.2;
-  var y=Math.sin(ph)*amp+Math.sin(f*13-tt*4.1)*amp*.35;
-  ctx.drawImage(v,(x-ox)/sc,0,sw/sc+1,vh,x,oy+y,sw+1,dh);
-  var sh=Math.cos(ph)*.16;ctx.fillStyle=sh>0?'rgba(255,255,255,'+(sh*.3)+')':'rgba(0,0,12,'+(-sh*.9)+')';ctx.fillRect(x,0,sw+1,H);}
- cv.style.opacity=1;}
+(function(){var s=document.getElementById('splash'),v=document.getElementById('sv'),d=false;
+function hide(){if(d)return;d=true;s.classList.add('out');setTimeout(function(){s.remove()},800)}
 try{var p=v.play();if(p&&p.catch)p.catch(function(){})}catch(e){}
-raf=requestAnimationFrame(draw);
-v.addEventListener('ended',function(){setTimeout(hide,250)});v.addEventListener('error',function(){setTimeout(hide,1200)});
-setTimeout(hide,2500);})();
+v.addEventListener('ended',hide);v.addEventListener('error',function(){setTimeout(hide,1200)});
+setTimeout(hide,2400);})();
 </script>
 </body>
 </html>
