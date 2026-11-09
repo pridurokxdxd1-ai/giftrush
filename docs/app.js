@@ -43,6 +43,8 @@ const ITEMS = [
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 
+/* страховка: необработанная ошибка не должна «вешать» интерфейс */
+window.addEventListener('error', () => {}); window.addEventListener('unhandledrejection', e => { e.preventDefault(); });
 /* ---------- иконка Rushcoin (вместо ⭐) ---------- */
 function iconify(root) {
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.indexOf('⭐') >= 0 ? 1 : 3 }), list = [];
@@ -91,8 +93,6 @@ try {
   document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
 } catch (e) {}
 
-/* ticker */
-$('#tickerTrack').innerHTML = [...ITEMS, ...ITEMS].map(i => `<span>${i.e}</span>`).join('');
 
 /* ---------- cases & odds ---------- */
 /*ODDS_START*/
@@ -218,38 +218,54 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${it.e}</div>`;
   const sorted = c.pool.map(o => o.it).sort((a, b) => a.p - b.p);
-  el.insertAdjacentHTML('beforeend', `<div class="reel-wrap"><div class="reel" id="reel"></div></div>
+  let cnt = Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
+  el.insertAdjacentHTML('beforeend', `<div class="reels" id="reels"></div>
     <div class="win" id="win">Цена: ⭐ ${fmt(c.price)}</div><div id="act"></div>
-    <div class="openrow"><button class="btn" id="go">Открыть за ⭐ ${fmt(c.price)}</button>${TURBO_BTN}</div>
+    <div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>
+    <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
     <h4 class="sec">Содержимое кейса</h4>
     <div class="contents">${sorted.map(i => `<div class="ci" style="--c:${i.c}"><b>${i.e}</b>⭐ ${fmt(i.p)}</div>`).join('')}</div>`);
-  const reel = $('#reel'), win = $('#win'), act = $('#act'), btn = $('#go'); bindTurbo(el);
+  const reels = $('#reels'), win = $('#win'), act = $('#act'), btn = $('#go'); bindTurbo(el);
   const filler = () => rollCase(c);
-  reel.innerHTML = Array.from({ length: 14 }, () => mk(filler())).join('');
   let busy = false;
+  const paint = () => {
+    reels.className = 'reels' + (cnt > 1 ? ' multi' : '');
+    reels.innerHTML = Array.from({ length: cnt }, () => `<div class="reel-wrap"><div class="reel">${Array.from({ length: 14 }, () => mk(filler())).join('')}</div></div>`).join('');
+    btn.textContent = `Открыть${cnt > 1 ? ' ×' + cnt : ''} за ⭐ ${fmt(c.price * cnt)}`;
+    el.querySelectorAll('#cnt .chip').forEach(b => b.classList.toggle('on', Number(b.dataset.n) === cnt));
+    iconify(btn);
+  };
+  el.querySelectorAll('#cnt .chip').forEach(b => b.onclick = () => { if (busy) return; cnt = Number(b.dataset.n); store.set('gr2_cnt', cnt); act.innerHTML = ''; win.textContent = `Цена: ⭐ ${fmt(c.price)}`; paint(); haptic(); });
+  paint();
   btn.onclick = async () => {
     if (busy) return;
-    if (!spend(c.price)) return;
+    const n = cnt;
+    if (!spend(c.price * n)) return;
     busy = true; btn.disabled = true; act.innerHTML = ''; win.textContent = '';
-    const prize = rollCase(c), gift = addGift(prize.n); // выдаём сразу — приз не потеряется
-    const N = 52, stop = 44;
-    const arr = Array.from({ length: N }, (_, i) => i === stop ? prize : filler());
-    reel.style.transition = 'none'; reel.style.transform = 'translate3d(0,0,0)';
-    reel.innerHTML = arr.map(mk).join(''); void reel.offsetWidth;
-    const w = reel.parentElement.offsetWidth, tgt = reel.children[stop];   // реальная позиция призового предмета (на узких экранах размер другой)
-    const off = tgt.offsetLeft + tgt.offsetWidth / 2 - w / 2 + rnd(-tgt.offsetWidth * .3, tgt.offsetWidth * .3);
-    const fast = isTurbo();
-    reel.style.transition = fast ? 'transform .95s cubic-bezier(.2,.7,.15,1)' : 'transform 5s cubic-bezier(.1,.75,.12,1)';
-    reel.style.transform = `translate3d(${-off}px,0,0)`;
+    const prizes = Array.from({ length: n }, () => rollCase(c)), gifts = prizes.map(p => addGift(p.n)); // выдаём сразу — призы не потеряются
+    const fast = isTurbo(), N = 52, stop = 44, strips = [...reels.querySelectorAll('.reel')];
+    strips.forEach((reel, k) => {
+      reel.style.transition = 'none'; reel.style.transform = 'translate3d(0,0,0)';
+      reel.innerHTML = Array.from({ length: N }, (_, i) => i === stop ? prizes[k] : filler()).map(mk).join('');
+    });
+    void reels.offsetWidth;
+    strips.forEach((reel, k) => {
+      const w = reel.parentElement.offsetWidth, tgt = reel.children[stop];   // реальная позиция призового предмета
+      const off = tgt.offsetLeft + tgt.offsetWidth / 2 - w / 2 + rnd(-tgt.offsetWidth * .3, tgt.offsetWidth * .3);
+      reel.style.transition = fast ? `transform ${.85 + k * .12}s cubic-bezier(.2,.7,.15,1)` : `transform ${4.6 + k * .45}s cubic-bezier(.1,.75,.12,1)`;
+      reel.style.transform = `translate3d(${-off}px,0,0)`;
+    });
     const iv = fast ? 0 : setInterval(() => haptic('light'), 170);
-    await sleep(fast ? 1100 : 5150); clearInterval(iv);
+    await sleep(fast ? 1100 + n * 120 : 4800 + n * 450); clearInterval(iv);
     if (!el.isConnected) return;
     notify('success');
-    win.innerHTML = `<div class="pop" style="color:${prize.c}">${prize.e} ${prize.n} · ⭐ ${fmt(prize.p)}</div>`;
-    act.innerHTML = `<button class="btn green sm" id="sell">Продать за ⭐ ${fmt(prize.p)}</button>`;
+    const sum = prizes.reduce((s, p) => s + p.p, 0);
+    win.innerHTML = n === 1 ? `<div class="pop" style="color:${prizes[0].c}">${prizes[0].e} ${prizes[0].n} · ⭐ ${fmt(prizes[0].p)}</div>`
+      : `<div class="pop">${prizes.map(p => `<span style="color:${p.c}">${p.e}</span>`).join(' ')} · ⭐ ${fmt(sum)}</div>`;
+    act.innerHTML = `<button class="btn green sm" id="sell">${n > 1 ? 'Продать всё' : 'Продать'} за ⭐ ${fmt(sum)}</button>`;
     $('#sell').onclick = () => {
-      if (!invGift(gift.id)) return;
-      const v = sellGift(gift.id); toast(`+${fmt(v)} ⭐ на баланс`); act.innerHTML = ''; haptic('medium');
+      let v = 0; gifts.forEach(g => { if (invGift(g.id)) v += sellGift(g.id); });
+      if (!v) return; toast(`+${fmt(v)} ⭐ на баланс`); act.innerHTML = ''; haptic('medium');
     };
     btn.disabled = false; busy = false;
   };
@@ -259,7 +275,7 @@ function caseScreen(el, c) {
 const up = { mine: null, want: null, bal: 0 };
 const UP_MAX = 80;
 const stakeOf = () => { const g = up.mine && invGift(up.mine), gi = g ? ITEM(g.n) : null; return { g, gi, S: (gi ? gi.p : 0) + (up.bal || 0) }; };
-const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(1, (S / w.p) * 97));
+const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(0.01, (S / w.p) * 97));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
   if (up.mine && !invGift(up.mine)) up.mine = null;
@@ -285,7 +301,7 @@ function upgradeScreen(el) {
     wantB.className = 'pick ' + (wi ? 'has' : ''); wantB.innerHTML = slot(wi);
     chance = mi || up.bal ? (wi ? chanceOf(S, wi) : 0) : 0;
     $('#rarc').style.strokeDasharray = `${chance / 100 * 276.46} 276.46`;
-    rnum.textContent = chance ? chance.toFixed(1) + '%' : '—'; rx.textContent = chance ? `x${(wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
+    rnum.textContent = chance ? (chance < 1 ? chance.toFixed(2) : chance.toFixed(1)) + '%' : '—'; rx.textContent = chance ? `x${wi.p / S >= 1000 ? fmt(Math.round(wi.p / S)) : (wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
     goB.textContent = !S ? 'Добавьте подарок или Rushcoin' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
   };
   const setBal = v => { up.bal = Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.floor(state.balance)); paint(); };
@@ -567,8 +583,8 @@ function crashScreen(el) {
 
   /* отрисовка */
   const stars = Array.from({ length: 26 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
-  const RS = Math.min(W * .4, 104 * dpr);               // размер ракеты
-  const X0 = W * .17, Y0 = H * .76, X1 = W * .5, Y1 = H * .5; // старт слева-снизу → центр (дальше она не уходит)
+  const RS = Math.min(W * .44, 118 * dpr);               // размер ракеты
+  const X0 = W * .17, Y0 = H * .8, X1 = W * .5, Y1 = H * .6; // старт слева-снизу → центр (дальше она не уходит)
   let burst = null;
   const frame = () => {
     if (!alive) return;
@@ -830,20 +846,17 @@ function rouletteScreen(el) {
 /* ---------- plinko ---------- */
 const PL_ROWS = 10, PL_MULT = [11, 5.5, 2.5, 1, 0.4, 0.2, 0.4, 1, 2.5, 5.5, 11];
 const plCol = m => m >= 5 ? '#ff4d5e' : m >= 2 ? '#ff9a3d' : m >= 1 ? '#3ee48f' : '#ffd23f';
-let plHist = store.get('gr2_phist', []); if (!Array.isArray(plHist)) plHist = []; plHist = plHist.filter(x => typeof x === 'number').slice(-10);
 function plinkoScreen(el) {
   bar(el, 'PLINKO');
-  el.insertAdjacentHTML('beforeend', `<div class="hist" id="phist"></div><div class="pl-box"><canvas id="pcv"></canvas></div>
+  el.insertAdjacentHTML('beforeend', `<div class="pl-box"><canvas id="pcv"></canvas></div>
     <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-m="0.5">½</button><button data-m="2">×2</button><button data-max>MAX</button></div>
     <button class="btn" id="drop">Бросить шар</button>
     <div class="odds">Шар отскакивает от шипов и падает в одну из ячеек · мин. ставка 20 ⭐ · можно бросать несколько шаров подряд</div>`);
-  const cv = $('#pcv'), ctx = cv.getContext('2d'), betIn = $('#bet'), hist = $('#phist');
+  const cv = $('#pcv'), ctx = cv.getContext('2d'), betIn = $('#bet');
   const dpr = Math.min(window.devicePixelRatio || 1, document.documentElement.classList.contains('lite') ? 1.5 : 2);
   const W = Math.max(10, Math.round(cv.offsetWidth * dpr)), H = Math.max(10, Math.round(cv.offsetHeight * dpr));
   cv.width = W; cv.height = H;
   let alive = true, raf = 0, lastHap = 0, dirty = true;
-  const paintHist = () => { hist.innerHTML = plHist.slice().reverse().map(m => `<span class="${m >= 1 ? 'h' : 'l'}">x${m}</span>`).join(''); };
-  paintHist();
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
   el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); });
 
@@ -857,7 +870,7 @@ function plinkoScreen(el) {
   /* статичный слой: шипы + труба */
   const layer = document.createElement('canvas'); layer.width = W; layer.height = H; const lx = layer.getContext('2d');
   const peg = document.createElement('canvas'); const ps = Math.ceil(PR * 7); peg.width = peg.height = ps; { const g = peg.getContext('2d'), c = ps / 2;
-    const gr = g.createRadialGradient(c, c, 0, c, c, c); gr.addColorStop(0, '#5cc8ff66'); gr.addColorStop(1, '#5cc8ff00'); g.fillStyle = gr; g.fillRect(0, 0, ps, ps);
+    const gr = g.createRadialGradient(c, c, 0, c, c, c); gr.addColorStop(0, '#5cc8ff1c'); gr.addColorStop(1, '#5cc8ff00'); g.fillStyle = gr; g.fillRect(0, 0, ps, ps);
     const pg = g.createRadialGradient(c - PR * .3, c - PR * .35, PR * .1, c, c, PR); pg.addColorStop(0, '#d8f4ff'); pg.addColorStop(.45, '#46b9ff'); pg.addColorStop(1, '#1f6dff');
     g.fillStyle = pg; g.beginPath(); g.arc(c, c, PR, 0, 7); g.fill(); }
   pegs.forEach(r => r.forEach(p => lx.drawImage(peg, p.x - ps / 2, p.y - ps / 2)));
@@ -870,16 +883,16 @@ function plinkoScreen(el) {
 
   /* шарики и эффекты */
   const balls = [], rings = [], sparks = [], floats = [], flash = Array(PL_MULT.length).fill(0);
-  const T_IN = 450, T_OUT = 450;
+  const T_IN = 260, T_OUT = 380;
   function launch(bet) {
     const d = Array.from({ length: PL_ROWS }, () => Math.random() < .5 ? -1 : 1);
     const s = d.reduce((x, y) => x + y, 0), k = s / 2 + 5, mult = PL_MULT[k], win = Math.floor(bet * mult);
-    const durs = d.map(() => 500 * (.92 + Math.random() * .16)); const t = [T_IN]; durs.forEach(x => t.push(t[t.length - 1] + x));
+    const durs = d.map(() => 450 * (.93 + Math.random() * .14)); const t = [T_IN]; durs.forEach(x => t.push(t[t.length - 1] + x));
     balls.push({ t0: performance.now(), d, k, mult, win, bet, durs, t, seg: -1, done: false, paid: false, trail: [] });
   }
   const payBall = b => { if (b.paid) return; b.paid = true; state.balance += b.win; save(); };
   const ballPos = (b, el_) => {
-    const hop = dy * .6, cy = i => pegY(i) - PR - BR * .9;
+    const hop = dy * .42, cy = i => pegY(i) - PR - BR * .9;
     let xi = 0; const X = i => { let x = 0; for (let n = 0; n < i; n++) x += b.d[n] * .5; return W / 2 + x * dx; };
     if (el_ < T_IN) { const u = el_ / T_IN; return [W / 2, H * .115 + (cy(0) - H * .115) * u * u, 0]; }
     const i = b.t.findIndex((v, n) => n > 0 && el_ < v) - 1;                    // сегмент между шипами
@@ -892,7 +905,7 @@ function plinkoScreen(el) {
     return [xa + (xb - xa) * (u < .5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u)), ya + (yb - ya) * u * u - hop * 4 * u * (1 - u), 0];
   };
   const bsp = document.createElement('canvas'); const bs = Math.ceil(BR * 5); bsp.width = bsp.height = bs; { const g = bsp.getContext('2d'), c = bs / 2;
-    const gr = g.createRadialGradient(c, c, 0, c, c, c); gr.addColorStop(0, '#ffffffaa'); gr.addColorStop(.4, '#9fd8ff44'); gr.addColorStop(1, '#9fd8ff00'); g.fillStyle = gr; g.fillRect(0, 0, bs, bs);
+    const gr = g.createRadialGradient(c, c, 0, c, c, c); gr.addColorStop(0, '#ffffff66'); gr.addColorStop(.45, '#9fd8ff18'); gr.addColorStop(1, '#9fd8ff00'); g.fillStyle = gr; g.fillRect(0, 0, bs, bs);
     const bg = g.createRadialGradient(c - BR * .3, c - BR * .3, BR * .1, c, c, BR); bg.addColorStop(0, '#fff'); bg.addColorStop(1, '#cfe6ff'); g.fillStyle = bg; g.beginPath(); g.arc(c, c, BR, 0, 7); g.fill(); }
 
   const slotColors = PL_MULT.map(plCol);
@@ -908,7 +921,6 @@ function plinkoScreen(el) {
   }
   function finish(b, now) {
     b.done = true; flash[b.k] = now; payBall(b); bump(); haptic('medium');
-    plHist.push(b.mult); plHist = plHist.slice(-10); store.set('gr2_phist', plHist); paintHist();
     floats.push({ x: slotX(b.k), y: slotTop - H * .02, t: now, txt: b.win >= b.bet ? `+${fmt(b.win - b.bet)}` : `−${fmt(b.bet - b.win)}`, c: b.win >= b.bet ? '#3ee48f' : '#ff8a96' });
     if (b.win >= b.bet * 2) notify('success');
     for (let n = 0; n < 8; n++) sparks.push({ x: slotX(b.k), y: slotTop, vx: rnd(-1, 1) * dx * .04, vy: -rnd(.4, 1.2) * dx * .08, t: now, c: slotColors[b.k] });
@@ -921,8 +933,8 @@ function plinkoScreen(el) {
       ctx.clearRect(0, 0, W, H); ctx.drawImage(layer, 0, 0);
       // отклик шипов
       for (let i = 0; i < PL_ROWS; i++) for (const p of pegs[i]) { const f = 1 - (now - p.hit) / 420; if (f > 0) {
-        ctx.globalAlpha = f; const sc = 1 + f * .9; ctx.drawImage(peg, p.x - ps * sc / 2, p.y - ps * sc / 2, ps * sc, ps * sc);
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, PR * (1 + f * .35), 0, 7); ctx.fill(); ctx.globalAlpha = 1; } }
+        ctx.globalAlpha = f; const sc = 1 + f * .45; ctx.globalAlpha = f * .6; ctx.drawImage(peg, p.x - ps * sc / 2, p.y - ps * sc / 2, ps * sc, ps * sc);
+        ctx.globalAlpha = f * .85; ctx.fillStyle = '#e6f6ff'; ctx.beginPath(); ctx.arc(p.x, p.y, PR * (1 + f * .2), 0, 7); ctx.fill(); ctx.globalAlpha = 1; } }
       for (let n = rings.length - 1; n >= 0; n--) { const r = rings[n], f = (now - r.t) / 520; if (f >= 1) { rings.splice(n, 1); continue; }
         ctx.strokeStyle = `rgba(140,215,255,${1 - f})`; ctx.lineWidth = 2 * dpr; ctx.beginPath(); ctx.arc(r.x, r.y, PR * (1.2 + f * 3.2), 0, 7); ctx.stroke(); }
       drawSlots(now);
@@ -959,7 +971,7 @@ function plinkoScreen(el) {
     if (!spend(v)) return;
     launch(v); haptic('medium');
   };
-  cleanup = () => { alive = false; cancelAnimationFrame(raf); balls.forEach(b => { if (!b.paid) { payBall(b); plHist.push(b.mult); } }); plHist = plHist.slice(-10); store.set('gr2_phist', plHist); };
+  cleanup = () => { alive = false; cancelAnimationFrame(raf); balls.forEach(b => payBall(b)); };
 }
 
 /* ---------- mines ---------- */
@@ -1056,7 +1068,7 @@ function openTG(url) { try { if (tg && tg.openTelegramLink) return tg.openTelegr
 function tasksScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай Rushcoin</p></div>
     ${subTask(SUBS[0])}${subTask(SUBS[1])}
-    <div class="task" id="t1"><div class="ti"><h3>Стать крутым типом</h3><span class="rew">+⭐ 5 000</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
+    <div class="task" id="t1"><div class="ti"><h3>Зайти в Gift Rush</h3><span class="rew">+⭐ 5 000</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
     <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
     ${subTask(SUBS[2])}${subTask(SUBS[3])}
     <div class="task" id="t3"><div class="ti"><h3>Апнуть 25 000 ⭐</h3><span class="rew">+⭐ 50 000</span>
