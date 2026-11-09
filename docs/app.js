@@ -103,6 +103,8 @@ const CASES = [{
   n: 'Daily', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
   drops: [[ITEM('Champagne'), 4], [ITEM('Cup'), 1], [ITEM('Swag Bag'), 0.001], [ITEM('Candy Cane'), 0.01],
     [COIN(10), 10.099], [COIN(5), 20], [COIN(3), 24], [COIN(2), 10], [COIN(1), 50]],
+  // что мелькает на ленте при прокрутке (не влияет на реальные шансы)
+  bait: [[ITEM('Swag Bag'), 7], [ITEM('Candy Cane'), 8], [ITEM('Cup'), 10], [ITEM('Champagne'), 11], [COIN(10), 12], [COIN(5), 14], [COIN(3), 14], [COIN(2), 12], [COIN(1), 12]],
 }];
 CASES.forEach(c => { c.pool = c.drops.map(([it, w]) => ({ it, w })); c.sum = c.pool.reduce((t, o) => t + o.w, 0); });
 function rollCase(c) {
@@ -163,12 +165,20 @@ function home(el) {
   </div>`;
   el.querySelectorAll('.tile').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
-    b.onclick = () => go(b.dataset.id === 'cases' ? 'case' : b.dataset.id, b.dataset.id === 'cases' ? CASES[0] : undefined);
+    b.onclick = () => go(b.dataset.id);
   });
 }
 
 /* ---------- cases ---------- */
-function casesList(el) { caseScreen(el, CASES[0]); }
+function casesList(el) {
+  bar(el, 'CASES');
+  const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
+  CASES.forEach((c, i) => {
+    const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=16" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.onclick = () => go('case', c); g.append(d);
+  });
+}
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
 const isTurbo = () => !!store.get('gr2_turbo', false);
 function bindTurbo(el) {
@@ -177,7 +187,7 @@ function bindTurbo(el) {
   set(); b.onclick = () => { store.set('gr2_turbo', !isTurbo()); set(); haptic('medium'); };
 }
 function caseScreen(el, c) {
-  bar(el, c.n, 'games');
+  bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
   el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=14" alt=""><div class="reels" id="reels"></div>
@@ -187,7 +197,9 @@ function caseScreen(el, c) {
     <h4 class="sec">Содержимое кейса</h4>
     <div class="drops">${c.pool.map(o => o.it).map(i => `<div class="dr"><div class="ic">${ico(i)}</div><span>${i.coin ? i.p + ' Rushcoin' : esc(i.n)}<small>⭐ ${fmt(i.p)}</small></span></div>`).join('')}</div>`);
   const reels = $('#reels'), win = $('#win'), act = $('#act'), btn = $('#go'); bindTurbo(el);
-  const filler = () => rollCase(c);
+  const bw = c.bait || c.pool.map(o => [o.it, o.w]);
+  const bsum = bw.reduce((t, o) => t + o[1], 0);
+  const filler = () => { let x = Math.random() * bsum; for (const o of bw) { x -= o[1]; if (x <= 0) return o[0]; } return bw[0][0]; };   // «байт»: на ленте дорогие подарки мелькают чаще, чем выпадают
   let busy = false, tm = 0;
   const left = () => c.daily ? Math.max(0, Number(store.get('gr2_daily', 0)) + c.cd - Date.now()) : 0;
   const hms = ms => { const t = Math.ceil(ms / 1000), p = x => String(x).padStart(2, '0'); return `${p(Math.floor(t / 3600))}:${p(Math.floor(t % 3600 / 60))}:${p(t % 60)}`; };
