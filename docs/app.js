@@ -159,10 +159,10 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=23" alt=""><img class="gf g1" src="case_toxic.webp?v=23" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=24" alt=""><img class="gf g1" src="case_toxic.webp?v=24" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=23" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=23" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=24" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=24" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
@@ -187,10 +187,10 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=23" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=24" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=23" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=24" alt="" draggable="false">`).join('');
   el.insertAdjacentHTML('beforeend', `<div class="mq"><div class="mq-t">${strip}${strip}</div></div>`);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
@@ -204,7 +204,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=23" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=24" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -377,7 +377,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=23';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=24';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -389,8 +389,10 @@ function drawRocket(ctx, x, y, size, t, alpha, rot) {
 }
 
 /* ---------- crash (онлайн, общий сервер) ---------- */
-const CRASH_K = 0.1425;
-const crashMult = ms => Math.floor(Math.exp(CRASH_K * Math.max(0, ms) / 1000) * 100) / 100;
+/* рост иксa ускоряется: x = exp(K1·t + K2·t²), максимум x100 */
+const CRASH_K1 = 0.12, CRASH_K2 = 0.004, CRASH_MAX = 100;
+const crashMult = ms => { const t = Math.max(0, ms) / 1000; return Math.min(CRASH_MAX, Math.floor(Math.exp(CRASH_K1 * t + CRASH_K2 * t * t) * 100) / 100); };
+const crashTime = x => { const L = Math.log(x); return (-CRASH_K1 + Math.sqrt(CRASH_K1 * CRASH_K1 + 4 * CRASH_K2 * L)) / (2 * CRASH_K2) * 1000; };
 /* Онлайн-режим (общие раунды на сервере) временно выключен. Чтобы вернуть: ONLINE = true */
 const ONLINE = false;
 const OFFLINE_TXT = ONLINE ? 'Офлайн-режим · сервер не найден' : 'Офлайн-режим';
@@ -398,7 +400,7 @@ const LIVE_BADGE = ONLINE ? '<span class="live">ONLINE</span>' : '';
 const apiBase = () => { try { return new URLSearchParams(location.search).get('api') || ''; } catch (e) { return ''; } };
 
 /* огромные иксы редкие; история живёт, пока открыт бот (новый запуск — новая история) */
-const genCrash = () => { let x = 0.95 / (1 - Math.random() * 0.99); if (x > 8) x = 8 + (x - 8) * 0.3; return Math.min(60, Math.max(1, +x.toFixed(2))); };
+const genCrash = () => { let x = 0.95 / (1 - Math.random() * 0.9993); if (x > 8) x = 8 + (x - 8) * 0.3; return Math.min(CRASH_MAX, Math.max(1, +x.toFixed(2))); };
 const CRASH_HIST = Array.from({ length: 9 }, genCrash);
 
 /* офлайн-сервер: тот же протокол, но раунды крутятся прямо в телефоне */
@@ -410,7 +412,7 @@ function localServer(onMsg) {
   const me = { uid: 'me', name: TGU ? (TGU.username ? '@' + TGU.username : TGU.first_name || 'Игрок') : 'Игрок', photo: (TGU && TGU.photo_url) || '' };
   const newRound = first => {
     round++; phase = 'wait'; bet = null;
-    crashAt = genCrash(); crashMs = Math.log(crashAt) / CRASH_K * 1000; until = Date.now() + 6000;
+    crashAt = genCrash(); crashMs = crashTime(crashAt); until = Date.now() + 6000;
     if (!first) emit({ t: 'round', round, until, now: Date.now() });
     T(() => {
       phase = 'fly'; t0 = Date.now(); emit({ t: 'fly', t0 });
@@ -430,7 +432,7 @@ function localServer(onMsg) {
       } else if (m.t === 'cash') {
         if (phase !== 'fly' || !bet || bet.mult != null) return;
         const el = Date.now() - t0; if (el >= crashMs) return emit({ t: 'err', code: 'late', msg: 'Слишком поздно' });
-        const mu = crashMult(el); bet.mult = mu;
+        let mu = crashMult(el); if (m.auto >= 1.01) mu = Math.min(mu, +m.auto); bet.mult = mu;
         emit({ t: 'cash_ok', mult: mu, payout: Math.floor(bet.amount * mu) }); emit({ t: 'cash', uid: me.uid, mult: mu });
       }
     },
@@ -466,6 +468,7 @@ function crashScreen(el) {
     <div class="hist" id="hist"></div>
     <div class="crash-box"><canvas id="cv"></canvas><div class="mult" id="mult">Старт…</div></div>
     <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-m="0.5">½</button><button data-m="2">×2</button><button data-max>MAX</button></div>
+    <div class="auto"><span>Авто-вывод</span><label class="ax"><input id="auto" type="number" inputmode="decimal" step="0.01" min="1.01" max="100"><b>x</b></label><button class="sw" id="autoSw" aria-label="Авто-вывод"><i></i></button></div>
     <button class="btn" id="go" disabled>Подключение…</button>
     <div class="bhd"><h4 class="sec" style="margin:0">Ставки</h4><span id="bcount"></span></div>
     <div class="bets" id="bets"></div>`);
@@ -477,6 +480,13 @@ function crashScreen(el) {
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
   el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
 
+  const autoIn = $('#auto'), autoSw = $('#autoSw');
+  let AU = store.get('gr2_auto', { on: false, v: 2 }); if (!AU || typeof AU !== 'object') AU = { on: false, v: 2 };
+  autoIn.value = (Number(AU.v) >= 1.01 ? Number(AU.v) : 2).toFixed(2); autoSw.classList.toggle('on', !!AU.on);
+  const autoVal = () => Math.min(100, Math.max(1.01, Number(autoIn.value) || 2));
+  const autoSave = () => { AU = { on: AU.on, v: autoVal() }; store.set('gr2_auto', AU); };
+  autoIn.onchange = () => { autoIn.value = autoVal().toFixed(2); autoSave(); };
+  autoSw.onclick = () => { AU.on = !AU.on; autoSw.classList.toggle('on', AU.on); autoSave(); haptic(); toast(AU.on ? `Авто-вывод на x${autoVal().toFixed(2)}` : 'Авто-вывод выключен'); };
   loadRocket();
   const G = { phase: 'wait', until: 0, t0: 0, crashAt: 1, offset: 0, me: null, crashTs: 0 };
   const bets = new Map();
@@ -484,7 +494,7 @@ function crashScreen(el) {
   const srv = () => Date.now() + G.offset;
   const fl = v => (Math.floor(v * 100) / 100).toFixed(2);
 
-  const addHist = v => { histEl.insertAdjacentHTML('afterbegin', `<span class="${v >= 2 ? 'h' : 'l'}">${fl(v)}x</span>`); while (histEl.children.length > 9) histEl.lastChild.remove(); };
+  const addHist = v => { histEl.insertAdjacentHTML('afterbegin', `<span class="${v >= 10 ? 'y' : v >= 2 ? 'h' : 'l'}">${fl(v)}x</span>`); while (histEl.children.length > 9) histEl.lastChild.remove(); };
   const setNet = (online, n) => {
     $('#net').className = 'net ' + (online ? 'on' : 'off');
     $('#netTxt').textContent = online ? `Сервер ${room} · онлайн: ${n || 1}` : OFFLINE_TXT;
@@ -594,18 +604,52 @@ function crashScreen(el) {
   })();
 
   /* отрисовка */
-  const stars = Array.from({ length: 26 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
+  const light = document.documentElement.classList.contains('ios') || document.documentElement.classList.contains('lite');
+  const stars = Array.from({ length: light ? 34 : 56 }, (_, i) => { const l = i % 3; return { x: Math.random() * W, y: Math.random() * H * .66, l, s: (.5 + l * .55) * dpr, v: (.12 + l * .22) * dpr, a: .3 + l * .22 }; });
+  let spd = .4, gridP = 0, animT = 0, lastT = Date.now(), shoot = null, nextShoot = Date.now() + 2500;
+  const HY = H * .64;   // линия горизонта
   const RS = Math.min(W * .38, 132 * dpr);               // размер ракеты
   const X0 = W * .17, Y0 = H * .8, X1 = W * .5, Y1 = H * .6; // старт слева-снизу → центр (дальше она не уходит)
   let burst = null;
+  const crashing0 = () => G.phase === 'crash';
   const frame = () => {
     if (!alive) return;
     const now = Date.now();
+    const dt = Math.min(64, now - lastT) / 1000; lastT = now;
+    const curM = G.phase === 'fly' ? crashMult(srv() - G.t0) : 1;
+    /* чем выше икс — тем быстрее летит мир и крутится ракета */
+    const tgt = G.phase === 'fly' ? 1.2 + Math.log2(curM) * 1.1 : crashing0() ? .15 : .45;
+    spd += (tgt - spd) * Math.min(1, dt * 3);
+    animT += dt * 1000 * (G.phase === 'fly' ? 1 + Math.min(2.2, Math.log2(curM) * .35) : 1);
     ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    if (G.phase === 'fly' && curM >= 5) { const q = Math.min(2.2, Math.log10(curM)) * dpr; ctx.translate((Math.random() - .5) * q, (Math.random() - .5) * q); }   // лёгкая тряска на больших иксах
+    /* планета с кольцом */
+    { const px = W * .8 - gridP * 0, py = H * .27, pr = W * .075;
+      const pg = ctx.createRadialGradient(px - pr * .4, py - pr * .4, pr * .1, px, py, pr);
+      pg.addColorStop(0, '#c9a7ff'); pg.addColorStop(.55, '#6b3fd1'); pg.addColorStop(1, '#1c1250');
+      ctx.globalAlpha = .85; ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(px, py, pr, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#b79bff'; ctx.lineWidth = 1.5 * dpr; ctx.globalAlpha = .5; ctx.beginPath(); ctx.ellipse(px, py, pr * 1.75, pr * .42, -.35, 0, 7); ctx.stroke();
+      ctx.globalAlpha = .55; const mg = ctx.createRadialGradient(W * .14, H * .2, 0, W * .14, H * .2, pr * .55); mg.addColorStop(0, '#fff'); mg.addColorStop(1, '#6f86ff00'); ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(W * .14, H * .2, pr * .55, 0, 7); ctx.fill(); }
+    /* звёзды в 3 слоя (параллакс) */
     ctx.fillStyle = '#fff';
-    const boost = G.phase === 'fly' ? 5 : 1;
-    stars.forEach(s => { s.y += s.v * boost; if (s.y > H) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = .55; ctx.fillRect(s.x, s.y, s.s, s.s); });
+    stars.forEach(s => { s.y += s.v * spd * 3; if (s.y > HY) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = s.a; ctx.fillRect(s.x, s.y, s.s, s.s * (1 + Math.min(4, spd * .5) * s.l)); });
+    /* падающие звёзды */
+    if (now > nextShoot && !shoot) { shoot = { x: W * rnd(.3, 1), y: H * rnd(.05, .3), t: 0 }; nextShoot = now + rnd(2200, 5200); }
+    if (shoot) { shoot.t += dt; const k = shoot.t / .7, x = shoot.x - k * W * .35, y = shoot.y + k * H * .16;
+      const sg = ctx.createLinearGradient(x, y, x + W * .1, y - H * .035); sg.addColorStop(0, '#fff'); sg.addColorStop(1, '#ffffff00');
+      ctx.globalAlpha = Math.max(0, 1 - k); ctx.strokeStyle = sg; ctx.lineWidth = 1.6 * dpr; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + W * .1, y - H * .035); ctx.stroke(); if (k >= 1) shoot = null; }
+    /* бегущая сетка-пол */
+    gridP = (gridP + dt * spd * .55) % 1;
+    ctx.lineWidth = 1 * dpr; ctx.strokeStyle = '#9a6bff';
+    const nv = light ? 7 : 11;
+    for (let i = -nv; i <= nv; i++) { ctx.globalAlpha = .22; ctx.beginPath(); ctx.moveTo(W / 2 + i * W * .028, HY); ctx.lineTo(W / 2 + i * W * .2, H); ctx.stroke(); }
+    for (let j = 0; j < 9; j++) { const z = (j + gridP) / 9, y = HY + (H - HY) * z * z; ctx.globalAlpha = .08 + z * .3; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    const hg = ctx.createLinearGradient(0, HY - 14 * dpr, 0, HY + 10 * dpr); hg.addColorStop(0, '#8d5bff00'); hg.addColorStop(.6, '#8d5bff55'); hg.addColorStop(1, '#8d5bff00');
+    ctx.globalAlpha = 1; ctx.fillStyle = hg; ctx.fillRect(0, HY - 14 * dpr, W, 24 * dpr);
     ctx.globalAlpha = 1;
+    /* авто-вывод */
+    if (G.phase === 'fly' && AU.on && myBet && !myCashed && !cashSent && curM >= autoVal()) { cashSent = true; net.send({ t: 'cash', auto: autoVal() }); haptic('medium'); }
     if (G.phase === 'wait') { multEl.textContent = Math.max(0, (G.until - srv()) / 1000).toFixed(1) + 'с'; rkx = X0; rky = Y0 + Math.sin(now / 420) * 4 * dpr; }
     if (G.phase === 'fly') {
       const m = crashMult(srv() - G.t0); multEl.textContent = fl(m) + 'x';
@@ -624,14 +668,15 @@ function crashScreen(el) {
       const ct = now - G.crashTs, k = Math.min(1, ct / 900);
       if (!burst) burst = Array.from({ length: 14 }, () => ({ a: Math.random() * 6.283, v: rnd(2, 6) * dpr }));
       if (k < 1) {
-        drawRocket(ctx, rkx + ct * .05 * dpr, rky + ct * ct * .0004 * dpr, RS, now, 1 - k, ct * .004);
+        drawRocket(ctx, rkx + ct * .05 * dpr, rky + ct * ct * .0004 * dpr, RS, animT, 1 - k, ct * .004);
         ctx.fillStyle = `rgba(255,120,60,${(1 - k) * .55})`; ctx.beginPath(); ctx.arc(rkx, rky, RS * (.25 + k * .5), 0, 7); ctx.fill();
         burst.forEach(b => { ctx.fillStyle = `rgba(255,200,80,${1 - k})`; ctx.beginPath(); ctx.arc(rkx + Math.cos(b.a) * b.v * ct * .06, rky + Math.sin(b.a) * b.v * ct * .06, 3 * dpr, 0, 7); ctx.fill(); });
       }
     } else {
       burst = null;
-      if (G.phase === 'fly') { const k = Math.min(1, (now - (G.t0 - G.offset)) / 350); drawRocket(ctx, rkx, rky, RS * (.55 + .45 * (1 - Math.pow(1 - k, 3))), now, k, 0); }  // ракета появляется, когда начинается полёт
+      if (G.phase === 'fly') { const k = Math.min(1, (now - (G.t0 - G.offset)) / 350); drawRocket(ctx, rkx, rky, RS * (.55 + .45 * (1 - Math.pow(1 - k, 3))), animT, k, 0); }  // ракета появляется, когда начинается полёт
     }
+    ctx.restore();
     renderBtn();
     raf = requestAnimationFrame(frame);
   };

@@ -192,13 +192,21 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:800}
 .xf-in{width:100%;height:46px;border-radius:12px;border:1px solid #ffffff14;background:#121722;color:#fff;padding:0 14px;font:800 16px var(--body);text-align:center;outline:none;margin-bottom:12px}
 
 /* ---------- crash ---------- */
-.crash-box{position:relative;height:280px;border-radius:26px;overflow:hidden;background:radial-gradient(circle at 50% 110%,#2742c9,#080f45 70%);border:1px solid #ffffff1c;box-shadow:none;margin-bottom:16px}
+.crash-box{position:relative;height:280px;border-radius:26px;overflow:hidden;background:radial-gradient(ellipse at 20% 10%,#5a2bb066,transparent 55%),radial-gradient(ellipse at 85% 30%,#1b5fd855,transparent 50%),radial-gradient(circle at 50% 110%,#3a2bc9,#0a0a38 70%);border:1px solid #ffffff1c;box-shadow:none;margin-bottom:16px}
 .crash-box canvas{position:absolute;inset:0;width:100%;height:100%}
 .mult{position:absolute;left:0;right:0;top:6%;text-align:center;font-family:var(--disp);font-size:42px;font-weight:800;text-shadow:0 4px 12px #0006,0 0 30px #5b8cff;transition:color .2s}
 .mult.lose{color:var(--red);text-shadow:0 4px 12px #0006,0 0 30px #ff3b57}
 .hist{display:flex;gap:6px;margin-bottom:12px;overflow:hidden;min-height:30px}
 .hist span{padding:6px 10px;border-radius:999px;font-family:var(--disp);font-size:10px;font-weight:800;background:#0e1d66;border:1px solid #ffffff14;animation:pop .4s var(--ease)}
-.hist .h{color:var(--green)}.hist .l{color:#ff8497}
+.hist .h{color:#34d27b}.hist .l{color:#ff5d73}.hist .y{color:#ffd23f;background:#2a2308;border-color:#ffd23f55}
+.auto{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:8px 10px 8px 14px;background:#0a1240;border:1px solid #ffffff1a;border-radius:14px}
+.auto>span{flex:1;font-family:var(--disp);font-weight:800;font-size:12px;color:#c8d3ff}
+.ax{display:flex;align-items:center;gap:4px;background:#07104a;border:1px solid #ffffff1c;border-radius:10px;padding:0 10px}
+.ax input{width:64px;background:none;border:0;color:#fff;font-family:var(--disp);font-weight:800;font-size:14px;text-align:right;padding:8px 0;outline:none;user-select:text;-webkit-user-select:text}
+.ax b{color:#9fb0ff;font-size:13px}
+.sw{width:46px;height:26px;border-radius:999px;background:#1a2350;border:1px solid #ffffff22;position:relative;transition:background .2s;padding:0}
+.sw i{position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#7f8bb8;transition:transform .2s,background .2s}
+.sw.on{background:#2fae6a;border-color:#2fae6a}.sw.on i{transform:translateX(20px);background:#fff}
 .betrow{display:flex;gap:8px;margin-bottom:12px}
 .betrow input{flex:1;min-width:0;background:#07104a;border:1px solid #ffffff1c;border-radius:14px;padding:13px;color:#fff;font-family:var(--disp);font-weight:800;text-align:center;outline:none;user-select:text;-webkit-user-select:text;box-shadow:inset 0 3px 8px #0008}
 .betrow input:focus{border-color:var(--gold);box-shadow:inset 0 3px 8px #0008,0 0 16px #ffd23f66}
@@ -411,7 +419,7 @@ html.lite .turbo.on{animation:none}
 
 
 /* ---------- v12: спокойный тёмный стиль ---------- */
-.a-crash .rkt{width:66px;height:66px;font-size:0;background:url(rocket.webp?v=23) 0 0/792px auto no-repeat;transform:none;right:10%;top:10%;filter:none;animation:none}
+.a-crash .rkt{width:66px;height:66px;font-size:0;background:url(rocket.webp?v=24) 0 0/792px auto no-repeat;transform:none;right:10%;top:10%;filter:none;animation:none}
 .hub .tile{box-shadow:inset 0 0 0 100vmax #05081a40,0 10px 26px #0006}
 .btn{filter:saturate(.85)}
 .card,.case,.task,.slot,.row{border-color:#ffffff12}
@@ -536,7 +544,7 @@ html.ios .gi,html.ios .case-hero,html.ios .a-cs .chest{filter:none}
 html.ios .hub .tile{animation:none}
 html.ios .tile,html.ios .a-cs .chest,html.ios .a-cs .gf,html.ios .a-up .u{will-change:transform}
 
-.a-crash .rkt{position:absolute;right:11%;top:10%;width:84px;height:84px;background:url(rocket.webp?v=23) 0 0/840px auto no-repeat;animation:none}
+.a-crash .rkt{position:absolute;right:11%;top:10%;width:84px;height:84px;background:url(rocket.webp?v=24) 0 0/840px auto no-repeat;animation:none}
 .mq{overflow:hidden;margin:22px -16px 4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
 .mq-t{display:flex;width:max-content;animation:mq 38s linear infinite}
 .mq-t img{width:54px;height:54px;object-fit:contain;flex:none;margin-right:18px}
