@@ -381,7 +381,7 @@ body.paused *{animation-play-state:paused!important}
 
 
 
-.rc{display:inline-block;width:1.08em;height:1.08em;vertical-align:-.16em;margin:0 .06em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238b5cff'/%3E%3Cstop offset='1' stop-color='%2319c8ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='16' fill='url(%23g)'/%3E%3Cpath d='M16 6 25 12 16 26 7 12Z' fill='%23fff'/%3E%3Cpath d='M16 6 16 26 7 12Z' fill='%23fff' fill-opacity='.55'/%3E%3Cpath d='M7 12H25' stroke='url(%23g)' stroke-width='1.6'/%3E%3C/svg%3E") center/contain no-repeat;font-style:normal}
+.rc{display:inline-block;width:1.08em;height:1.08em;vertical-align:-.16em;margin:0 .06em;background:url(rc.webp?v=20) center/contain no-repeat;font-style:normal}
 .balance .rc{width:22px;height:22px;vertical-align:middle}
 html.lite .ring,html.lite .ring.spin{animation:none;box-shadow:none}
 html.lite .track{animation:none}
@@ -547,3 +547,12 @@ html.ios .tile,html.ios .a-cs .chest,html.ios .a-cs .gf,html.ios .a-up .u{will-c
 .dr .ic .gi{width:auto;height:auto;max-width:84%;max-height:84%}
 .it .gi{width:auto;height:auto;max-width:74%;max-height:74%}
 .reels.multi .it .gi{max-width:76%;max-height:76%;width:auto;height:auto}
+
+/* v20: баннер кейсов — два наших кейса */
+.a-cs .chest{left:auto;right:150px;top:50%;width:122px;margin-top:-52px;animation:csf1 3.8s ease-in-out infinite}
+.a-cs .g1{width:158px;height:auto;right:8px;top:50%;bottom:auto;margin-top:-66px;object-fit:contain;animation:csf2 3.4s ease-in-out infinite;z-index:2}
+.a-cs::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 130px 90px at 62% 55%,#2f6bff30,transparent 70%),radial-gradient(ellipse 120px 90px at 85% 50%,#5dff4a2e,transparent 70%);pointer-events:none}
+@keyframes csf1{0%,100%{transform:rotate(-7deg)}50%{transform:translateY(-7px) rotate(-7deg)}}
+@keyframes csf2{0%,100%{transform:rotate(5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+.a-cs .chest{right:156px;top:60%;width:100px;margin-top:-40px}
+.a-cs .g1{width:150px;right:6px;margin-top:-58px}
