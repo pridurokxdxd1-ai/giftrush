@@ -556,3 +556,7 @@ html.ios .tile,html.ios .a-cs .chest,html.ios .a-cs .gf,html.ios .a-up .u{will-c
 @keyframes csf2{0%,100%{transform:rotate(5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
 .a-cs .chest{right:156px;top:60%;width:100px;margin-top:-40px}
 .a-cs .g1{width:150px;right:6px;margin-top:-58px}
+
+.dr .ic{overflow:hidden}.dr .ic .gi{max-width:80%;max-height:80%;object-fit:contain}
+.it .gi,.pick .gi,.inv .tile .gi{object-fit:contain}
+.inv .tile b .gi{max-height:52px;max-width:80%;height:auto;width:auto}

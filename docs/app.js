@@ -159,10 +159,10 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=21" alt=""><img class="gf g1" src="case_toxic.webp?v=21" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=22" alt=""><img class="gf g1" src="case_toxic.webp?v=22" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=21" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=21" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=22" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=22" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
@@ -187,10 +187,10 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=21" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=22" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=21" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=22" alt="" draggable="false">`).join('');
   el.insertAdjacentHTML('beforeend', `<div class="mq"><div class="mq-t">${strip}${strip}</div></div>`);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
@@ -204,7 +204,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=21" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=22" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -1148,12 +1148,7 @@ async function syncAccount() {
     }
   } catch (e) {} finally { syncing = false; }
 }
-function autoIncome() {
-  const now = Date.now(), parts = []; let add = 0;
-  const l6 = Number(store.get('gr2_b6', 0)) || 0;           // бонус 500 раз в 6 часов
-  if (now - l6 >= 6 * 3600e3) { store.set('gr2_b6', now); add += 500; parts.push('+500 ⭐ бонус (раз в 6 часов)'); }
-  if (add > 0) { state.balance += add; save(); bump(); notify('success'); toast(parts.length > 1 ? `🎁 Начислено +${fmt(add)} ⭐` : parts[0]); }
-}
+function autoIncome() {}   // автоначислений больше нет
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } else if (Math.floor(state.balance) !== lastPushed) syncAccount(); });
 setInterval(() => { if (!document.hidden) { autoIncome(); if (Math.floor(state.balance) !== lastPushed) syncAccount(); } }, 45000);
 
@@ -1217,13 +1212,17 @@ function profileScreen(el) {
     b.innerHTML = `<b>${ico(o.it)}</b><small>⭐ ${fmt(o.it.p)}</small>`; b.onclick = () => openGift(o.g); inv.append(b);
   });
 }
+function wdDate() {   // ровно через месяц от сегодняшней даты
+  const n = new Date(), y = n.getFullYear(), m = n.getMonth() + 1, last = new Date(y, m + 1, 0).getDate(), d = new Date(y, m, Math.min(n.getDate(), last));
+  const p = x => String(x).padStart(2, '0'); return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
 function openGift(g) {
   const it = ITEM(g.n); if (!it) return;
   const m = modal(`<div class="g-em" style="--c:${it.c}"><span>${ico(it)}</span></div><div class="g-n">${it.n}</div><div class="g-p">⭐ ${fmt(it.p)}</div>
     <div class="g-act"><button class="btn red" id="wd">Вывести</button><button class="btn green" id="sl">Продать</button></div>
-    <div class="wd-msg" id="wdm">ВЫВОД НЕДОСТУПЕН ДО 29.11.2026</div>`);
+    <div class="wd-msg" id="wdm">ВЫВОД НЕДОСТУПЕН ДО ${wdDate()}</div>`);
   const msg = $('#wdm', m.el);
-  $('#wd', m.el).onclick = () => { msg.classList.remove('go'); void msg.offsetWidth; msg.classList.add('go'); notify('error'); };
+  $('#wd', m.el).onclick = () => { msg.textContent = 'ВЫВОД НЕДОСТУПЕН ДО ' + wdDate(); msg.classList.remove('go'); void msg.offsetWidth; msg.classList.add('go'); notify('error'); };
   $('#sl', m.el).onclick = () => {
     if (!invGift(g.id)) return m.close();
     const v = sellGift(g.id); m.close(); toast(`+${fmt(v)} ⭐ на баланс`); notify('success');
