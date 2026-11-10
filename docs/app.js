@@ -79,6 +79,9 @@ function save() {
 }
 function bump() { const b = $('.balance'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
 function addGift(n) { const g = { id: uid(), n }; state.inv.push(g); save(); return g; }
+let PINS = store.get('gr4_pins', []); if (!Array.isArray(PINS)) PINS = [];
+const savePins = () => store.set('gr4_pins', PINS);
+const cleanPins = () => { const n = PINS.filter(id => state.inv.some(g => g.id === id)).slice(0, 6); if (n.length !== PINS.length) { PINS = n; savePins(); } return PINS; };
 function invGift(id) { return state.inv.find(g => g.id === id) || null; }
 function sellGift(id) {
   const i = state.inv.findIndex(g => g.id === id); if (i < 0) return 0;
@@ -161,15 +164,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=29" alt=""><img class="gf g1" src="case_toxic.webp?v=29" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=30" alt=""><img class="gf g1" src="case_toxic.webp?v=30" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=29" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=29" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=30" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=30" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=29" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=30" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -190,7 +193,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=29" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=30" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -205,7 +208,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=29" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=30" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -293,7 +296,7 @@ function upgradeScreen(el) {
   const slot = i => i ? `${ico(i)}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
   const mslot = its => its.length ? `<span class="mi">${its.slice(0, 4).map(i => ico(i)).join('')}</span><small>${its.length} шт · ⭐ ${fmt(its.reduce((t, i) => t + i.p, 0))}</small>` : '<small>＋ Добавить подарки</small>';
   el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или Rushcoin. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
-    <div class="slot"><h4>Ваши подарки (можно несколько)</h4><button class="pick ${mis.length ? 'has' : ''}" id="mine">${mslot(mis)}</button></div>
+    <div class="slot"><h4>Ваши подарки (до 3)</h4><button class="pick ${mis.length ? 'has' : ''}" id="mine">${mslot(mis)}</button></div>
     <div class="slot"><h4>Добавить Rushcoin</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
     <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
       <defs><linearGradient id="ug" gradientUnits="userSpaceOnUse" x1="94" y1="0" x2="6" y2="0"><stop offset="0" stop-color="#c6ff4a"/><stop offset=".5" stop-color="#6fe66a"/><stop offset="1" stop-color="#0fae52"/></linearGradient></defs><circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="url(#ug)" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
@@ -384,7 +387,7 @@ function pickScreen(el, kind) {
     const ch = kind === 'want' ? chanceOf(S, o.it) : 0;
     b.innerHTML = `<span class="em" style="height:64px;animation:none">${ico(o.it)}</span><div class="nm"><span>${o.it.n}</span><span class="pr">⭐ ${fmt(o.it.p)}</span></div>${kind === 'want' ? `<div class="pk-ch">x${(o.it.p / S).toFixed(2)} · ${ch < 1 ? ch.toFixed(2) : ch.toFixed(1)}%</div>` : '<i class="pk-ok">✓</i>'}`;
     b.onclick = () => {
-      if (kind === 'mine') { const k = up.items.indexOf(o.id); if (k >= 0) up.items.splice(k, 1); else up.items.push(o.id); up.want = null; b.classList.toggle('sel', k < 0); info(); haptic(); }
+      if (kind === 'mine') { const k = up.items.indexOf(o.id); if (k < 0 && up.items.length >= 3) { notify('error'); return toast('В апгрейд можно положить максимум 3 подарка'); } if (k >= 0) up.items.splice(k, 1); else up.items.push(o.id); up.want = null; b.classList.toggle('sel', k < 0); info(); haptic(); }
       else { up.want = o.id; go('upgrade'); }
     };
     g.append(b);
@@ -394,7 +397,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=29';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=30';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1123,14 +1126,19 @@ function tourScreen(el) {
     const mine = !inTop && me && TGU ? `<div class="rk me"><span class="n">${me.rank ? '#' + me.rank : '—'}</span><span class="a lbav">${avHtml(TGU.photo_url, me.name)}</span><span class="t">${esc(me.name)} (вы)</span><span class="b">${balHtml(Math.floor(state.balance))}</span></div>` : '';
     body.innerHTML = `<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div><div class="ranks">${rows.join('')}${mine ? '<div class="rk-sep"></div>' + mine : ''}</div>`;
   };
-  render([], null);
-  if (!TGU || !(tg && tg.initData)) { body.insertAdjacentHTML('beforeend', '<div class="empty" style="margin-top:14px">Откройте игру через бота, чтобы увидеть онлайн-топ</div>'); return; }
+  const cache = store.get('gr4_lb', null), cached = !!(cache && Array.isArray(cache.top) && cache.top.length);
+  if (cached) render(cache.top, cache.me);   // сразу показываем последний известный топ — без пустого пьедестала
+  if (!TGU || !(tg && tg.initData)) { body.innerHTML = '<div class="empty" style="margin-top:14px">Откройте игру через бота, чтобы увидеть онлайн-топ</div>'; return; }
   (async () => {
     try {
-      await syncAccount();
+      if (Math.floor(state.balance) !== lastPushed) await syncAccount();
       const d = await api('/api/top', {});
       if (dead) return;
-      if (d && d.ok) render(d.top || [], d.me); else body.insertAdjacentHTML('beforeend', `<div class="empty" style="margin-top:14px">${esc(apiErr(d))}</div>`);
+      if (d && d.ok) {
+        const same = cached && JSON.stringify(cache.top) === JSON.stringify(d.top) && JSON.stringify(cache.me) === JSON.stringify(d.me);
+        store.set('gr4_lb', { top: d.top || [], me: d.me });
+        if (!same) { if (cached) body.classList.add('noanim'); render(d.top || [], d.me); }
+      } else body.insertAdjacentHTML('beforeend', `<div class="empty" style="margin-top:14px">${esc(apiErr(d))}</div>`);
     } catch (e) { if (!dead) body.insertAdjacentHTML('beforeend', `<div class="empty" style="margin-top:14px">${esc(apiErr(null, e))}</div>`); }
   })();
 }
@@ -1227,6 +1235,7 @@ async function syncAccount() {
   } catch (e) {} finally { syncing = false; }
 }
 function autoIncome() {}   // автоначислений больше нет
+window.addEventListener('focus', () => syncAccount());
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } else if (Math.floor(state.balance) !== lastPushed) syncAccount(); });
 setInterval(() => { if (!document.hidden) syncAccount(); }, 20000);   // раз в 20 с: баланс уходит на сервер, переводы/списания приходят
 
@@ -1306,8 +1315,20 @@ function profileScreen(el) {
   const ini = (name.replace('@', '')[0] || '?').toUpperCase();
   const list = state.inv.map(g => ({ g, it: ITEM(g.n) })).sort((a, b) => b.it.p - a.it.p);
   const total = list.reduce((s, o) => s + o.it.p, 0);
-  el.insertAdjacentHTML('beforeend', `<div class="pf"><button class="gear" id="gear" aria-label="Настройки"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button><div class="pf-av" id="pfav"></div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
-    <div id="admslot"></div><div class="invhd"><h3>Инвентарь</h3><span>${list.length} шт · ⭐ ${fmt(total)}</span></div><div class="inv" id="inv"></div>`);
+  const POS = [[-76, -44], [-88, 0], [-76, 44], [76, -44], [88, 0], [76, 44]];   // 3 слева и 3 справа от аватарки
+  const pinsHtml = cleanPins().map((id, i) => { const g = invGift(id), it = g && ITEM(g.n); return it ? `<button class="pin" data-pin="${id}" style="--c:${it.c};left:calc(50% + ${POS[i][0]}px);top:calc(50% + ${POS[i][1]}px)">${ico(it)}</button>` : ''; }).join('');
+  el.insertAdjacentHTML('beforeend', `<div class="pf"><button class="gear" id="gear" aria-label="Настройки"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button><div class="pf-stage"><div class="pf-av" id="pfav"></div>${pinsHtml}</div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
+    <div id="admslot"></div><div class="invhd"><h3>Инвентарь</h3><span>${list.length} шт · ⭐ ${fmt(total)}</span></div>${list.length ? '<button class="btn green sm" id="sellall">Продать все</button>' : ''}<div class="inv" id="inv"></div>`);
+  el.querySelectorAll('[data-pin]').forEach(b => b.onclick = () => { const g = invGift(b.dataset.pin); if (g) openGift(g); });
+  const sa = $('#sellall');
+  if (sa) sa.onclick = () => {
+    const pins = new Set(cleanPins()), sell = state.inv.filter(g => !pins.has(g.id)); if (!sell.length) return toast('Нечего продавать — все подарки закреплены');
+    const sum = sell.reduce((t, g) => t + ITEM(g.n).p, 0);
+    const m = modal(`<div class="g-n" style="margin-top:4px">Продать все подарки?</div><div class="g-p">${sell.length} шт · ⭐ ${fmt(sum)}</div>${pins.size ? '<div class="wd-msg" style="opacity:1;animation:none">Закреплённые останутся</div>' : ''}
+      <div class="g-act"><button class="btn" id="sno">Отмена</button><button class="btn green" id="syes">Продать</button></div>`);
+    $('#sno', m.el).onclick = () => m.close();
+    $('#syes', m.el).onclick = () => { let v = 0; sell.forEach(g => { if (invGift(g.id)) v += sellGift(g.id); }); cleanPins(); m.close(); toast(`+${fmt(v)} ⭐ на баланс`); notify('success'); go('profile'); };
+  };
   if (TGU && TGU.id === ADMIN_ID) adminBox($('#admslot'));
   $('#gear').onclick = () => { haptic(); openSettings(); };
   const av = $('#pfav');
@@ -1330,12 +1351,19 @@ function openGift(g) {
   const it = ITEM(g.n); if (!it) return;
   const m = modal(`<div class="g-em" style="--c:${it.c}"><span>${ico(it)}</span></div><div class="g-n">${it.n}</div><div class="g-p">⭐ ${fmt(it.p)}</div>
     <div class="g-act"><button class="btn red" id="wd">Вывести</button><button class="btn green" id="sl">Продать</button></div>
+    <button class="btn sm pinb" id="pinb"></button>
     <div class="wd-msg" id="wdm">ВЫВОД НЕДОСТУПЕН ДО ${wdDate()}</div>`);
-  const msg = $('#wdm', m.el);
+  const msg = $('#wdm', m.el), pb = $('#pinb', m.el), pinTxt = () => { pb.textContent = PINS.includes(g.id) ? 'Открепить от профиля' : 'Закрепить в профиле'; };
+  pinTxt();
+  pb.onclick = () => {
+    if (PINS.includes(g.id)) PINS = PINS.filter(x => x !== g.id);
+    else { if (cleanPins().length >= 6) { notify('error'); return toast('Можно закрепить максимум 6 подарков'); } PINS.push(g.id); }
+    savePins(); haptic(); m.close(); if ($('#inv')) go('profile');
+  };
   $('#wd', m.el).onclick = () => { msg.textContent = 'ВЫВОД НЕДОСТУПЕН ДО ' + wdDate(); msg.classList.remove('go'); void msg.offsetWidth; msg.classList.add('go'); notify('error'); };
   $('#sl', m.el).onclick = () => {
     if (!invGift(g.id)) return m.close();
-    const v = sellGift(g.id); m.close(); toast(`+${fmt(v)} ⭐ на баланс`); notify('success');
+    const v = sellGift(g.id); cleanPins(); m.close(); toast(`+${fmt(v)} ⭐ на баланс`); notify('success');
     if ($('#inv')) go('profile');
   };
 }
