@@ -161,16 +161,16 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=28" alt=""><img class="gf g1" src="case_toxic.webp?v=28" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=29" alt=""><img class="gf g1" src="case_toxic.webp?v=29" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=28" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=28" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=29" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=29" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=28" alt="" draggable="false">`).join('');
-  el.innerHTML = `<h2 class="hd">Игры</h2><div class="mq home"><div class="mq-t">${strip}${strip}</div></div><div class="hub">
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=29" alt="" draggable="false">`).join('');
+  el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
@@ -190,7 +190,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=28" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=29" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -205,7 +205,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=28" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=29" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -276,20 +276,24 @@ function caseScreen(el, c) {
 }
 
 /* ---------- upgrade ---------- */
-const up = { mine: null, want: null, bal: 0 };
+const up = { items: [], want: null, bal: 0 };
 const UP_MAX = 80;
-const stakeOf = () => { const g = up.mine && invGift(up.mine), gi = g ? ITEM(g.n) : null; return { g, gi, S: (gi ? gi.p : 0) + (up.bal || 0) }; };
+const stakeOf = () => {
+  up.items = up.items.filter(id => invGift(id));
+  const gs = up.items.map(id => invGift(id)), its = gs.map(g => ITEM(g.n));
+  return { gs, its, S: its.reduce((t, i) => t + i.p, 0) + (up.bal || 0) };
+};
 const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(0.01, (S / w.p) * 90));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
-  if (up.mine && !invGift(up.mine)) up.mine = null;
   up.bal = Math.min(Math.max(0, Math.floor(up.bal || 0)), Math.floor(state.balance));
-  let { g: mg, gi: mi, S } = stakeOf();
+  let { gs: mgs, its: mis, S } = stakeOf();
   let wi = up.want ? ITEM(up.want) : null;
   if (wi && wi.p <= S) { wi = null; up.want = null; }
   const slot = i => i ? `${ico(i)}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
+  const mslot = its => its.length ? `<span class="mi">${its.slice(0, 4).map(i => ico(i)).join('')}</span><small>${its.length} шт · ⭐ ${fmt(its.reduce((t, i) => t + i.p, 0))}</small>` : '<small>＋ Добавить подарки</small>';
   el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или Rushcoin. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
-    <div class="slot"><h4>Ваш подарок (необязательно)</h4><button class="pick ${mi ? 'has' : ''}" id="mine">${slot(mi)}</button></div>
+    <div class="slot"><h4>Ваши подарки (можно несколько)</h4><button class="pick ${mis.length ? 'has' : ''}" id="mine">${mslot(mis)}</button></div>
     <div class="slot"><h4>Добавить Rushcoin</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
     <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
       <defs><linearGradient id="ug" gradientUnits="userSpaceOnUse" x1="94" y1="0" x2="6" y2="0"><stop offset="0" stop-color="#c6ff4a"/><stop offset=".5" stop-color="#6fe66a"/><stop offset="1" stop-color="#0fae52"/></linearGradient></defs><circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="url(#ug)" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
@@ -300,11 +304,11 @@ function upgradeScreen(el) {
   const ubal = $('#ubal'), rnum = $('#rnum'), rx = $('#rx'), goB = $('#go'), wantB = $('#want');
   let chance = 0;
   const paint = () => {
-    ({ g: mg, gi: mi, S } = stakeOf());
+    ({ gs: mgs, its: mis, S } = stakeOf());
     if (wi && wi.p <= S) { wi = null; up.want = null; }
-    $('#mine').className = 'pick ' + (mi ? 'has' : ''); $('#mine').innerHTML = slot(mi);
+    $('#mine').className = 'pick ' + (mis.length ? 'has' : ''); $('#mine').innerHTML = mslot(mis);
     wantB.className = 'pick ' + (wi ? 'has' : ''); wantB.innerHTML = slot(wi);
-    chance = mi || up.bal ? (wi ? chanceOf(S, wi) : 0) : 0;
+    chance = S ? (wi ? chanceOf(S, wi) : 0) : 0;
     $('#rarc').style.strokeDasharray = `${chance / 100 * 276.46} 276.46`;
     rnum.textContent = chance ? (chance < 1 ? chance.toFixed(2) : chance.toFixed(1)) + '%' : '—'; rx.textContent = chance ? `x${wi.p / S >= 1000 ? fmt(Math.round(wi.p / S)) : (wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
     goB.textContent = !S ? 'Добавьте подарок или Rushcoin' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
@@ -322,12 +326,12 @@ function upgradeScreen(el) {
     if (!S) return toast('Добавьте подарок или Rushcoin');
     if (up.bal > 0 && up.bal < 20) return toast('Минимум 20 ⭐ Rushcoin');
     if (!wi) return go('pick', 'want');
-    if (mg && !invGift(mg.id)) return toast('Подарок уже недоступен');
+    if (mgs.some(g => !invGift(g.id))) return toast('Подарок уже недоступен');
     if (up.bal > state.balance) return toast('Недостаточно ⭐');
     if (up.bal > 0 && !spend(up.bal)) return;
     busy = true; goB.disabled = true; ubal.disabled = true;
     const ok = Math.random() * 100 < chance;
-    if (mg) state.inv = state.inv.filter(x => x.id !== mg.id);
+    if (mgs.length) { const ids = new Set(mgs.map(g => g.id)); state.inv = state.inv.filter(x => !ids.has(x.id)); }
     if (ok) addGift(wi.n); save(); // результат сохраняем сразу
     const hand = $('#hand'), ring = $('.ring'); hand.classList.add('on');
     const arc = chance / 100 * 360;
@@ -342,7 +346,7 @@ function upgradeScreen(el) {
     hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
     toast(ok ? `🎉 Успех! ${wi.n}` : '💥 Неудача, ставка сгорела');
-    up.mine = null;                                   // подарок-ставка использован; желаемый предмет и сумма остаются
+    up.items = [];                                    // подарки-ставка использованы; желаемый предмет и сумма остаются
     up.bal = Math.min(up.bal || 0, Math.floor(state.balance)); ubal.value = up.bal || '';
     await sleep(1300);
     if (!el.isConnected) return;
@@ -359,18 +363,30 @@ function burst(host) {
   }
 }
 function pickScreen(el, kind) {
-  bar(el, kind === 'mine' ? 'Ваш подарок' : 'Желаемый подарок', 'upgrade');
+  bar(el, kind === 'mine' ? 'Ваши подарки' : 'Желаемый подарок', 'upgrade');
   const { S } = stakeOf();
-  if (kind === 'mine' && up.mine) { const r = document.createElement('button'); r.className = 'btn'; r.style.marginBottom = '12px'; r.textContent = 'Убрать подарок'; r.onclick = () => { up.mine = null; up.want = null; go('upgrade'); }; el.append(r); }
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   let list;
   if (kind === 'mine') list = state.inv.map(x => ({ id: x.id, it: ITEM(x.n) })).sort((a, b) => a.it.p - b.it.p);
-  else list = ITEMS.filter(i => i.p > S).map(i => ({ id: i.n, it: i }));
+  else list = ITEMS.filter(i => i.p > S).sort((a, b) => a.p - b.p).map(i => ({ id: i.n, it: i }));
   if (!list.length) { g.innerHTML = kind === 'mine' ? '<div class="empty"><b>📭</b>Пока пусто. Откройте кейс.</div>' : '<div class="empty"><b>📭</b>Нет подарков дороже вашей ставки.</div>'; return; }
+  let done, info;
+  if (kind === 'mine') {
+    const row = document.createElement('div'); row.className = 'pk-bar';
+    row.innerHTML = '<button class="btn sm" id="pkok"></button><button class="pk-clr" id="pkclr">Сбросить</button>'; el.insertBefore(row, g);
+    done = $('#pkok', row); info = () => { const n = up.items.length, sum = up.items.reduce((t, id) => t + ITEM(invGift(id).n).p, 0); done.textContent = n ? `Готово · ${n} шт · ⭐ ${fmt(sum)}` : 'Готово'; };
+    done.onclick = () => go('upgrade');
+    $('#pkclr', row).onclick = () => { up.items = []; g.querySelectorAll('.case.sel').forEach(x => x.classList.remove('sel')); info(); haptic(); };
+    info();
+  }
   list.forEach((o, i) => {
-    const b = document.createElement('button'); b.className = 'case'; b.style.animationDelay = Math.min(i, 8) * 35 + 'ms';
-    b.innerHTML = `<span class="em" style="height:64px;animation:none">${ico(o.it)}</span><div class="nm"><span>${o.it.n}</span><span class="pr">⭐ ${fmt(o.it.p)}</span></div>`;
-    b.onclick = () => { if (kind === 'mine') { up.mine = o.id; up.want = null; } else up.want = o.id; go('upgrade'); };
+    const b = document.createElement('button'); b.className = 'case' + (kind === 'mine' && up.items.includes(o.id) ? ' sel' : ''); b.style.animationDelay = Math.min(i, 8) * 35 + 'ms';
+    const ch = kind === 'want' ? chanceOf(S, o.it) : 0;
+    b.innerHTML = `<span class="em" style="height:64px;animation:none">${ico(o.it)}</span><div class="nm"><span>${o.it.n}</span><span class="pr">⭐ ${fmt(o.it.p)}</span></div>${kind === 'want' ? `<div class="pk-ch">x${(o.it.p / S).toFixed(2)} · ${ch < 1 ? ch.toFixed(2) : ch.toFixed(1)}%</div>` : '<i class="pk-ok">✓</i>'}`;
+    b.onclick = () => {
+      if (kind === 'mine') { const k = up.items.indexOf(o.id); if (k >= 0) up.items.splice(k, 1); else up.items.push(o.id); up.want = null; b.classList.toggle('sel', k < 0); info(); haptic(); }
+      else { up.want = o.id; go('upgrade'); }
+    };
     g.append(b);
   });
 }
@@ -378,7 +394,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=28';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=29';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1212,7 +1228,7 @@ async function syncAccount() {
 }
 function autoIncome() {}   // автоначислений больше нет
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } else if (Math.floor(state.balance) !== lastPushed) syncAccount(); });
-setInterval(() => { if (!document.hidden) { autoIncome(); if (Math.floor(state.balance) !== lastPushed) syncAccount(); } }, 45000);
+setInterval(() => { if (!document.hidden) syncAccount(); }, 20000);   // раз в 20 с: баланс уходит на сервер, переводы/списания приходят
 
 /* ---------- profile ---------- */
 function adminBox(el) {
