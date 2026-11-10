@@ -174,7 +174,7 @@ function home(el) {
     <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="new">NEW</span>')}</div>
   </div>`;
   const rk = $('#hrkt'); loadRocket();
-  if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 96; rk.style.backgroundPosition = `${-(f % 12) * 84}px ${-Math.floor(f / 12) * 84}px`; }, 42); cleanup = () => clearInterval(tm); }
+  if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; }, 33); cleanup = () => clearInterval(tm); }
   el.querySelectorAll('.tile').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
     b.onclick = () => go(b.dataset.id);
@@ -375,9 +375,9 @@ function pickScreen(el, kind) {
 }
 
 /* ---------- ракета (спрайт из видео) ---------- */
-const RK = { img: null, ok: false, FR: 224, COLS: 12, N: 96, FPS: 31.17 };
+const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=11';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=23';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -595,7 +595,7 @@ function crashScreen(el) {
 
   /* отрисовка */
   const stars = Array.from({ length: 26 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.6 * dpr + .4, v: rnd(.15, .5) * dpr }));
-  const RS = Math.min(W * .44, 118 * dpr);               // размер ракеты
+  const RS = Math.min(W * .38, 132 * dpr);               // размер ракеты
   const X0 = W * .17, Y0 = H * .8, X1 = W * .5, Y1 = H * .6; // старт слева-снизу → центр (дальше она не уходит)
   let burst = null;
   const frame = () => {
