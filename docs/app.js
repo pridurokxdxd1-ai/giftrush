@@ -34,11 +34,13 @@ const OLD = { Lollipop: 10, Bear: 15, Cookie: 20, Rose: 25, Balloon: 35, Cake: 5
 const ITEMS = [
   ['Champagne', 50, 'g_champagne.webp', '#3fbf7f'], ['Cup', 100, 'g_cup.webp', '#f2c14e'],
   ['Candy Cane', 450, 'g_candy.webp', '#ff5d8f'], ['Swag Bag', 490, 'g_swag.webp', '#8be04e'],
+  ['Snake Box', 450, 'g_snake.webp', '#2fd6a0'], ['Big Year', 490, 'g_year.webp', '#ff6a6a'], ['Chill Flame', 500, 'g_flame.webp', '#f2c14e'],
+  ['Spy Agaric', 570, 'g_agaric.webp', '#9be04e'], ['Love Potion', 1400, 'g_potion.webp', '#7af0a0'], ['Sharp Tongue', 3800, 'g_tongue.webp', '#c6ff3a'],
 ].map(([n, p, img, c]) => ({ n, p, img, c, r: rar(p), nc: false }));
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 /* монеты Rushcoin, выпадающие из кейса (сразу идут на баланс) */
-const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
+const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e'], [100, '#7aa8ff'], [210, '#a06bf0'], [250, '#c06bf0'], [350, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
 const COIN = p => COINS.find(x => x.p === p);
 const rcI = '<i class="rc"></i>';
 /* иконка предмета: картинка для подарка, монета с числом для Rushcoin */
@@ -62,7 +64,7 @@ function iconify(root) {
 /* ---------- state ---------- */
 let balanceHook = null;
 const state = {
-  balance: Number(store.get('gr2_bal', 1000)) || 0,
+  balance: Number(store.get('gr2_bal', 0)) || 0,
   inv: store.get('gr2_inv', []),
 };
 if (!Array.isArray(state.inv)) state.inv = [];
@@ -92,7 +94,9 @@ function toast(t) { const e = $('#toast'); e.textContent = t; iconify(e); e.clas
 /* лёгкий режим для слабых телефонов и пауза анимаций в фоне */
 try {
   const weak = (navigator.hardwareConcurrency || 8) <= 6 || (navigator.deviceMemory || 8) <= 4;
-  if (weak) document.documentElement.classList.add('lite');
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) document.documentElement.classList.add('ios');
+  if (weak && !ios) document.documentElement.classList.add('lite');
   document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
 } catch (e) {}
 
@@ -101,16 +105,22 @@ try {
 /*ODDS_START*/
 const CASES = [{
   n: 'Daily', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
-  drops: [[ITEM('Champagne'), 4], [ITEM('Cup'), 1], [ITEM('Swag Bag'), 0.001], [ITEM('Candy Cane'), 0.01],
-    [COIN(10), 10.099], [COIN(5), 20], [COIN(3), 24], [COIN(2), 10], [COIN(1), 50]],
+  drops: [[ITEM('Champagne'), 2.3529], [ITEM('Cup'), 0.5882], [ITEM('Swag Bag'), 0.0005], [ITEM('Candy Cane'), 0.005],
+    [COIN(10), 8.5905], [COIN(5), 17.0121], [COIN(3), 20.4145], [COIN(2), 8.506], [COIN(1), 42.5301]],   // сумма = 100%
   // что мелькает на ленте при прокрутке (не влияет на реальные шансы)
   bait: [[ITEM('Swag Bag'), 7], [ITEM('Candy Cane'), 8], [ITEM('Cup'), 10], [ITEM('Champagne'), 11], [COIN(10), 12], [COIN(5), 14], [COIN(3), 14], [COIN(2), 12], [COIN(1), 12]],
+}, {
+  n: 'Toxic', img: 'case_toxic.webp', price: 399,
+  drops: [[COIN(100), 57.9505], [COIN(210), 40.1504], [COIN(250), 0.999], [COIN(350), 0.88], [ITEM('Snake Box'), 0.01], [ITEM('Big Year'), 0.008],
+    [ITEM('Swag Bag'), 0.001], [ITEM('Chill Flame'), 0.001], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
+  bait: [[ITEM('Sharp Tongue'), 6], [ITEM('Love Potion'), 7], [ITEM('Spy Agaric'), 8], [ITEM('Chill Flame'), 8], [ITEM('Swag Bag'), 8], [ITEM('Big Year'), 8], [ITEM('Snake Box'), 9],
+    [COIN(350), 10], [COIN(250), 10], [COIN(210), 12], [COIN(100), 14]],
 }];
 CASES.forEach(c => { c.pool = c.drops.map(([it, w]) => ({ it, w })); c.sum = c.pool.reduce((t, o) => t + o.w, 0); });
 function rollCase(c) {
   let x = Math.random() * c.sum;
-  for (const o of c.pool) { x -= o.w; if (x <= 0) return o.it; }
-  return c.pool[c.pool.length - 1].it;
+  for (const o of c.pool) { if (o.w <= 0) continue; x -= o.w; if (x <= 0) return o.it; }
+  return c.pool.filter(o => o.w > 0).pop().it;
 }
 /*ODDS_END*/
 
@@ -149,20 +159,22 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><i class="gb"></i><i class="gr"></i><img class="chest" src="case.webp?v=17" alt=""><div class="txt"><small>Ежедневный кейс</small><em>Бесплатно · раз в сутки</em></div><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
-    crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt"></span><em>x2.45</em></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=19" alt=""><img class="gf g1" src="g_candy.webp?v=19" alt=""><img class="gf g2" src="g_cup.webp?v=19" alt=""><img class="gf g3" src="g_champagne.webp?v=19" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>»»</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""></span><b>»»</b><span class="u u3"><img src="g_cup.webp?v=14" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=19" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=19" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  el.innerHTML = `<div class="hub">
+  el.innerHTML = `<h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
     <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="new">NEW</span>')}</div>
   </div>`;
+  const rk = $('#hrkt'); loadRocket();
+  if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 96; rk.style.backgroundPosition = `${-(f % 12) * 84}px ${-Math.floor(f / 12) * 84}px`; }, 42); cleanup = () => clearInterval(tm); }
   el.querySelectorAll('.tile').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
     b.onclick = () => go(b.dataset.id);
@@ -175,9 +187,11 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=17" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=19" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=19" alt="" draggable="false">`).join('');
+  el.insertAdjacentHTML('beforeend', `<div class="mq"><div class="mq-t">${strip}${strip}</div></div>`);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
 const isTurbo = () => !!store.get('gr2_turbo', false);
@@ -190,7 +204,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=14" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=19" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -264,7 +278,7 @@ function caseScreen(el, c) {
 const up = { mine: null, want: null, bal: 0 };
 const UP_MAX = 80;
 const stakeOf = () => { const g = up.mine && invGift(up.mine), gi = g ? ITEM(g.n) : null; return { g, gi, S: (gi ? gi.p : 0) + (up.bal || 0) }; };
-const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(0.01, (S / w.p) * 97));
+const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(0.01, (S / w.p) * 90));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
   if (up.mine && !invGift(up.mine)) up.mine = null;
@@ -287,6 +301,7 @@ function upgradeScreen(el) {
   const paint = () => {
     ({ g: mg, gi: mi, S } = stakeOf());
     if (wi && wi.p <= S) { wi = null; up.want = null; }
+    $('#mine').className = 'pick ' + (mi ? 'has' : ''); $('#mine').innerHTML = slot(mi);
     wantB.className = 'pick ' + (wi ? 'has' : ''); wantB.innerHTML = slot(wi);
     chance = mi || up.bal ? (wi ? chanceOf(S, wi) : 0) : 0;
     $('#rarc').style.strokeDasharray = `${chance / 100 * 276.46} 276.46`;
@@ -326,8 +341,12 @@ function upgradeScreen(el) {
     hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error');
     toast(ok ? `🎉 Успех! ${wi.n}` : '💥 Неудача, ставка сгорела');
-    up.mine = null; up.want = null; up.bal = 0;
-    if (el.isConnected) { await sleep(1500); if (el.isConnected) go('upgrade'); }
+    up.mine = null;                                   // подарок-ставка использован; желаемый предмет и сумма остаются
+    up.bal = Math.min(up.bal || 0, Math.floor(state.balance)); ubal.value = up.bal || '';
+    await sleep(1300);
+    if (!el.isConnected) return;
+    ring.classList.remove('win', 'lose'); hand.classList.remove('on'); hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)';
+    ubal.disabled = false; goB.disabled = false; busy = false; paint();
   };
 }
 function burst(host) {
@@ -378,16 +397,20 @@ const OFFLINE_TXT = ONLINE ? 'Офлайн-режим · сервер не на�
 const LIVE_BADGE = ONLINE ? '<span class="live">ONLINE</span>' : '';
 const apiBase = () => { try { return new URLSearchParams(location.search).get('api') || ''; } catch (e) { return ''; } };
 
+/* огромные иксы редкие; история живёт, пока открыт бот (новый запуск — новая история) */
+const genCrash = () => { let x = 0.95 / (1 - Math.random() * 0.99); if (x > 8) x = 8 + (x - 8) * 0.3; return Math.min(60, Math.max(1, +x.toFixed(2))); };
+const CRASH_HIST = Array.from({ length: 9 }, genCrash);
+
 /* офлайн-сервер: тот же протокол, но раунды крутятся прямо в телефоне */
 function localServer(onMsg) {
   let phase = 'wait', round = 0, until = 0, t0 = 0, crashAt = 2, crashMs = 0, bet = null, closed = false;
-  const timers = [], hist = Array.from({ length: 9 }, () => Math.min(80, Math.max(1, +(0.95 / (1 - Math.random() * 0.99)).toFixed(2))));
+  const timers = [], hist = CRASH_HIST;
   const T = (fn, ms) => timers.push(setTimeout(fn, ms));
   const emit = m => { if (!closed) onMsg(m); };
   const me = { uid: 'me', name: TGU ? (TGU.username ? '@' + TGU.username : TGU.first_name || 'Игрок') : 'Игрок', photo: (TGU && TGU.photo_url) || '' };
   const newRound = first => {
     round++; phase = 'wait'; bet = null;
-    crashAt = Math.max(1, +(0.95 / (1 - Math.random() * 0.99)).toFixed(2)); crashMs = Math.log(crashAt) / CRASH_K * 1000; until = Date.now() + 6000;
+    crashAt = genCrash(); crashMs = Math.log(crashAt) / CRASH_K * 1000; until = Date.now() + 6000;
     if (!first) emit({ t: 'round', round, until, now: Date.now() });
     T(() => {
       phase = 'fly'; t0 = Date.now(); emit({ t: 'fly', t0 });
@@ -521,7 +544,7 @@ function crashScreen(el) {
     let txt, cls = 'btn', dis = false;
     if (!net) { txt = 'Подключение…'; dis = true; }
     else if (G.phase === 'wait') {
-      if (myBet) { txt = `Отменить ставку ⭐ ${fmt(myBet)}`; cls = 'btn red'; }
+      if (myBet) { txt = `Ставка принята ⭐ ${fmt(myBet)}`; cls = 'btn green'; dis = true; }
       else if (pending) { txt = 'Отправка…'; dis = true; }
       else txt = 'Сделать ставку';
     } else if (G.phase === 'fly') {
@@ -546,7 +569,7 @@ function crashScreen(el) {
         if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); }
         if (!spend(v)) return;
         pending = v; net.send({ t: 'bet', amount: v }); haptic('medium');
-      } else if (myBet && !pending) net.send({ t: 'cancel' });
+      } else if (myBet) toast('Ставку отменить нельзя');
     } else if (G.phase === 'fly' && myBet && !myCashed && !cashSent) { cashSent = true; net.send({ t: 'cash' }); haptic('medium'); }
   };
 
@@ -784,7 +807,7 @@ function rouletteScreen(el) {
 
   rbtns.forEach(b => b.onclick = () => {
     const c = b.dataset.c; if (!net) return;
-    if (myBets[c]) { if (G.phase === 'wait') net.send({ t: 'cancel', color: c }); return; }
+    if (myBets[c]) { toast('Ставку отменить нельзя'); return; }
     if (G.phase !== 'wait') return toast('Ставки закрыты');
     if (pending[c]) return;
     if (Object.keys({ ...myBets, ...pending }).some(k => (myBets[k] || pending[k]) && rGroup(k) !== rGroup(c))) { notify('error'); return toast('Нельзя ставить и цвет, и чёт/нечет'); }
@@ -1040,27 +1063,27 @@ function tourScreen(el) {
 }
 
 /* ---------- tasks ---------- */
-const TASK_GOAL = 25000;
+const TASK_GOAL = 1000, TASK_REW = 100;
 const TASK_LINK = 'https://t.me/xdsold';
 const SUBS = [
-  { id: 't6', title: 'Подписаться на Gift Rush News', link: 'https://t.me/Gifts_Rush_News', rew: 25000 },
-  { id: 't7', title: 'Забустить Gift Rush News', link: 'https://t.me/boost/Gifts_Rush_News', rew: 20000 },
-  { id: 't4', title: 'Подпишись на омутх', link: 'https://t.me/omutxwin', rew: 10000 },
-  { id: 't5', title: 'Подпишись на w1npros', link: 'https://t.me/w1npros', rew: 10000 },
+  { id: 't6', title: 'Подписаться на Gift Rush News', link: 'https://t.me/Gifts_Rush_News', rew: 5 },
+  { id: 't7', title: 'Забустить Gift Rush News', link: 'https://t.me/boost/Gifts_Rush_News', rew: 5 },
+  { id: 't4', title: 'Подпишись на омутх', link: 'https://t.me/omutxwin', rew: 5 },
+  { id: 't5', title: 'Подпишись на w1npros', link: 'https://t.me/w1npros', rew: 5 },
 ];
 const subTask = s => `<div class="task wide" id="${s.id}"><div class="ti"><h3>${s.title}</h3><span class="rew">+⭐ ${fmt(s.rew)}</span></div><div class="ta two"><button class="pbtn ghost" id="${s.id}a">Выполнить</button><button class="pbtn" id="${s.id}b"></button></div></div>`;
-let tasks = store.get('gr2_tasks', {}); if (!tasks || typeof tasks !== 'object') tasks = {};
-const saveTasks = () => store.set('gr2_tasks', tasks);
+let tasks = store.get('gr3_tasks', {}); if (!tasks || typeof tasks !== 'object') tasks = {};
+const saveTasks = () => store.set('gr3_tasks', tasks);
 function grant(n) { state.balance += n; save(); bump(); notify('success'); toast(`+${fmt(n)} ⭐ на баланс`); }
 function openTG(url) { try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {} window.open(url, '_blank'); }
 
 function tasksScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай Rushcoin</p></div>
     ${subTask(SUBS[0])}${subTask(SUBS[1])}
-    <div class="task" id="t1"><div class="ti"><h3>Зайти в Gift Rush</h3><span class="rew">+⭐ 5 000</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
-    <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 10 000</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
+    <div class="task" id="t1"><div class="ti"><h3>Зайти в Gift Rush</h3><span class="rew">+⭐ 1</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
+    <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 5</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
     ${subTask(SUBS[2])}${subTask(SUBS[3])}
-    <div class="task" id="t3"><div class="ti"><h3>Апнуть 25 000 ⭐</h3><span class="rew">+⭐ 50 000</span>
+    <div class="task" id="t3"><div class="ti"><h3>Апнуть 1 000 ⭐</h3><span class="rew">+⭐ 100</span>
       <div class="prog"><i id="t3p"></i></div><div class="pt" id="t3t"></div></div><div class="ta"><button class="pbtn" id="t3b">Забрать</button></div></div>`);
   const b1 = $('#t1b'), b2a = $('#t2a'), b2b = $('#t2b'), b3 = $('#t3b');
   const paint = () => {
@@ -1077,13 +1100,13 @@ function tasksScreen(el) {
     $('#t3p').style.width = pct + '%'; $('#t3t').textContent = `Баланс: ⭐ ${fmt(bal)} / ${fmt(TASK_GOAL)}`;
     b3.textContent = tasks.t3 ? 'Получено ✓' : 'Забрать'; b3.disabled = !!tasks.t3 || bal < TASK_GOAL; b3.classList.toggle('done', !!tasks.t3);
   };
-  b1.onclick = () => { if (tasks.t1) return; tasks.t1 = 'claimed'; saveTasks(); grant(5000); paint(); };
+  b1.onclick = () => { if (tasks.t1) return; tasks.t1 = 'claimed'; saveTasks(); grant(1); paint(); };
   b2a.onclick = () => { openTG(TASK_LINK); if (!tasks.t2) { tasks.t2 = 'done'; saveTasks(); toast('Задание выполнено — нажмите «Забрать»'); paint(); } };
   b2b.onclick = () => {
     if (!tasks.t2) return toast('Сначала нажмите «Выполнить»');
-    if (tasks.t2 === 'claimed') return; tasks.t2 = 'claimed'; saveTasks(); grant(10000); paint();
+    if (tasks.t2 === 'claimed') return; tasks.t2 = 'claimed'; saveTasks(); grant(5); paint();
   };
-  b3.onclick = () => { if (tasks.t3 || state.balance < TASK_GOAL) return; tasks.t3 = 'claimed'; saveTasks(); grant(50000); paint(); };
+  b3.onclick = () => { if (tasks.t3 || state.balance < TASK_GOAL) return; tasks.t3 = 'claimed'; saveTasks(); grant(TASK_REW); paint(); };
   SUBS.forEach(s => {
     $('#' + s.id + 'a').onclick = () => { openTG(s.link); if (!tasks[s.id]) { tasks[s.id] = 'done'; saveTasks(); toast('Задание выполнено — нажмите «Проверить»'); } };
     $('#' + s.id + 'b').onclick = () => {
@@ -1103,26 +1126,32 @@ const TGU = tg && tg.initDataUnsafe && tg.initDataUnsafe.user || null;
 async function api(path, body) {
   // text/plain — «простой» запрос без предварительного CORS-запроса (работает надёжнее в Telegram)
   const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(Object.assign({ initData: (tg && tg.initData) || '' }, body || {})) });
+    keepalive: true, body: JSON.stringify(Object.assign({ initData: (tg && tg.initData) || '' }, body || {})) });
   let d; try { d = await r.json(); } catch (e) { throw new Error('http ' + r.status); }
   return d;
 }
 const apiErr = (d, e) => e ? 'Сервер недоступен. Вставь новый worker.js в Cloudflare и нажми Deploy' :
   d && d.err === 'nokv' ? 'К воркеру не привязан KV (имя DB)' : d && d.err === 'auth' ? 'Открой игру через бота в Telegram' : d && d.err === 'forbidden' ? 'Нет прав' : 'Ошибка, попробуйте ещё раз';
-let syncing = false;
+let syncing = false, lastPushed = -1;
 async function syncAccount() {
   if (syncing || !TGU || !(tg && tg.initData)) return;
   syncing = true;
   try {
-    const d = await api('/api/sync');
-    if (d && d.ok && d.credit > 0) { state.balance += d.credit; save(); bump(); toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); notify('success'); }
+    let bal = Math.floor(state.balance);
+    const d = await api('/api/sync', { bal });
+    if (d && d.ok) {
+      let ch = false;
+      if (d.credit > 0) { state.balance += d.credit; ch = true; toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); }
+      if (d.debit > 0) { const t = Math.min(d.debit, Math.floor(state.balance)); state.balance -= t; ch = true; if (t) toast(`С баланса списано ${fmt(t)} ⭐`); }
+      if (ch) { save(); bump(); notify('success'); bal = Math.floor(state.balance); api('/api/sync', { bal }).catch(() => {}); }
+      lastPushed = bal;
+    }
   } catch (e) {} finally { syncing = false; }
 }
 function autoIncome() {
   const now = Date.now(), parts = []; let add = 0;
   const l6 = Number(store.get('gr2_b6', 0)) || 0;           // бонус 500 раз в 6 часов
   if (now - l6 >= 6 * 3600e3) { store.set('gr2_b6', now); add += 500; parts.push('+500 ⭐ бонус (раз в 6 часов)'); }
-  if (!store.get('gr2_v9_1m', 0)) { store.set('gr2_v9_1m', 1); add += 1e6; parts.push('+1 000 000 ⭐ подарок всем игрокам'); }
   if (TGU && TGU.id === ADMIN_ID) {                          // владелец: 50 000 000 каждые 5 минут
     const lh = Number(store.get('gr2_5m', 0)) || 0, n = lh ? Math.min(288, Math.floor((now - lh) / 300e3)) : 1;
     if (n > 0) { store.set('gr2_5m', lh ? Math.min(lh + n * 300e3, now) : now); add += n * 50e6; parts.push(`+${fmt(n * 50e6)} ⭐ (каждые 5 минут)`); }
@@ -1130,13 +1159,13 @@ function autoIncome() {
   }
   if (add > 0) { state.balance += add; save(); bump(); notify('success'); toast(parts.length > 1 ? `🎁 Начислено +${fmt(add)} ⭐` : parts[0]); }
 }
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } });
-setInterval(() => { if (!document.hidden) autoIncome(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } else if (Math.floor(state.balance) !== lastPushed) syncAccount(); });
+setInterval(() => { if (!document.hidden) { autoIncome(); if (Math.floor(state.balance) !== lastPushed) syncAccount(); } }, 45000);
 
 /* ---------- profile ---------- */
 function adminBox(el) {
-  el.insertAdjacentHTML('beforeend', `<div class="adm"><h4>Перевод Rushcoin игроку</h4><div class="row">
-    <input id="xfq" placeholder="ID или @username из профиля" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ok" id="xfok">ОК</button></div></div>`);
+  el.insertAdjacentHTML('beforeend', `<div class="adm"><h4>Игроки: перевод и списание Rushcoin</h4><div class="row">
+    <input id="xfq" placeholder="ID или @username" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ok" id="xfok">ОК</button></div></div>`);
   const ok = $('#xfok');
   const run = async () => {
     const q = $('#xfq').value.trim(); if (!q) return toast('Введите ID или юзернейм');
@@ -1144,25 +1173,31 @@ function adminBox(el) {
     try {
       const d = await api('/api/lookup', { q });
       if (!d || !d.ok) return toast(d && d.err === 'nf' ? 'Игрок не найден — пусть откроет игру хотя бы раз' : apiErr(d));
-      const amounts = [100, 500, 1000, 5000, 10000, 50000];
-      let sel = 1000;
-      const m = modal(`<div class="g-n">Перевод Rushcoin</div><div class="g-p">${esc(d.name)} · ID ${esc(d.id)}</div>
-        <div class="xf-amt">${amounts.map(x => `<button data-a="${x}" class="${x === sel ? 'on' : ''}">⭐ ${fmt(x)}</button>`).join('')}</div>
-        <input class="xf-in" id="xfa" type="number" inputmode="numeric" min="1" value="${sel}">
-        <div class="g-act"><button class="btn green" id="xfgo">Перевести</button></div>`);
+      const amounts = [10, 100, 500, 1000, 5000, 10000];
+      const at = d.at ? new Date(d.at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+      const m = modal(`<div class="lk"><div class="lk-av" id="lkav"><span>${esc((String(d.name).replace('@', '')[0] || '?').toUpperCase())}</span></div>
+        <div class="lk-nm">${esc(d.name)}</div><div class="lk-id">ID ${esc(d.id)}</div>
+        <div class="lk-bal"><i class="rc"></i> ${fmt(d.bal || 0)}</div>
+        <div class="lk-sub">Баланс на ${at}${d.pending ? ` · в очереди: ${d.pending > 0 ? '+' : ''}${fmt(d.pending)}` : ''}</div></div>
+        <div class="xf-amt">${amounts.map(x => `<button data-a="${x}">${fmt(x)}</button>`).join('')}</div>
+        <input class="xf-in" id="xfa" type="number" inputmode="numeric" min="1" placeholder="Сумма">
+        <div class="g-act"><button class="btn red" id="xftake">Списать</button><button class="btn green" id="xfgo">Начислить</button></div>`);
+      if (d.photo) { const im = new Image(); im.alt = ''; im.onload = () => { const a = $('#lkav', m.el); if (a) { a.innerHTML = ''; a.append(im); } }; im.src = d.photo; }
       m.el.querySelectorAll('.xf-amt button').forEach(b => b.onclick = () => {
         m.el.querySelectorAll('.xf-amt button').forEach(x => x.classList.toggle('on', x === b)); $('#xfa', m.el).value = b.dataset.a;
       });
-      $('#xfgo', m.el).onclick = async () => {
+      const act = (path, label, btn) => async () => {
         const amt = Math.floor(Number($('#xfa', m.el).value));
         if (!(amt >= 1)) return toast('Введите сумму');
-        const g = $('#xfgo', m.el); g.disabled = true;
+        btn.disabled = true;
         try {
-          const r = await api('/api/give', { to: d.id, amount: amt });
-          if (r && r.ok) { m.close(); toast(`✅ ${fmt(amt)} ⭐ отправлено: ${d.name}`); notify('success'); $('#xfq').value = ''; }
-          else { toast(apiErr(r)); g.disabled = false; }
-        } catch (e) { toast(apiErr(null, e)); g.disabled = false; }
+          const r = await api(path, { to: d.id, amount: amt });
+          if (r && r.ok) { m.close(); toast(`✅ ${label} ${fmt(amt)} ⭐: ${d.name}`); notify('success'); $('#xfq').value = ''; }
+          else { toast(apiErr(r)); btn.disabled = false; }
+        } catch (e) { toast(apiErr(null, e)); btn.disabled = false; }
       };
+      const g = $('#xfgo', m.el), t = $('#xftake', m.el);
+      g.onclick = act('/api/give', 'Начислено', g); t.onclick = act('/api/take', 'Списано', t);
     } catch (e) { toast(apiErr(null, e)); } finally { ok.disabled = false; }
   };
   ok.onclick = run; $('#xfq').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
