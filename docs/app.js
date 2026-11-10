@@ -159,10 +159,10 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=24" alt=""><img class="gf g1" src="case_toxic.webp?v=24" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=26" alt=""><img class="gf g1" src="case_toxic.webp?v=26" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=24" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=24" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=26" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=26" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
@@ -187,10 +187,10 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=24" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=26" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=24" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=26" alt="" draggable="false">`).join('');
   el.insertAdjacentHTML('beforeend', `<div class="mq"><div class="mq-t">${strip}${strip}</div></div>`);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
@@ -204,7 +204,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=24" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=26" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -377,7 +377,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=24';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=26';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -605,7 +605,7 @@ function crashScreen(el) {
 
   /* отрисовка */
   const light = document.documentElement.classList.contains('ios') || document.documentElement.classList.contains('lite');
-  const stars = Array.from({ length: light ? 34 : 56 }, (_, i) => { const l = i % 3; return { x: Math.random() * W, y: Math.random() * H * .66, l, s: (.5 + l * .55) * dpr, v: (.12 + l * .22) * dpr, a: .3 + l * .22 }; });
+  const stars = Array.from({ length: light ? 14 : 22 }, (_, i) => { const l = i % 3; return { x: Math.random() * W, y: Math.random() * H * .66, l, s: (.5 + l * .55) * dpr, v: (.08 + l * .12) * dpr, a: .25 + l * .2 }; });
   let spd = .4, gridP = 0, animT = 0, lastT = Date.now(), shoot = null, nextShoot = Date.now() + 2500;
   const HY = H * .64;   // линия горизонта
   const RS = Math.min(W * .38, 132 * dpr);               // размер ракеты
@@ -624,16 +624,9 @@ function crashScreen(el) {
     ctx.clearRect(0, 0, W, H);
     ctx.save();
     if (G.phase === 'fly' && curM >= 5) { const q = Math.min(2.2, Math.log10(curM)) * dpr; ctx.translate((Math.random() - .5) * q, (Math.random() - .5) * q); }   // лёгкая тряска на больших иксах
-    /* планета с кольцом */
-    { const px = W * .8 - gridP * 0, py = H * .27, pr = W * .075;
-      const pg = ctx.createRadialGradient(px - pr * .4, py - pr * .4, pr * .1, px, py, pr);
-      pg.addColorStop(0, '#c9a7ff'); pg.addColorStop(.55, '#6b3fd1'); pg.addColorStop(1, '#1c1250');
-      ctx.globalAlpha = .85; ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(px, py, pr, 0, 7); ctx.fill();
-      ctx.strokeStyle = '#b79bff'; ctx.lineWidth = 1.5 * dpr; ctx.globalAlpha = .5; ctx.beginPath(); ctx.ellipse(px, py, pr * 1.75, pr * .42, -.35, 0, 7); ctx.stroke();
-      ctx.globalAlpha = .55; const mg = ctx.createRadialGradient(W * .14, H * .2, 0, W * .14, H * .2, pr * .55); mg.addColorStop(0, '#fff'); mg.addColorStop(1, '#6f86ff00'); ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(W * .14, H * .2, pr * .55, 0, 7); ctx.fill(); }
     /* звёзды в 3 слоя (параллакс) */
     ctx.fillStyle = '#fff';
-    stars.forEach(s => { s.y += s.v * spd * 3; if (s.y > HY) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = s.a; ctx.fillRect(s.x, s.y, s.s, s.s * (1 + Math.min(4, spd * .5) * s.l)); });
+    stars.forEach(s => { s.y += s.v * spd * 1.6; if (s.y > HY) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = s.a; ctx.fillRect(s.x, s.y, s.s, s.s * (1 + Math.min(2.5, spd * .3) * s.l)); });
     /* падающие звёзды */
     if (now > nextShoot && !shoot) { shoot = { x: W * rnd(.3, 1), y: H * rnd(.05, .3), t: 0 }; nextShoot = now + rnd(2200, 5200); }
     if (shoot) { shoot.t += dt; const k = shoot.t / .7, x = shoot.x - k * W * .35, y = shoot.y + k * H * .16;
