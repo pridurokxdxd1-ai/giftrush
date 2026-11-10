@@ -110,7 +110,7 @@ const CASES = [{
   // что мелькает на ленте при прокрутке (не влияет на реальные шансы)
   bait: [[ITEM('Swag Bag'), 7], [ITEM('Candy Cane'), 8], [ITEM('Cup'), 10], [ITEM('Champagne'), 11], [COIN(10), 12], [COIN(5), 14], [COIN(3), 14], [COIN(2), 12], [COIN(1), 12]],
 }, {
-  n: 'Toxic', img: 'case_toxic.webp', price: 399,
+  n: 'Toxic', img: 'case_toxic.webp', price: 349,
   drops: [[COIN(100), 57.9505], [COIN(210), 40.1504], [COIN(250), 0.999], [COIN(350), 0.88], [ITEM('Snake Box'), 0.01], [ITEM('Big Year'), 0.008],
     [ITEM('Swag Bag'), 0.001], [ITEM('Chill Flame'), 0.001], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
   bait: [[ITEM('Sharp Tongue'), 6], [ITEM('Love Potion'), 7], [ITEM('Spy Agaric'), 8], [ITEM('Chill Flame'), 8], [ITEM('Swag Bag'), 8], [ITEM('Big Year'), 8], [ITEM('Snake Box'), 9],
@@ -159,10 +159,10 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=20" alt=""><img class="gf g1" src="case_toxic.webp?v=20" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=21" alt=""><img class="gf g1" src="case_toxic.webp?v=21" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=20" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=20" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=21" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=21" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
@@ -187,10 +187,10 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=20" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=21" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=20" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=21" alt="" draggable="false">`).join('');
   el.insertAdjacentHTML('beforeend', `<div class="mq"><div class="mq-t">${strip}${strip}</div></div>`);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
@@ -204,7 +204,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=20" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=21" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -1152,11 +1152,6 @@ function autoIncome() {
   const now = Date.now(), parts = []; let add = 0;
   const l6 = Number(store.get('gr2_b6', 0)) || 0;           // бонус 500 раз в 6 часов
   if (now - l6 >= 6 * 3600e3) { store.set('gr2_b6', now); add += 500; parts.push('+500 ⭐ бонус (раз в 6 часов)'); }
-  if (TGU && TGU.id === ADMIN_ID) {                          // владелец: 50 000 000 каждые 5 минут
-    const lh = Number(store.get('gr2_5m', 0)) || 0, n = lh ? Math.min(288, Math.floor((now - lh) / 300e3)) : 1;
-    if (n > 0) { store.set('gr2_5m', lh ? Math.min(lh + n * 300e3, now) : now); add += n * 50e6; parts.push(`+${fmt(n * 50e6)} ⭐ (каждые 5 минут)`); }
-    if (!store.get('gr2_v8_100m', 0)) { store.set('gr2_v8_100m', 1); add += 1e8; parts.push('+100 000 000 ⭐'); }
-  }
   if (add > 0) { state.balance += add; save(); bump(); notify('success'); toast(parts.length > 1 ? `🎁 Начислено +${fmt(add)} ⭐` : parts[0]); }
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } else if (Math.floor(state.balance) !== lastPushed) syncAccount(); });
