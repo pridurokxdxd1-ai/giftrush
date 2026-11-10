@@ -14,8 +14,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => Math.random() * (b - a) + a;
 const fmt = n => Math.floor(n).toLocaleString('ru-RU');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const haptic = (t = 'light') => { try { tg.HapticFeedback.impactOccurred(t); } catch (e) {} };
-const notify = t => { try { tg.HapticFeedback.notificationOccurred(t); } catch (e) {} };
+let VIB = true; try { VIB = localStorage.getItem('gr4_vib') !== '0'; } catch (e) {}
+const haptic = (t = 'light') => { if (!VIB) return; try { tg.HapticFeedback.impactOccurred(t); } catch (e) {} };
+const notify = t => { if (!VIB) return; try { tg.HapticFeedback.notificationOccurred(t); } catch (e) {} };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 /* ---------- storage ---------- */
@@ -106,15 +107,16 @@ try {
 const CASES = [{
   n: 'Daily', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
   drops: [[ITEM('Champagne'), 2.3529], [ITEM('Cup'), 0.5882], [ITEM('Swag Bag'), 0.0005], [ITEM('Candy Cane'), 0.005],
-    [COIN(10), 8.5905], [COIN(5), 17.0121], [COIN(3), 20.4145], [COIN(2), 8.506], [COIN(1), 42.5301]],   // сумма = 100%
+    [COIN(10), 8.5905], [COIN(5), 17.0121], [COIN(3), 20.4145], [COIN(2), 8.506], [COIN(1), 42.5303]],   // сумма = 100%
   // что мелькает на ленте при прокрутке (не влияет на реальные шансы)
-  bait: [[ITEM('Swag Bag'), 7], [ITEM('Candy Cane'), 8], [ITEM('Cup'), 10], [ITEM('Champagne'), 11], [COIN(10), 12], [COIN(5), 14], [COIN(3), 14], [COIN(2), 12], [COIN(1), 12]],
+  bait: [[ITEM('Swag Bag'), 14], [ITEM('Candy Cane'), 14], [ITEM('Cup'), 16], [ITEM('Champagne'), 16], [COIN(10), 8], [COIN(5), 9], [COIN(3), 9], [COIN(2), 8], [COIN(1), 8]],
 }, {
-  n: 'Toxic', img: 'case_toxic.webp', price: 349,
-  drops: [[COIN(100), 57.9515], [COIN(210), 40.1504], [COIN(250), 0.999], [COIN(350), 0.88], [ITEM('Snake Box'), 0.01], [ITEM('Big Year'), 0.008],
-    [ITEM('Swag Bag'), 0.001], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
-  bait: [[ITEM('Sharp Tongue'), 6], [ITEM('Love Potion'), 7], [ITEM('Spy Agaric'), 8], [ITEM('Swag Bag'), 8], [ITEM('Big Year'), 8], [ITEM('Snake Box'), 9],
-    [COIN(350), 10], [COIN(250), 10], [COIN(210), 12], [COIN(100), 14]],
+  n: 'Toxic', img: 'case_toxic.webp', price: 375,
+  drops: [[COIN(100), 48.4999], [COIN(210), 33], [COIN(250), 0.8], [COIN(350), 0.7], [ITEM('Snake Box'), 10], [ITEM('Big Year'), 5],
+    [ITEM('Swag Bag'), 2], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
+  // на ленте дорогие NFT и просто NFT мелькают чаще (на реальные шансы не влияет)
+  bait: [[ITEM('Sharp Tongue'), 12], [ITEM('Love Potion'), 12], [ITEM('Spy Agaric'), 12], [ITEM('Swag Bag'), 12], [ITEM('Big Year'), 12], [ITEM('Snake Box'), 12],
+    [COIN(350), 6], [COIN(250), 6], [COIN(210), 7], [COIN(100), 9]],
 }];
 CASES.forEach(c => { c.pool = c.drops.map(([it, w]) => ({ it, w })); c.sum = c.pool.reduce((t, o) => t + o.w, 0); });
 function rollCase(c) {
@@ -159,15 +161,16 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=26" alt=""><img class="gf g1" src="case_toxic.webp?v=26" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=28" alt=""><img class="gf g1" src="case_toxic.webp?v=28" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=26" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=26" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=28" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=28" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  el.innerHTML = `<h2 class="hd">Игры</h2><div class="hub">
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=28" alt="" draggable="false">`).join('');
+  el.innerHTML = `<h2 class="hd">Игры</h2><div class="mq home"><div class="mq-t">${strip}${strip}</div></div><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
@@ -187,11 +190,9 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=26" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=28" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=26" alt="" draggable="false">`).join('');
-  el.insertAdjacentHTML('beforeend', `<div class="mq"><div class="mq-t">${strip}${strip}</div></div>`);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
 const isTurbo = () => !!store.get('gr2_turbo', false);
@@ -204,7 +205,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=26" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=28" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -377,7 +378,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=26';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=28';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1082,22 +1083,40 @@ function minesScreen(el) {
   draw(); ui();
 }
 
-/* ---------- tournament ---------- */
+/* ---------- лидерборд (онлайн, по балансу) ---------- */
 function tourScreen(el) {
-  const rows = [
-    ['#4', '🐙', 'w1', 'radial-gradient(circle at 30% 25%,#5eead4,#0f766e 75%)'],
-    ['#5', '🦇', 'омутх', 'radial-gradient(circle at 30% 25%,#c084fc,#581c87 75%)'],
-    ['#6', '🙂', ':)', 'radial-gradient(circle at 30% 25%,#fde68a,#d97706 75%)'],
-    ...[7, 8, 9, 10].map(() => ['#--', '?', 'NOBODY', null]),
-  ];
-  el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>🏆 Турнир</h2><p class="sub" style="margin-top:6px">Лучшие игроки</p>
-    <div class="podium">
-      <div class="pl p2"><div class="av">🖤</div><div class="nk">PUPSYA</div><div class="step s2">2</div></div>
-      <div class="pl p1"><div class="crown">👑</div><div class="av">🦁</div><div class="nk">WENZOR</div><div class="step s1">1</div></div>
-      <div class="pl p3"><div class="av">🐺</div><div class="nk">ONYX</div><div class="step s3">3</div></div>
-    </div>
-    <div class="ranks">${rows.map((r, i) => `<div class="rk" style="animation-delay:${0.5 + i * 0.06}s"><span class="n">${r[0]}</span>
-      <span class="a ${r[3] ? '' : 'q'}" ${r[3] ? `style="background:${r[3]}"` : ''}>${r[1]}</span><span class="t">${esc(r[2])}</span></div>`).join('')}</div></div>`);
+  el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>Лидерборд</h2><p class="sub" style="margin-top:6px">Топ-10 игроков по балансу</p><div id="lbBody"><div class="empty lb-ld">Загрузка…</div></div></div>`);
+  const body = $('#lbBody'); let dead = false; cleanup = () => { dead = true; };
+  const myId = TGU ? String(TGU.id) : '';
+  const avHtml = (p, nm) => `<span class="lb-i">${esc((String(nm || '?').replace('@', '')[0] || '?').toUpperCase())}</span>${p ? `<img src="${esc(p)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}`;
+  const balHtml = v => `<i class="rc"></i>${fmt(v)}`;
+  const render = (top, me) => {
+    const pod = i => {
+      const u = top[i], cls = ['p1', 'p2', 'p3'][i], st = ['s1', 's2', 's3'][i];
+      return `<div class="pl ${cls}">${i === 0 ? '<div class="crown"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="#ffd23f" stroke="#b57a0c" stroke-width="1.2" stroke-linejoin="round"/></svg></div>' : ''}
+        <div class="av lbav">${u ? avHtml(u.photo, u.name) : '<span class="lb-i">?</span>'}</div>
+        <div class="nk">${u ? esc(u.name) : 'NOBODY'}</div>${u ? `<div class="pbal">${balHtml(u.bal)}</div>` : ''}<div class="step ${st}">${i + 1}</div></div>`;
+    };
+    const rows = [];
+    for (let i = 3; i < 10; i++) {
+      const u = top[i];
+      rows.push(u ? `<div class="rk${u.id === myId ? ' me' : ''}" style="animation-delay:${.3 + (i - 3) * .05}s"><span class="n">#${i + 1}</span><span class="a lbav">${avHtml(u.photo, u.name)}</span><span class="t">${esc(u.name)}</span><span class="b">${balHtml(u.bal)}</span></div>`
+        : `<div class="rk" style="animation-delay:${.3 + (i - 3) * .05}s"><span class="n">#${i + 1}</span><span class="a q">?</span><span class="t">NOBODY</span></div>`);
+    }
+    const inTop = top.some(u => u.id === myId);
+    const mine = !inTop && me && TGU ? `<div class="rk me"><span class="n">${me.rank ? '#' + me.rank : '—'}</span><span class="a lbav">${avHtml(TGU.photo_url, me.name)}</span><span class="t">${esc(me.name)} (вы)</span><span class="b">${balHtml(Math.floor(state.balance))}</span></div>` : '';
+    body.innerHTML = `<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div><div class="ranks">${rows.join('')}${mine ? '<div class="rk-sep"></div>' + mine : ''}</div>`;
+  };
+  render([], null);
+  if (!TGU || !(tg && tg.initData)) { body.insertAdjacentHTML('beforeend', '<div class="empty" style="margin-top:14px">Откройте игру через бота, чтобы увидеть онлайн-топ</div>'); return; }
+  (async () => {
+    try {
+      await syncAccount();
+      const d = await api('/api/top', {});
+      if (dead) return;
+      if (d && d.ok) render(d.top || [], d.me); else body.insertAdjacentHTML('beforeend', `<div class="empty" style="margin-top:14px">${esc(apiErr(d))}</div>`);
+    } catch (e) { if (!dead) body.insertAdjacentHTML('beforeend', `<div class="empty" style="margin-top:14px">${esc(apiErr(null, e))}</div>`); }
+  })();
 }
 
 /* ---------- tasks ---------- */
@@ -1153,8 +1172,8 @@ function tasksScreen(el) {
       tasks[s.id] = 'claimed'; saveTasks(); grant(s.rew); paint();
     };
   });
-  balanceHook = paint; cleanup = () => { balanceHook = null; };
-  paint();
+  balanceHook = paint; taskPaint = paint; cleanup = () => { balanceHook = null; taskPaint = null; };
+  paint(); syncAccount();
 }
 
 /* ---------- аккаунт: связь с Worker (переводы от админа) ---------- */
@@ -1170,15 +1189,20 @@ async function api(path, body) {
 }
 const apiErr = (d, e) => e ? 'Сервер недоступен. Вставь новый worker.js в Cloudflare и нажми Deploy' :
   d && d.err === 'nokv' ? 'К воркеру не привязан KV (имя DB)' : d && d.err === 'auth' ? 'Открой игру через бота в Telegram' : d && d.err === 'forbidden' ? 'Нет прав' : 'Ошибка, попробуйте ещё раз';
-let syncing = false, lastPushed = -1;
+let syncing = false, lastPushed = -1, taskPaint = null;
 async function syncAccount() {
   if (syncing || !TGU || !(tg && tg.initData)) return;
   syncing = true;
   try {
     let bal = Math.floor(state.balance);
-    const d = await api('/api/sync', { bal });
+    const d = await api('/api/sync', { bal, tasks });
     if (d && d.ok) {
       let ch = false;
+      if (d.tasks && typeof d.tasks === 'object') {   // задания выполняются раз и навсегда: берём лучшее из устройства и сервера
+        const rk = { claimed: 2, done: 1 }; let tch = false;
+        Object.keys(d.tasks).forEach(k => { if ((rk[d.tasks[k]] || 0) > (rk[tasks[k]] || 0)) { tasks[k] = d.tasks[k]; tch = true; } });
+        if (tch) { saveTasks(); if (taskPaint) taskPaint(); }
+      }
       if (d.credit > 0) { state.balance += d.credit; ch = true; toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); }
       if (d.debit > 0) { const t = Math.min(d.debit, Math.floor(state.balance)); state.balance -= t; ch = true; if (t) toast(`С баланса списано ${fmt(t)} ⭐`); }
       if (ch) { save(); bump(); notify('success'); bal = Math.floor(state.balance); api('/api/sync', { bal }).catch(() => {}); }
@@ -1230,14 +1254,46 @@ function adminBox(el) {
   };
   ok.onclick = run; $('#xfq').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
 }
+/* ---------- настройки: цвет приложения и вибрация ---------- */
+const THEMES = [
+  { n: 'Синий', a: '#5d90e6', b: '#3a6fd8' },
+  { n: 'Фиолетовый', a: '#a37bff', b: '#6d3fe0', t1: '#2f2652', t2: '#211a3c', bg: '#140f26', gl: '#8b5cf6' },
+  { n: 'Зелёный', a: '#3ee48f', b: '#13a85b', t1: '#1f3d33', t2: '#16291f', bg: '#0b1a14', gl: '#22c55e' },
+  { n: 'Красный', a: '#ff6b7e', b: '#d11f3f', t1: '#43262c', t2: '#2d1a1e', bg: '#1b0e11', gl: '#ef4458' },
+  { n: 'Оранжевый', a: '#ffb23f', b: '#f07a12', t1: '#423423', t2: '#2d2418', bg: '#1b140b', gl: '#f59e0b' },
+  { n: 'Розовый', a: '#ff7ac8', b: '#d6339c', t1: '#412a3a', t2: '#2c1c27', bg: '#1b0f17', gl: '#ec4899' },
+];
+function applyTheme(i) {
+  const r = document.documentElement, t = THEMES[i] || THEMES[0];
+  ['--ta', '--tb', '--t1', '--t2', '--tbg', '--tgl'].forEach(k => r.style.removeProperty(k));
+  if (!i || !THEMES[i]) { r.removeAttribute('data-theme'); } else {
+    r.setAttribute('data-theme', i); r.style.setProperty('--ta', t.a); r.style.setProperty('--tb', t.b); r.style.setProperty('--t1', t.t1); r.style.setProperty('--t2', t.t2); r.style.setProperty('--tbg', t.bg); r.style.setProperty('--tgl', t.gl);
+  }
+  try { tg && tg.setHeaderColor && tg.setHeaderColor(i ? t.bg : '#040922'); tg && tg.setBackgroundColor && tg.setBackgroundColor(i ? t.bg : '#0d1015'); } catch (e) {}
+}
+let themeIdx = Number(store.get('gr4_theme', 0)) || 0; if (!THEMES[themeIdx]) themeIdx = 0; applyTheme(themeIdx);
+function openSettings() {
+  const m = modal(`<div class="st"><h3>Настройки</h3>
+    <h4>Цвет приложения</h4><div class="sw-row" id="thRow">${THEMES.map((t, i) => `<button class="th${i === themeIdx ? ' on' : ''}" data-i="${i}" aria-label="${t.n}" style="background:linear-gradient(135deg,${t.a},${t.b})"></button>`).join('')}</div>
+    <div class="st-row"><span>Вибрация</span><button class="sw${VIB ? ' on' : ''}" id="vibSw" aria-label="Вибрация"><i></i></button></div></div>`);
+  m.el.querySelectorAll('.th').forEach(b => b.onclick = () => {
+    themeIdx = Number(b.dataset.i); store.set('gr4_theme', themeIdx); applyTheme(themeIdx);
+    m.el.querySelectorAll('.th').forEach(x => x.classList.toggle('on', x === b)); haptic();
+  });
+  $('#vibSw', m.el).onclick = e => {
+    VIB = !VIB; try { localStorage.setItem('gr4_vib', VIB ? '1' : '0'); } catch (x) {}
+    e.currentTarget.classList.toggle('on', VIB); if (VIB) haptic('medium');
+  };
+}
 function profileScreen(el) {
   const name = TGU ? (TGU.username ? '@' + TGU.username : [TGU.first_name, TGU.last_name].filter(Boolean).join(' ')) : 'Игрок';
   const ini = (name.replace('@', '')[0] || '?').toUpperCase();
   const list = state.inv.map(g => ({ g, it: ITEM(g.n) })).sort((a, b) => b.it.p - a.it.p);
   const total = list.reduce((s, o) => s + o.it.p, 0);
-  el.insertAdjacentHTML('beforeend', `<div class="pf"><div class="pf-av" id="pfav"></div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
+  el.insertAdjacentHTML('beforeend', `<div class="pf"><button class="gear" id="gear" aria-label="Настройки"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button><div class="pf-av" id="pfav"></div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
     <div id="admslot"></div><div class="invhd"><h3>Инвентарь</h3><span>${list.length} шт · ⭐ ${fmt(total)}</span></div><div class="inv" id="inv"></div>`);
   if (TGU && TGU.id === ADMIN_ID) adminBox($('#admslot'));
+  $('#gear').onclick = () => { haptic(); openSettings(); };
   const av = $('#pfav');
   const fallback = () => { av.innerHTML = `<span>${esc(ini)}</span>`; };
   if (TGU && TGU.photo_url) {

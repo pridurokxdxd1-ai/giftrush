@@ -419,7 +419,7 @@ html.lite .turbo.on{animation:none}
 
 
 /* ---------- v12: спокойный тёмный стиль ---------- */
-.a-crash .rkt{width:66px;height:66px;font-size:0;background:url(rocket.webp?v=26) 0 0/792px auto no-repeat;transform:none;right:10%;top:10%;filter:none;animation:none}
+.a-crash .rkt{width:66px;height:66px;font-size:0;background:url(rocket.webp?v=28) 0 0/792px auto no-repeat;transform:none;right:10%;top:10%;filter:none;animation:none}
 .hub .tile{box-shadow:inset 0 0 0 100vmax #05081a40,0 10px 26px #0006}
 .btn{filter:saturate(.85)}
 .card,.case,.task,.slot,.row{border-color:#ffffff12}
@@ -544,7 +544,7 @@ html.ios .gi,html.ios .case-hero,html.ios .a-cs .chest{filter:none}
 html.ios .hub .tile{animation:none}
 html.ios .tile,html.ios .a-cs .chest,html.ios .a-cs .gf,html.ios .a-up .u{will-change:transform}
 
-.a-crash .rkt{position:absolute;right:11%;top:10%;width:84px;height:84px;background:url(rocket.webp?v=26) 0 0/840px auto no-repeat;animation:none}
+.a-crash .rkt{position:absolute;right:11%;top:10%;width:84px;height:84px;background:url(rocket.webp?v=28) 0 0/840px auto no-repeat;animation:none}
 .mq{overflow:hidden;margin:22px -16px 4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
 .mq-t{display:flex;width:max-content;animation:mq 38s linear infinite}
 .mq-t img{width:54px;height:54px;object-fit:contain;flex:none;margin-right:18px}
@@ -568,3 +568,41 @@ html.ios .tile,html.ios .a-cs .chest,html.ios .a-cs .gf,html.ios .a-up .u{will-c
 .dr .ic{overflow:hidden}.dr .ic .gi{max-width:80%;max-height:80%;object-fit:contain}
 .it .gi,.pick .gi,.inv .tile .gi{object-fit:contain}
 .inv .tile b .gi{max-height:52px;max-width:80%;height:auto;width:auto}
+
+/* ===== v28: лидерборд, настройки, цветовые темы ===== */
+.mq.home{margin:0 -16px 14px;max-width:none}
+.mq.home .mq-t img{width:50px;height:50px}
+.lbav{position:relative;overflow:hidden;background:#232c40}
+.lbav .lb-i{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-weight:800}
+.lbav img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.av.lbav{font-size:28px}
+.pbal{display:flex;align-items:center;gap:5px;margin:-4px 0 10px;font-family:var(--disp);font-weight:800;font-size:11px;color:#e8eefc}
+.pbal .rc{width:14px;height:14px}
+.rk .b{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--disp);font-weight:800;font-size:12px;flex:none}
+.rk .b .rc{width:16px;height:16px}
+.rk .t{flex:1}
+.rk .a.lbav{font-size:18px}
+.rk.me{border-color:var(--ta,#4d8dff);background:#ffffff12}
+.rk-sep{height:1px;background:#ffffff1c;margin:2px 10px}
+.lb-ld{margin-top:30px}
+.pf{position:relative}
+.gear{position:absolute;right:0;top:-4px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#171c26;border:1px solid #ffffff14;color:#cfd8ee;transition:transform .2s}
+.gear:active{transform:rotate(60deg) scale(.94)}
+.st h3{text-align:center;font-size:18px;margin-bottom:16px}
+.st h4{font-size:12px;color:var(--mut);margin-bottom:10px;letter-spacing:.4px;text-transform:uppercase}
+.sw-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+.th{aspect-ratio:1;border-radius:50%;border:2px solid #ffffff22;transition:transform .2s var(--ease),box-shadow .2s}
+.th.on{border-color:#fff;transform:scale(1.12);box-shadow:0 0 14px #ffffff55}
+.st-row{display:flex;align-items:center;justify-content:space-between;background:#ffffff0d;border-radius:14px;padding:12px 14px;font-family:var(--disp);font-weight:800;font-size:13px}
+/* цветовые темы (синяя — стандартная, без data-theme) */
+html[data-theme] body,html[data-theme]{background:linear-gradient(180deg,var(--tbg) 0%,#0d1015 70%) fixed,#0d1015}
+html[data-theme] #app{background:radial-gradient(520px 260px at 50% -40px,color-mix(in srgb,var(--tgl) 22%,transparent) 0,transparent 70%)}
+html[data-theme] .btn:not(.green):not(.red){background:linear-gradient(180deg,var(--ta),var(--tb));box-shadow:0 6px 16px #0006,0 10px 22px color-mix(in srgb,var(--tgl) 33%,transparent)}
+html[data-theme] .chip.on,html[data-theme] .xf-amt button.on{background:linear-gradient(180deg,var(--ta),var(--tb));border-color:#ffffff55;box-shadow:0 0 16px color-mix(in srgb,var(--tgl) 55%,transparent)}
+html[data-theme] #nav button.on{background:color-mix(in srgb,var(--tgl) 20%,#0d1015);color:var(--ta)}
+html[data-theme] #nav{background:color-mix(in srgb,var(--tbg) 85%,#000)}
+html[data-theme] .balance,html[data-theme] .gear{background:color-mix(in srgb,var(--tgl) 10%,#14181f)}
+html[data-theme] .hub .tile.t-cases,html[data-theme] .hub .tile.t-crash,html[data-theme] .hub .tile.t-mines,html[data-theme] .hub .tile.t-up,html[data-theme] .hub .tile.t-roul,html[data-theme] .hub .tile.t-plk{background:linear-gradient(150deg,var(--t1),var(--t2))}
+html[data-theme] .a-crash path{stroke:var(--ta)}
+html[data-theme] .task{background:linear-gradient(165deg,var(--t1),var(--t2))}
+html[data-theme] .pf-av{background:conic-gradient(from 0deg,var(--ta),var(--tb),#ffd23f,var(--ta));box-shadow:0 0 34px color-mix(in srgb,var(--tgl) 45%,transparent)}
