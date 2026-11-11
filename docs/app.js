@@ -171,20 +171,20 @@ try {
 /*ODDS_START*/
 const CASES = [{
   n: 'DAILY', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
-  drops: [[ITEM('Champagne'), 2.3529], [ITEM('Cup'), 0.5882], [ITEM('Swag Bag'), 0.0005], [ITEM('Candy Cane'), 0.005],
-    [COIN(10), 8.5905], [COIN(5), 17.0121], [COIN(3), 20.4145], [COIN(2), 8.506], [COIN(1), 42.5303]],   // сумма = 100%
+  drops: [[ITEM('Bear'), 33], [ITEM('Champagne'), 2.3529], [ITEM('Cup'), 0.5882], [ITEM('Swag Bag'), 0.0005], [ITEM('Candy Cane'), 0.005],
+    [COIN(10), 5.6696], [COIN(5), 11.2277], [COIN(3), 13.4732], [COIN(2), 5.6138], [COIN(1), 28.0691]],   // сумма = 100%
   // что мелькает на ленте при прокрутке (не влияет на реальные шансы)
-  bait: [[ITEM('Swag Bag'), 14], [ITEM('Candy Cane'), 14], [ITEM('Cup'), 16], [ITEM('Champagne'), 16], [COIN(10), 8], [COIN(5), 9], [COIN(3), 9], [COIN(2), 8], [COIN(1), 8]],
+  bait: [[ITEM('Swag Bag'), 14], [ITEM('Candy Cane'), 14], [ITEM('Cup'), 16], [ITEM('Champagne'), 16], [ITEM('Bear'), 16], [COIN(10), 8], [COIN(5), 9], [COIN(3), 9], [COIN(2), 8], [COIN(1), 8]],
 }, {
   n: 'CHEAP', img: 'case_cheap.webp', price: 99,
-  drops: [[ITEM('Champagne'), 55], [COIN(75), 43.6], [ITEM('Cup'), 1], [ITEM('Easter Egg'), 0.3], [ITEM('Lol Pop'), 0.09], [ITEM('Jester Hat'), 0], [ITEM('Holiday Drink'), 0],
-    [ITEM('Ice Cream'), 0], [ITEM('Light Sword'), 0.01], [ITEM('Toy Bear'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
+  drops: [[ITEM('Champagne'), 55], [COIN(75), 24], [ITEM('Cup'), 15], [ITEM('Easter Egg'), 4.5], [ITEM('Lol Pop'), 1.35], [ITEM('Jester Hat'), 0], [ITEM('Holiday Drink'), 0],
+    [ITEM('Ice Cream'), 0], [ITEM('Light Sword'), 0.15], [ITEM('Toy Bear'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
   bait: [[ITEM('Toy Bear'), 12], [ITEM('Light Sword'), 12], [ITEM('Ice Cream'), 12], [ITEM('Holiday Drink'), 12], [ITEM('Jester Hat'), 12], [ITEM('Lol Pop'), 12], [ITEM('Easter Egg'), 12],
     [ITEM('Cup'), 10], [ITEM('Champagne'), 10], [COIN(75), 8]],
 }, {
   n: 'TOXIC', img: 'case_toxic.webp', price: 375,
-  drops: [[COIN(100), 48.4999], [COIN(210), 33], [COIN(250), 0.8], [COIN(350), 0.7], [ITEM('Snake Box'), 10], [ITEM('Big Year'), 5],
-    [ITEM('Swag Bag'), 2], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
+  drops: [[COIN(100), 45.51977], [COIN(210), 30.9723], [COIN(250), 0.7508], [COIN(350), 0.657], [ITEM('Snake Box'), 13], [ITEM('Big Year'), 6.5],
+    [ITEM('Swag Bag'), 2.6], [ITEM('Spy Agaric'), 0.00013], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
   // на ленте дорогие NFT и просто NFT мелькают чаще (на реальные шансы не влияет)
   bait: [[ITEM('Sharp Tongue'), 12], [ITEM('Love Potion'), 12], [ITEM('Spy Agaric'), 12], [ITEM('Swag Bag'), 12], [ITEM('Big Year'), 12], [ITEM('Snake Box'), 12],
     [COIN(350), 6], [COIN(250), 6], [COIN(210), 7], [COIN(100), 9]],
