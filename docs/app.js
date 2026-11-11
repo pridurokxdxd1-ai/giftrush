@@ -14,6 +14,38 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => Math.random() * (b - a) + a;
 const fmt = n => Math.floor(n).toLocaleString('ru-RU');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* ---------- звук (WebAudio, без файлов) ---------- */
+let SND = true; try { SND = localStorage.getItem('gr4_snd') !== '0'; } catch (e) {}
+let AC = null, MASTER = null;
+const audio = () => {
+  if (!SND) return null;
+  try {
+    if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); MASTER = AC.createGain(); MASTER.gain.value = .55; const cp = AC.createDynamicsCompressor(); MASTER.connect(cp); cp.connect(AC.destination); }
+    if (AC.state === 'suspended') AC.resume();
+    return AC;
+  } catch (e) { return null; }
+};
+const note = (f, t, d, type = 'sine', v = .2, f2) => {
+  const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  o.connect(g); g.connect(MASTER); o.start(t); o.stop(t + d + .05);
+};
+const sfx = {
+  chime(freqs, sweep) { const c = audio(); if (!c) return; const t = c.currentTime;
+    if (sweep) note(260, t, .55, 'sawtooth', .05, sweep);
+    freqs.forEach((f, i) => { note(f, t + i * .09, .85, 'triangle', .2); note(f * 2, t + i * .09, .5, 'sine', .06); }); },
+  m2() { this.chime([523, 659]); },
+  m3() { this.chime([659, 784, 988], 900); },
+  m5() { this.chime([784, 988, 1175, 1568], 1400); },
+  big() { this.chime([880, 1109, 1319, 1760, 2093], 2000); },
+  cash() { const c = audio(); if (!c) return; const t = c.currentTime; note(988, t, .12, 'square', .08); note(1480, t + .08, .5, 'triangle', .18); note(2960, t + .08, .3, 'sine', .05); },
+  crash() { const c = audio(); if (!c) return; const t = c.currentTime;
+    const n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * .6, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    n.buffer = b; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(1800, t); f.frequency.exponentialRampToValueAtTime(90, t + .55);
+    const g = c.createGain(); g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .6); n.connect(f); f.connect(g); g.connect(MASTER); n.start(t);
+    note(150, t, .5, 'sine', .3, 38); },
+};
+document.addEventListener('pointerdown', () => { if (SND) audio(); }, { once: true });
 let VIB = true; try { VIB = localStorage.getItem('gr4_vib') !== '0'; } catch (e) {}
 const haptic = (t = 'light') => { if (!VIB) return; try { tg.HapticFeedback.impactOccurred(t); } catch (e) {} };
 const notify = t => { if (!VIB) return; try { tg.HapticFeedback.notificationOccurred(t); } catch (e) {} };
@@ -181,15 +213,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=38" alt=""><img class="gf g1" src="case_toxic.webp?v=38" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=39" alt=""><img class="gf g1" src="case_toxic.webp?v=39" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=38" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=38" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=39" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=39" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=38" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=39" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -210,7 +242,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=38" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=39" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -246,7 +278,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=38" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=39" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -438,7 +470,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=38';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=39';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -642,6 +674,7 @@ function crashScreen(el) {
         pending = v; net.send({ t: 'bet', amount: v }); haptic('medium');
       } else if (myBet) toast('Ставку отменить нельзя');
     } else if (G.phase === 'fly' && myBet && !myCashed && !cashSent) { cashSent = true; net.send({ t: 'cash' }); haptic('medium'); }
+    audio();
   };
 
   cleanup = () => {
@@ -672,6 +705,15 @@ function crashScreen(el) {
   const RS = Math.min(W * .38, 132 * dpr);               // размер ракеты
   const X0 = W * .17, Y0 = H * .8, X1 = W * .5, Y1 = H * .6; // старт слева-снизу → центр (дальше она не уходит)
   let burst = null;
+  /* фон: горы на горизонте (рисуем один раз, потом прокручиваем) */
+  const mtn = (hgt, k, col, seed) => { const ow = Math.ceil(W * 2), c = document.createElement('canvas'); c.width = ow; c.height = Math.ceil(hgt + 2); const x = c.getContext('2d');
+    x.fillStyle = col; x.beginPath(); x.moveTo(0, c.height);
+    for (let i = 0; i <= ow; i += 4 * dpr) { const u = i / ow * Math.PI * 2; const y = hgt * (.55 + .22 * Math.sin(u * k + seed) + .14 * Math.sin(u * (k * 2 + 1) + seed * 2.3) + .08 * Math.sin(u * (k * 5 + 2) + seed * .7)); x.lineTo(i, c.height - y); }
+    x.lineTo(ow, c.height); x.closePath(); x.fill(); return c; };
+  const mFar = mtn(H * .13, 3, '#1b1245', 1.2), mNear = mtn(H * .085, 4, '#0f0a2e', 3.1);
+  const parts = [], rings = [], hit = new Set(), lines = Array.from({ length: light ? 8 : 14 }, () => ({ x: Math.random() * W, y: Math.random() * H, l: rnd(.6, 1.4) }));
+  let prevPhase = '', prevCashed = false, mOff = 0;
+  const MILES = [2, 3, 5, 10, 25, 50];
   const crashing0 = () => G.phase === 'crash';
   const frame = () => {
     if (!alive) return;
@@ -685,14 +727,23 @@ function crashScreen(el) {
     ctx.clearRect(0, 0, W, H);
     ctx.save();
     if (G.phase === 'fly' && curM >= 5) { const q = Math.min(2.2, Math.log10(curM)) * dpr; ctx.translate((Math.random() - .5) * q, (Math.random() - .5) * q); }   // лёгкая тряска на больших иксах
-    /* звёзды в 3 слоя (параллакс) */
+    /* туманности (медленно дрейфуют) */
+    { const t = now / 5000;
+      [[.25 + .08 * Math.sin(t), .22, W * .55, '#7b3fe4', .20], [.8 + .06 * Math.cos(t * 1.3), .38, W * .5, '#2a6bff', .16], [.5, .12 + .04 * Math.sin(t * .8), W * .42, '#d23fa8', .10]].forEach(([nx, ny, r, c, a]) => {
+        const g = ctx.createRadialGradient(W * nx, H * ny, 0, W * nx, H * ny, r); g.addColorStop(0, c + Math.round(a * 255).toString(16).padStart(2, '0')); g.addColorStop(1, c + '00'); ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }); }
+    /* звёзды в 3 слоя (параллакс), мерцают */
     ctx.fillStyle = '#fff';
-    stars.forEach(s => { s.y += s.v * spd * 1.6; if (s.y > HY) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = s.a; ctx.fillRect(s.x, s.y, s.s, s.s * (1 + Math.min(2.5, spd * .3) * s.l)); });
+    stars.forEach(s => { s.y += s.v * spd * 1.6; if (s.y > HY) { s.y = 0; s.x = Math.random() * W; } ctx.globalAlpha = s.a * (.7 + .3 * Math.sin(now / 300 + s.x)); ctx.fillRect(s.x, s.y, s.s, s.s * (1 + Math.min(2.5, spd * .3) * s.l)); });
     /* падающие звёзды */
     if (now > nextShoot && !shoot) { shoot = { x: W * rnd(.3, 1), y: H * rnd(.05, .3), t: 0 }; nextShoot = now + rnd(2200, 5200); }
     if (shoot) { shoot.t += dt; const k = shoot.t / .7, x = shoot.x - k * W * .35, y = shoot.y + k * H * .16;
       const sg = ctx.createLinearGradient(x, y, x + W * .1, y - H * .035); sg.addColorStop(0, '#fff'); sg.addColorStop(1, '#ffffff00');
       ctx.globalAlpha = Math.max(0, 1 - k); ctx.strokeStyle = sg; ctx.lineWidth = 1.6 * dpr; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + W * .1, y - H * .035); ctx.stroke(); if (k >= 1) shoot = null; }
+    /* свечение горизонта + горы (параллакс) */
+    { const sg = ctx.createLinearGradient(0, HY - H * .2, 0, HY); sg.addColorStop(0, '#c04fd400'); sg.addColorStop(1, '#c04fd43a'); ctx.globalAlpha = 1; ctx.fillStyle = sg; ctx.fillRect(0, HY - H * .2, W, H * .2);
+      mOff = (mOff + dt * spd * 7 * dpr) % (W * 2);
+      const far = (mOff * .5) % (W * 2), near = mOff % (W * 2);
+      [[mFar, far], [mNear, near]].forEach(([m, o]) => { for (let k = 0; k < 2; k++) ctx.drawImage(m, -o + k * m.width, HY - m.height + 1); }); }
     /* бегущая сетка-пол */
     gridP = (gridP + dt * spd * .55) % 1;
     ctx.lineWidth = 1 * dpr; ctx.strokeStyle = '#9a6bff';
@@ -702,6 +753,20 @@ function crashScreen(el) {
     const hg = ctx.createLinearGradient(0, HY - 14 * dpr, 0, HY + 10 * dpr); hg.addColorStop(0, '#8d5bff00'); hg.addColorStop(.6, '#8d5bff55'); hg.addColorStop(1, '#8d5bff00');
     ctx.globalAlpha = 1; ctx.fillStyle = hg; ctx.fillRect(0, HY - 14 * dpr, W, 24 * dpr);
     ctx.globalAlpha = 1;
+    /* линии скорости на больших иксах */
+    if (G.phase === 'fly' && curM >= 2.5) { const a = Math.min(.5, .12 + Math.log10(curM) * .22);
+      ctx.lineWidth = 1.4 * dpr; ctx.strokeStyle = '#cfe0ff';
+      lines.forEach(l => { l.y += dt * H * (.9 + spd * .25) * l.l; if (l.y > H) { l.y = -H * .2; l.x = Math.random() * W; } const len = H * .09 * Math.min(2.2, spd * .35) * l.l; ctx.globalAlpha = a * l.l * .6; ctx.beginPath(); ctx.moveTo(l.x, l.y - len); ctx.lineTo(l.x, l.y); ctx.stroke(); });
+      ctx.globalAlpha = 1; }
+    /* звук и вспышки на отметках; взрыв; победа */
+    if (G.phase !== 'fly') hit.clear();
+    if (G.phase === 'fly') MILES.forEach(m => { if (curM >= m && !hit.has(m)) { hit.add(m); if (curM < m * 1.15) {
+      rings.push({ t: 0, c: m >= 10 ? '#ffd23f' : m >= 5 ? '#ff7ac8' : '#7fb2ff' });
+      (m >= 10 ? sfx.big : m >= 5 ? sfx.m5 : m >= 3 ? sfx.m3 : sfx.m2).call(sfx); haptic('medium');
+      multEl.classList.remove('mpulse'); void multEl.offsetWidth; multEl.classList.add('mpulse'); } } });
+    if (G.phase === 'crash' && prevPhase !== 'crash') sfx.crash();
+    if (myCashed && !prevCashed) sfx.cash();
+    prevPhase = G.phase; prevCashed = myCashed;
     /* авто-вывод */
     if (G.phase === 'fly' && AU.on && myBet && !myCashed && !cashSent && curM >= autoVal()) { cashSent = true; net.send({ t: 'cash', auto: autoVal() }); haptic('medium'); }
     if (G.phase === 'wait') { multEl.textContent = Math.max(0, (G.until - srv()) / 1000).toFixed(1) + 'с'; rkx = X0; rky = Y0 + Math.sin(now / 420) * 4 * dpr; }
@@ -713,6 +778,15 @@ function crashScreen(el) {
       tail.push([rkx, rky + RS * .12]); if (tail.length > 46) tail.shift();
     }
     const crashing = G.phase === 'crash';
+    /* огненный выхлоп ракеты (частицы) */
+    if (G.phase === 'fly' || G.phase === 'wait') {
+      const n = G.phase === 'fly' ? (light ? 1 : 2) + (curM >= 5 ? 1 : 0) : (Math.random() < .35 ? 1 : 0);
+      for (let i = 0; i < n && parts.length < (light ? 36 : 80); i++) parts.push({ x: rkx - RS * .27 + rnd(-4, 4) * dpr, y: rky + RS * .27 + rnd(-4, 4) * dpr, vx: -rnd(.4, 1.6) * dpr - spd * .25 * dpr, vy: rnd(.6, 1.8) * dpr + spd * .3 * dpr, a: 1, r: rnd(2, 5) * dpr, h: rnd(15, 50) });
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.x += p.vx; p.y += p.vy; p.a -= dt * 1.8; p.r *= .985; if (p.a <= 0) { parts.splice(i, 1); continue; }
+      ctx.globalAlpha = p.a * .8; ctx.fillStyle = `hsl(${p.h + (1 - p.a) * 10},100%,${55 + p.a * 20}%)`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     if (tail.length > 1 && (G.phase === 'fly' || crashing)) {
       const g = ctx.createLinearGradient(tail[0][0], tail[0][1], rkx, rky); g.addColorStop(0, '#5b7cff00'); g.addColorStop(1, crashing ? '#ff6b7a' : '#7b96ff');
       ctx.strokeStyle = g; ctx.lineWidth = 4 * dpr; ctx.lineCap = 'round';
@@ -730,6 +804,11 @@ function crashScreen(el) {
       burst = null;
       if (G.phase === 'fly') { const k = Math.min(1, (now - (G.t0 - G.offset)) / 350); drawRocket(ctx, rkx, rky, RS * (.55 + .45 * (1 - Math.pow(1 - k, 3))), animT, k, 0); }  // ракета появляется, когда начинается полёт
     }
+    /* кольца-вспышки на 2x/3x/5x… */
+    for (let i = rings.length - 1; i >= 0; i--) { const r = rings[i]; r.t += dt; const k = r.t / .9; if (k >= 1) { rings.splice(i, 1); continue; }
+      ctx.globalAlpha = (1 - k) * .75; ctx.strokeStyle = r.c; ctx.lineWidth = (5 - 3 * k) * dpr; ctx.beginPath(); ctx.arc(rkx, rky, RS * (.3 + k * 1.5), 0, 7); ctx.stroke();
+      ctx.globalAlpha = (1 - k) * .18; ctx.fillStyle = r.c; ctx.fillRect(0, 0, W, H); }
+    ctx.globalAlpha = 1;
     ctx.restore();
     renderBtn();
     raf = requestAnimationFrame(frame);
@@ -1345,7 +1424,9 @@ let themeIdx = Number(store.get('gr4_theme', 0)) || 0; if (!THEMES[themeIdx]) th
 function openSettings() {
   const m = modal(`<div class="st"><h3>Настройки</h3>
     <h4>Цвет приложения</h4><div class="sw-row" id="thRow">${THEMES.map((t, i) => `<button class="th${i === themeIdx ? ' on' : ''}" data-i="${i}" aria-label="${t.n}" style="background:linear-gradient(135deg,${t.a},${t.b})"></button>`).join('')}</div>
-    <div class="st-row"><span>Вибрация</span><button class="sw${VIB ? ' on' : ''}" id="vibSw" aria-label="Вибрация"><i></i></button></div></div>`);
+    <div class="st-row"><span>Вибрация</span><button class="sw${VIB ? ' on' : ''}" id="vibSw" aria-label="Вибрация"><i></i></button></div>
+    <div class="st-row" style="margin-top:10px"><span>Звук</span><button class="sw${SND ? ' on' : ''}" id="sndSw" aria-label="Звук"><i></i></button></div></div>`);
+  $('#sndSw', m.el).onclick = e => { SND = !SND; try { localStorage.setItem('gr4_snd', SND ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', SND); if (SND) { audio(); sfx.m2(); } };
   m.el.querySelectorAll('.th').forEach(b => b.onclick = () => {
     themeIdx = Number(b.dataset.i); store.set('gr4_theme', themeIdx); applyTheme(themeIdx);
     m.el.querySelectorAll('.th').forEach(x => x.classList.toggle('on', x === b)); haptic();
