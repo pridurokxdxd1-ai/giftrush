@@ -155,10 +155,6 @@ const CASES = [{
   bait: [[ITEM('Toy Bear'), 12], [ITEM('Light Sword'), 12], [ITEM('Ice Cream'), 12], [ITEM('Holiday Drink'), 12], [ITEM('Jester Hat'), 12], [ITEM('Lol Pop'), 12], [ITEM('Easter Egg'), 12],
     [ITEM('Cup'), 10], [ITEM('Champagne'), 10], [COIN(75), 8]],
 }, {
-  n: '50/50 NFT', img: 'case_5050.webp', price: 250,
-  drops: [[ITEM('Bear'), 35], [ITEM('Heart'), 35], [ITEM('Chill Flame'), 15], [ITEM('Ice Cream'), 15]],   // сумма = 100%
-  bait: [[ITEM('Chill Flame'), 14], [ITEM('Ice Cream'), 14], [ITEM('Toy Bear'), 8], [ITEM('Love Potion'), 6], [ITEM('Sharp Tongue'), 5], [ITEM('Bear'), 14], [ITEM('Heart'), 14]],
-}, {
   n: 'TOXIC', img: 'case_toxic.webp', price: 375,
   drops: [[COIN(100), 48.4999], [COIN(210), 33], [COIN(250), 0.8], [COIN(350), 0.7], [ITEM('Snake Box'), 10], [ITEM('Big Year'), 5],
     [ITEM('Swag Bag'), 2], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
@@ -213,15 +209,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=39" alt=""><img class="gf g1" src="case_toxic.webp?v=39" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=40" alt=""><img class="gf g1" src="case_toxic.webp?v=40" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=39" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=39" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=40" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=40" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=39" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=40" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -239,10 +235,10 @@ function home(el) {
 /* ---------- cases ---------- */
 function casesList(el) {
   bar(el, 'CASES');
-  const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
+  const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=39" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=40" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -278,7 +274,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=39" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=40" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -470,7 +466,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=39';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=40';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1421,11 +1417,41 @@ function applyTheme(i) {
   try { tg && tg.setHeaderColor && tg.setHeaderColor(i ? t.bg : '#040922'); tg && tg.setBackgroundColor && tg.setBackgroundColor(i ? t.bg : '#0d1015'); } catch (e) {}
 }
 let themeIdx = Number(store.get('gr4_theme', 0)) || 0; if (!THEMES[themeIdx]) themeIdx = 0; applyTheme(themeIdx);
+/* ---------- снег (лёгкий, на весь экран; частота кадров = частоте экрана, до 120 fps) ---------- */
+let SNOW = false; try { SNOW = localStorage.getItem('gr4_snow') === '1'; } catch (e) {}
+let snowEl = null, snowRaf = 0;
+function snowApply() {
+  if (!SNOW) { cancelAnimationFrame(snowRaf); snowRaf = 0; if (snowEl) { snowEl.remove(); snowEl = null; } return; }
+  if (snowEl) return;
+  const cv = snowEl = document.createElement('canvas'); cv.id = 'snow'; document.body.appendChild(cv);
+  const ctx = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  let W = 0, H = 0, flakes = [];
+  const size = () => { W = cv.width = Math.round(innerWidth * dpr); H = cv.height = Math.round(innerHeight * dpr); };
+  size(); window.addEventListener('resize', size);
+  const N = document.documentElement.classList.contains('ios') ? 38 : 56;
+  flakes = Array.from({ length: N }, () => ({ x: Math.random() * W, y: Math.random() * H, r: (.8 + Math.random() * 1.9) * dpr, v: (28 + Math.random() * 42) * dpr, ph: Math.random() * 6.283, sw: (10 + Math.random() * 18) * dpr, a: .35 + Math.random() * .5 }));
+  let last = performance.now();
+  const tick = now => {
+    if (!snowEl) return;
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fff';
+    for (const f of flakes) {
+      f.y += f.v * dt; f.ph += dt * .9; const x = f.x + Math.sin(f.ph) * f.sw;
+      if (f.y > H + 6) { f.y = -6; f.x = Math.random() * W; }
+      ctx.globalAlpha = f.a; ctx.beginPath(); ctx.arc(x, f.y, f.r, 0, 7); ctx.fill();
+    }
+    snowRaf = requestAnimationFrame(tick);
+  };
+  snowRaf = requestAnimationFrame(tick);
+}
+snowApply();
 function openSettings() {
   const m = modal(`<div class="st"><h3>Настройки</h3>
     <h4>Цвет приложения</h4><div class="sw-row" id="thRow">${THEMES.map((t, i) => `<button class="th${i === themeIdx ? ' on' : ''}" data-i="${i}" aria-label="${t.n}" style="background:linear-gradient(135deg,${t.a},${t.b})"></button>`).join('')}</div>
     <div class="st-row"><span>Вибрация</span><button class="sw${VIB ? ' on' : ''}" id="vibSw" aria-label="Вибрация"><i></i></button></div>
-    <div class="st-row" style="margin-top:10px"><span>Звук</span><button class="sw${SND ? ' on' : ''}" id="sndSw" aria-label="Звук"><i></i></button></div></div>`);
+    <div class="st-row" style="margin-top:10px"><span>Звук</span><button class="sw${SND ? ' on' : ''}" id="sndSw" aria-label="Звук"><i></i></button></div>
+    <div class="st-row" style="margin-top:10px"><span>Снег</span><button class="sw${SNOW ? ' on' : ''}" id="snowSw" aria-label="Снег"><i></i></button></div></div>`);
+  $('#snowSw', m.el).onclick = e => { SNOW = !SNOW; try { localStorage.setItem('gr4_snow', SNOW ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', SNOW); snowApply(); haptic(); };
   $('#sndSw', m.el).onclick = e => { SND = !SND; try { localStorage.setItem('gr4_snd', SND ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', SND); if (SND) { audio(); sfx.m2(); } };
   m.el.querySelectorAll('.th').forEach(b => b.onclick = () => {
     themeIdx = Number(b.dataset.i); store.set('gr4_theme', themeIdx); applyTheme(themeIdx);
