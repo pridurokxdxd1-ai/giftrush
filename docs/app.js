@@ -37,11 +37,12 @@ const ITEMS = [
   ['Candy Cane', 450, 'g_candy.webp', '#ff5d8f'], ['Swag Bag', 490, 'g_swag.webp', '#8be04e'],
   ['Snake Box', 450, 'g_snake.webp', '#2fd6a0'], ['Big Year', 490, 'g_year.webp', '#ff6a6a'], ['Chill Flame', 500, 'g_flame.webp', '#f2c14e'],
   ['Spy Agaric', 570, 'g_agaric.webp', '#9be04e'], ['Love Potion', 1400, 'g_potion.webp', '#7af0a0'], ['Sharp Tongue', 3800, 'g_tongue.webp', '#c6ff3a'],
+  ['Jester Hat', 490, 'g_jester.webp', '#ffa23f'], ['Swiss Watch', 4600, 'g_watch.webp', '#7ab0ff'],
 ].map(([n, p, img, c]) => ({ n, p, img, c, r: rar(p), nc: false }));
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 /* монеты Rushcoin, выпадающие из кейса (сразу идут на баланс) */
-const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e'], [100, '#7aa8ff'], [210, '#a06bf0'], [250, '#c06bf0'], [350, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
+const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e'], [20, '#5b8def'], [30, '#a06bf0'], [50, '#c06bf0'], [100, '#7aa8ff'], [210, '#a06bf0'], [250, '#c06bf0'], [350, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
 const COIN = p => COINS.find(x => x.p === p);
 const rcI = '<i class="rc"></i>';
 /* иконка предмета: картинка для подарка, монета с числом для Rushcoin */
@@ -120,6 +121,10 @@ const CASES = [{
   // на ленте дорогие NFT и просто NFT мелькают чаще (на реальные шансы не влияет)
   bait: [[ITEM('Sharp Tongue'), 12], [ITEM('Love Potion'), 12], [ITEM('Spy Agaric'), 12], [ITEM('Swag Bag'), 12], [ITEM('Big Year'), 12], [ITEM('Snake Box'), 12],
     [COIN(350), 6], [COIN(250), 6], [COIN(210), 7], [COIN(100), 9]],
+}, {
+  n: 'Promo', img: 'case_promo.webp', price: 0, promo: true,   // открывается по промокоду
+  drops: [[COIN(20), 74.999], [COIN(30), 20], [COIN(50), 3], [COIN(100), 2], [ITEM('Jester Hat'), 0.001], [ITEM('Swiss Watch'), 0]],   // сумма = 100%; Swiss Watch 0% — только мелькает на ленте
+  bait: [[ITEM('Swiss Watch'), 14], [ITEM('Jester Hat'), 14], [COIN(100), 10], [COIN(50), 12], [COIN(30), 14], [COIN(20), 16]],
 }];
 CASES.forEach(c => { c.pool = c.drops.map(([it, w]) => ({ it, w })); c.sum = c.pool.reduce((t, o) => t + o.w, 0); });
 function rollCase(c) {
@@ -164,15 +169,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=32" alt=""><img class="gf g1" src="case_toxic.webp?v=32" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=33" alt=""><img class="gf g1" src="case_toxic.webp?v=33" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=32" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=32" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=33" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=33" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=32" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=33" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -193,9 +198,30 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=32" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=33" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
+}
+/* окно ввода промокода: проверка и учёт активаций — на сервере (1 раз на человека, всего 1000) */
+function askPromo(onOk) {
+  const m = modal(`<div class="g-n" style="margin-top:4px">Промокод</div><div style="text-align:center;font-size:12px;color:var(--mut);margin:6px 0 14px">Введите промокод, чтобы открыть кейс</div>
+    <input class="xf-in" id="pcode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="PROMOCODE" style="text-transform:uppercase;text-align:center;letter-spacing:1px">
+    <div class="pc-err" id="pcerr"></div><div class="g-act" style="grid-template-columns:1fr"><button class="btn green" id="pcgo">Активировать</button></div>`);
+  const inp = $('#pcode', m.el), err = $('#pcerr', m.el), go_ = $('#pcgo', m.el);
+  const msgs = { badcode: 'Неверный промокод', used: 'Вы уже использовали этот промокод', empty: 'Промокод закончился — все 1000 активаций использованы' };
+  const run = async () => {
+    const code = inp.value.trim();
+    if (!code) { err.textContent = 'Введите промокод'; return; }
+    if (!(tg && tg.initData)) { err.textContent = 'Откройте игру через бота, чтобы ввести промокод'; return; }
+    go_.disabled = true; err.textContent = '';
+    try {
+      const r = await api('/api/promo', { code });
+      if (r && r.ok) { m.close(); notify('success'); onOk(); }
+      else { err.textContent = (r && msgs[r.err]) || apiErr(r); notify('error'); go_.disabled = false; }
+    } catch (e) { err.textContent = apiErr(null, e); go_.disabled = false; }
+  };
+  go_.onclick = run; inp.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+  setTimeout(() => { try { inp.focus(); } catch (e) {} }, 250);
 }
 const TURBO_BTN = '<button class="turbo" id="turbo" aria-label="Быстрый режим"><svg viewBox="0 0 24 24"><path d="M13.5 1.5 4 13.5h6.2l-1.4 9 9.7-12.3h-6.3z" fill="currentColor"/></svg></button>';
 const isTurbo = () => !!store.get('gr2_turbo', false);
@@ -207,10 +233,10 @@ function bindTurbo(el) {
 function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
-  let cnt = c.daily ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=32" alt=""><div class="reels" id="reels"></div>
-    <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
-    ${c.daily ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
+  let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=33" alt=""><div class="reels" id="reels"></div>
+    <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
+    ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
     <h4 class="sec">Содержимое кейса</h4>
     <div class="drops">${c.pool.map(o => o.it).sort((x, y) => y.p - x.p).map(i => `<div class="dr"><div class="ic">${ico(i)}</div><span>${i.coin ? i.p + ' Rushcoin' : esc(i.n)}<small>⭐ ${fmt(i.p)}</small></span></div>`).join('')}</div>`);
@@ -218,14 +244,14 @@ function caseScreen(el, c) {
   const bw = c.bait || c.pool.map(o => [o.it, o.w]);
   const bsum = bw.reduce((t, o) => t + o[1], 0);
   const filler = () => { let x = Math.random() * bsum; for (const o of bw) { x -= o[1]; if (x <= 0) return o[0]; } return bw[0][0]; };   // «байт»: на ленте дорогие подарки мелькают чаще, чем выпадают
-  let busy = false, tm = 0;
+  let busy = false, tm = 0, promoOK = false;
   const left = () => c.daily ? Math.max(0, Number(store.get('gr2_daily', 0)) + c.cd - Date.now()) : 0;
   const hms = ms => { const t = Math.ceil(ms / 1000), p = x => String(x).padStart(2, '0'); return `${p(Math.floor(t / 3600))}:${p(Math.floor(t % 3600 / 60))}:${p(t % 60)}`; };
   function tick() {
     if (busy) return;
     const l = left();
-    btn.disabled = l > 0;
-    btn.textContent = c.daily ? (l > 0 ? `Доступен через ${hms(l)}` : 'Открыть бесплатно') : `Открыть${cnt > 1 ? ' ×' + cnt : ''} за ⭐ ${fmt(c.price * cnt)}`;
+    btn.disabled = l > 0 || (c.promo && store.get('gr4_promo_done', false));
+    btn.textContent = c.promo ? (store.get('gr4_promo_done', false) ? 'Промокод уже использован' : 'Ввести промокод') : c.daily ? (l > 0 ? `Доступен через ${hms(l)}` : 'Открыть бесплатно') : `Открыть${cnt > 1 ? ' ×' + cnt : ''} за ⭐ ${fmt(c.price * cnt)}`;
     if (l > 0 && !tm) tm = setInterval(tick, 1000); else if (l <= 0 && tm) { clearInterval(tm); tm = 0; }
     iconify(btn);
   }
@@ -241,14 +267,17 @@ function caseScreen(el, c) {
   paint();
   btn.onclick = async () => {
     if (busy) return;
+    if (c.promo && !promoOK) return askPromo(() => { promoOK = true; btn.onclick(); });
     const n = cnt;
-    if (c.daily) { if (left() > 0) return tick(); store.set('gr2_daily', Date.now()); }
+    if (c.promo) promoOK = false;   // бесплатно: активация уже учтена на сервере
+    else if (c.daily) { if (left() > 0) return tick(); store.set('gr2_daily', Date.now()); }
     else if (!spend(c.price * n)) return;
     busy = true; btn.disabled = true; act.innerHTML = ''; win.textContent = '';
     const prizes = Array.from({ length: n }, () => rollCase(c));
     const gifts = prizes.filter(p => !p.coin).map(p => addGift(p.n));   // подарки — в инвентарь, монеты — сразу на баланс
     const coinSum = prizes.reduce((t, p) => t + (p.coin ? p.p : 0), 0);
     if (coinSum) { state.balance += coinSum; save(); }
+    if (c.promo) { store.set('gr4_promo_done', true); api('/api/promo', { done: 1 }).catch(() => {}); }   // приз уже выдан — фиксируем использование
     const fast = isTurbo(), N = 52, stop = 44, strips = [...reels.querySelectorAll('.reel')];
     strips.forEach((reel, k) => {
       reel.style.transition = 'none'; reel.style.transform = 'translate3d(0,0,0)';
@@ -397,7 +426,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=32';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=33';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
