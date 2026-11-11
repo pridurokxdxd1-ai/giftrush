@@ -169,15 +169,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=33" alt=""><img class="gf g1" src="case_toxic.webp?v=33" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=34" alt=""><img class="gf g1" src="case_toxic.webp?v=34" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=33" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=33" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=34" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=34" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=33" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=34" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -198,7 +198,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=33" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=34" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -234,7 +234,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=33" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=34" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -426,7 +426,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=33';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=34';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1242,13 +1242,17 @@ async function api(path, body) {
 }
 const apiErr = (d, e) => e ? 'Сервер недоступен. Вставь новый worker.js в Cloudflare и нажми Deploy' :
   d && d.err === 'nokv' ? 'К воркеру не привязан KV (имя DB)' : d && d.err === 'auth' ? 'Открой игру через бота в Telegram' : d && d.err === 'forbidden' ? 'Нет прав' : d && d.err === 'quota' ? 'Лимит записей Cloudflare KV на сегодня исчерпан — сбросится в 03:00 по Минску' : d && d.err === 'srv' ? 'Ошибка воркера: ' + (d.msg || '') : 'Ошибка, попробуйте ещё раз';
-let syncing = false, lastPushed = -1, taskPaint = null;
+let syncing = false, lastPushed = -1, taskPaint = null, lastTasksSent = '';
+const invSummary = () => { const o = {}; state.inv.forEach(g => { o[g.n] = (o[g.n] || 0) + 1; }); return o; };
+const pinNames = () => cleanPins().map(id => { const g = invGift(id); return g ? g.n : null; }).filter(Boolean);
 async function syncAccount() {
   if (syncing || !TGU || !(tg && tg.initData)) return;
   syncing = true;
   try {
     let bal = Math.floor(state.balance);
-    const d = await api('/api/sync', { bal, tasks });
+    const tj = JSON.stringify(tasks), body = { bal, inv: invSummary(), pins: pinNames() };
+    if (tj !== lastTasksSent) body.tasks = tasks;   // задания шлём только когда они изменились (экономим чтение на сервере)
+    const d = await api('/api/sync', body); if (d && d.ok && body.tasks) lastTasksSent = tj;
     if (d && d.ok) {
       let ch = false;
       if (d.tasks && typeof d.tasks === 'object') {   // задания выполняются раз и навсегда: берём лучшее из устройства и сервера
@@ -1266,7 +1270,7 @@ async function syncAccount() {
 function autoIncome() {}   // автоначислений больше нет
 window.addEventListener('focus', () => syncAccount());
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { autoIncome(); syncAccount(); } else if (Math.floor(state.balance) !== lastPushed) syncAccount(); });
-setInterval(() => { if (!document.hidden) syncAccount(); }, 30000);   // раз в 30 с: баланс уходит на сервер, переводы/списания приходят
+setInterval(() => { if (!document.hidden) syncAccount(); }, 60000);   // раз в 30 с: баланс уходит на сервер, переводы/списания приходят
 
 /* ---------- profile ---------- */
 function adminBox(el) {
@@ -1339,6 +1343,46 @@ function openSettings() {
     e.currentTarget.classList.toggle('on', VIB); if (VIB) haptic('medium');
   };
 }
+/* ---------- поиск и просмотр профиля любого игрока ---------- */
+const POS6 = [[-100, -64], [-122, 0], [-100, 64], [100, -64], [122, 0], [100, 64]];
+function openSearch() {
+  const m = modal(`<div class="g-n" style="margin-top:4px">Поиск игрока</div><div style="text-align:center;font-size:12px;color:var(--mut);margin:6px 0 14px">Введите @username или ID — откроется его профиль</div>
+    <input class="xf-in" id="sq" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="@username или ID" style="text-align:center">
+    <div class="pc-err" id="sqerr"></div><div class="g-act" style="grid-template-columns:1fr"><button class="btn green" id="sgo">Найти</button></div>`);
+  const inp = $('#sq', m.el), err = $('#sqerr', m.el), b = $('#sgo', m.el);
+  const run = async () => {
+    const q = inp.value.trim(); if (!q) { err.textContent = 'Введите @username или ID'; return; }
+    if (!(tg && tg.initData)) { err.textContent = 'Откройте игру через бота'; return; }
+    b.disabled = true; err.textContent = '';
+    try {
+      const d = await api('/api/profile', { q });
+      if (d && d.ok) { m.close(); go('user', d); }
+      else { err.textContent = d && d.err === 'nf' ? 'Игрок не найден (он должен хотя бы раз открыть игру)' : apiErr(d); b.disabled = false; }
+    } catch (e) { err.textContent = apiErr(null, e); b.disabled = false; }
+  };
+  b.onclick = run; inp.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+  setTimeout(() => { try { inp.focus(); } catch (e) {} }, 250);
+}
+function userScreen(el, d) {
+  bar(el, 'Профиль игрока', 'profile');
+  const name = d.name || ('ID ' + d.id), ini = (String(name).replace('@', '')[0] || '?').toUpperCase();
+  const rows = Object.keys(d.inv || {}).map(n => ({ it: ITEM(n), n: d.inv[n] })).filter(o => o.it).sort((a, b) => b.it.p - a.it.p);
+  const cnt = rows.reduce((t, o) => t + o.n, 0), total = rows.reduce((t, o) => t + o.n * o.it.p, 0);
+  const pins = (d.pins || []).map(n => ITEM(n)).filter(Boolean).slice(0, 6);
+  const pinsHtml = pins.map((it, i) => `<span class="pin" style="--c:${it.c};left:calc(50% + ${POS6[i][0]}px);top:calc(50% + ${POS6[i][1]}px)">${ico(it)}</span>`).join('');
+  const t = d.at ? new Date(d.at) : null, p2 = x => String(x).padStart(2, '0');
+  el.insertAdjacentHTML('beforeend', `<div class="pf"><div class="pf-stage"><div class="pf-av" id="pfav"></div>${pinsHtml}</div><div class="pf-nm">${esc(name)}</div><div class="pf-id">ID ${esc(d.id)}</div>
+    <div class="lk-bal" style="margin-top:12px"><i class="rc"></i> ${fmt(d.bal || 0)}</div>${t ? `<div class="pf-id" style="margin-top:8px">Обновлено ${p2(t.getDate())}.${p2(t.getMonth() + 1)}, ${p2(t.getHours())}:${p2(t.getMinutes())}</div>` : ''}</div>
+    <div class="invhd"><h3>Инвентарь</h3><span>${cnt} шт · ⭐ ${fmt(total)}</span></div><div class="inv" id="inv"></div>`);
+  const av = $('#pfav'), fb = () => { av.innerHTML = `<span>${esc(ini)}</span>`; };
+  if (d.photo) { const im = new Image(); im.alt = ''; im.referrerPolicy = 'no-referrer'; im.onerror = fb; im.src = d.photo; av.append(im); } else fb();
+  const inv = $('#inv');
+  if (!rows.length) { inv.innerHTML = '<div class="empty"><b>🎁</b>Инвентарь пуст или ещё не синхронизирован</div>'; return; }
+  rows.forEach((o, i) => {
+    const b = document.createElement('div'); b.className = 'tile'; b.style.setProperty('--c', o.it.c); b.style.animationDelay = Math.min(i, 12) * 30 + 'ms';
+    b.innerHTML = `<b>${ico(o.it)}</b><small>⭐ ${fmt(o.it.p)}</small>${o.n > 1 ? `<i class="cnt">×${o.n}</i>` : ''}`; inv.append(b);
+  });
+}
 function profileScreen(el) {
   const name = TGU ? (TGU.username ? '@' + TGU.username : [TGU.first_name, TGU.last_name].filter(Boolean).join(' ')) : 'Игрок';
   const ini = (name.replace('@', '')[0] || '?').toUpperCase();
@@ -1346,7 +1390,7 @@ function profileScreen(el) {
   const total = list.reduce((s, o) => s + o.it.p, 0);
   const POS = [[-100, -64], [-122, 0], [-100, 64], [100, -64], [122, 0], [100, 64]];   // 3 слева и 3 справа от аватарки
   const pinsHtml = cleanPins().map((id, i) => { const g = invGift(id), it = g && ITEM(g.n); return it ? `<button class="pin" data-pin="${id}" style="--c:${it.c};left:calc(50% + ${POS[i][0]}px);top:calc(50% + ${POS[i][1]}px)">${ico(it)}</button>` : ''; }).join('');
-  el.insertAdjacentHTML('beforeend', `<div class="pf"><button class="gear" id="gear" aria-label="Настройки"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button><div class="pf-stage"><div class="pf-av" id="pfav"></div>${pinsHtml}</div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
+  el.insertAdjacentHTML('beforeend', `<div class="pf"><button class="gear srch" id="srch" aria-label="Поиск игрока"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg></button><button class="gear" id="gear" aria-label="Настройки"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button><div class="pf-stage"><div class="pf-av" id="pfav"></div>${pinsHtml}</div><div class="pf-nm">${esc(name)}</div>${TGU ? `<div class="pf-id">ID ${esc(TGU.id)}</div>` : ''}</div>
     <div id="admslot"></div><div class="invhd"><h3>Инвентарь</h3><span>${list.length} шт · ⭐ ${fmt(total)}</span></div>${list.length ? '<button class="btn green sm" id="sellall">Продать все</button>' : ''}<div class="inv" id="inv"></div>`);
   el.querySelectorAll('[data-pin]').forEach(b => b.onclick = () => { const g = invGift(b.dataset.pin); if (g) openGift(g); });
   const sa = $('#sellall');
@@ -1360,6 +1404,7 @@ function profileScreen(el) {
   };
   if (TGU && TGU.id === ADMIN_ID) adminBox($('#admslot'));
   $('#gear').onclick = () => { haptic(); openSettings(); };
+  $('#srch').onclick = () => { haptic(); openSearch(); };
   const av = $('#pfav');
   const fallback = () => { av.innerHTML = `<span>${esc(ini)}</span>`; };
   if (TGU && TGU.photo_url) {
@@ -1403,7 +1448,7 @@ function contestsScreen(el) {
 }
 
 /* ---------- tabs ---------- */
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, contests: contestsScreen, profile: profileScreen, soon };
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, contests: contestsScreen, profile: profileScreen, user: userScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'contests'].includes(t) ? t : 'soon');
