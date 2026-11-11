@@ -39,6 +39,19 @@ const sfx = {
   m5() { this.chime([784, 988, 1175, 1568], 1400); },
   big() { this.chime([880, 1109, 1319, 1760, 2093], 2000); },
   cash() { const c = audio(); if (!c) return; const t = c.currentTime; note(988, t, .12, 'square', .08); note(1480, t + .08, .5, 'triangle', .18); note(2960, t + .08, .3, 'sine', .05); },
+  gem(n = 0) { const c = audio(); if (!c) return; const t = c.currentTime, b = 880 * Math.pow(2, Math.min(n, 12) / 12 * 1.2);
+    note(b, t, .35, 'triangle', .2); note(b * 1.5, t + .06, .45, 'sine', .14); note(b * 3, t + .1, .3, 'sine', .05); },
+  boom() { const c = audio(); if (!c) return; const t = c.currentTime;
+    const n = c.createBufferSource(), bf = c.createBuffer(1, c.sampleRate * .7, c.sampleRate), d = bf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+    n.buffer = bf; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(70, t + .6);
+    const g = c.createGain(); g.gain.setValueAtTime(.5, t); g.gain.exponentialRampToValueAtTime(.001, t + .7); n.connect(f); f.connect(g); g.connect(MASTER); n.start(t);
+    note(120, t, .6, 'sine', .45, 35); },
+  tick(p = 1) { const c = audio(); if (!c) return; note(1500 * p, c.currentTime, .04, 'square', .05); },
+  peg(p = 1) { const c = audio(); if (!c) return; note((700 + Math.random() * 500) * p, c.currentTime, .09, 'sine', .09); },
+  drop() { const c = audio(); if (!c) return; const t = c.currentTime; note(900, t, .18, 'sine', .15, 300); },
+  land(big) { const c = audio(); if (!c) return; const t = c.currentTime; note(big ? 660 : 300, t, .25, 'triangle', .2, big ? 990 : 200); if (big) note(1320, t + .08, .35, 'sine', .12); },
+  win() { const c = audio(); if (!c) return; const t = c.currentTime; [523, 659, 784, 1047].forEach((f, i) => { note(f, t + i * .08, .5, 'triangle', .18); note(f * 2, t + i * .08, .3, 'sine', .05); }); },
+  lose() { const c = audio(); if (!c) return; const t = c.currentTime; note(330, t, .3, 'sawtooth', .1, 200); note(220, t + .2, .5, 'sawtooth', .1, 110); },
   crash() { const c = audio(); if (!c) return; const t = c.currentTime;
     const n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * .6, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
     n.buffer = b; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(1800, t); f.frequency.exponentialRampToValueAtTime(90, t + .55);
@@ -47,6 +60,7 @@ const sfx = {
 };
 document.addEventListener('pointerdown', () => { if (SND) audio(); }, { once: true });
 let VIB = true; try { VIB = localStorage.getItem('gr4_vib') !== '0'; } catch (e) {}
+const DIA = '<svg class="dia" viewBox="0 0 24 24"><defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8fbff"/><stop offset=".5" stop-color="#4fd8ff"/><stop offset="1" stop-color="#2a7cff"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9z" fill="url(#dg)" stroke="#bff3ff" stroke-width="1" stroke-linejoin="round"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6" fill="none" stroke="#ffffffaa" stroke-width=".8" stroke-linejoin="round"/></svg>';
 const haptic = (t = 'light') => { if (!VIB) return; try { tg.HapticFeedback.impactOccurred(t); } catch (e) {} };
 const notify = t => { if (!VIB) return; try { tg.HapticFeedback.notificationOccurred(t); } catch (e) {} };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -208,17 +222,17 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 
 /* ---------- home ---------- */
 function home(el) {
-  const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
+  const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=41" alt=""><img class="gf g1" src="case_toxic.webp?v=41" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=42" alt=""><img class="gf g1" src="case_toxic.webp?v=42" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=41" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=41" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=42" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=42" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=41" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=42" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -239,7 +253,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=41" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=42" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -275,7 +289,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=41" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=42" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -331,10 +345,10 @@ function caseScreen(el, c) {
       reel.style.transition = fast ? `transform ${.85 + k * .12}s cubic-bezier(.2,.7,.15,1)` : `transform ${4.6 + k * .45}s cubic-bezier(.1,.75,.12,1)`;
       reel.style.transform = `translate3d(${-off}px,0,0)`;
     });
-    const iv = fast ? 0 : setInterval(() => haptic('light'), 170);
+    const iv = fast ? 0 : setInterval(() => { haptic('light'); sfx.tick(); }, 170);
     await sleep(fast ? 1100 + n * 120 : 4800 + n * 450); clearInterval(iv);
     if (!el.isConnected) return;
-    notify('success');
+    notify('success'); sfx.win();
     const sum = prizes.reduce((s, p) => s + p.p, 0), gsum = prizes.reduce((s, p) => s + (p.coin ? 0 : p.p), 0);
     if (coinSum) bump();
     win.innerHTML = n === 1 ? `<div class="pop" style="color:${prizes[0].c}">${prizes[0].coin ? '+' + prizes[0].p + ' ⭐' : esc(prizes[0].n) + ' · ⭐ ' + fmt(prizes[0].p)}</div>`
@@ -414,10 +428,10 @@ function upgradeScreen(el) {
     hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)'; void hand.offsetWidth;
     const fast = isTurbo();
     hand.style.willChange = 'transform'; hand.style.transition = fast ? 'transform 1.3s cubic-bezier(.25,.55,.35,1)' : 'transform 4.6s cubic-bezier(.25,.55,.35,1)'; hand.style.transform = `rotate(${360 * (fast ? 3 : 5) + th}deg)`;
-    ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {}
+    ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {} const tkI = setInterval(() => sfx.tick(1.2), fast ? 90 : 140); setTimeout(() => clearInterval(tkI), fast ? 1450 : 4800);
     await sleep(fast ? 1450 : 4800);
     hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
-    notify(ok ? 'success' : 'error');
+    notify(ok ? 'success' : 'error'); ok ? sfx.win() : sfx.lose();
     toast(ok ? `🎉 Успех! ${wi.n}` : '💥 Неудача, ставка сгорела');
     up.items = [];                                    // подарки-ставка использованы; желаемый предмет и сумма остаются
     up.bal = Math.min(up.bal || 0, Math.floor(state.balance)); ubal.value = up.bal || '';
@@ -467,7 +481,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=41';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=42';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -967,8 +981,8 @@ function rouletteScreen(el) {
       case 'result':
         G.phase = 'result'; if (G.spin) rot = G.spin.r1; G.res = { n: m.n, c: m.c }; dirty = true; addHist(G.res);
         bets.forEach(b => { if (rWin(b.color, m.n)) b.win = b.amount * R_MULT[b.color]; else b.lost = true; });
-        if (m.c === 'green') notify('success'); renderBets(); break;
-      case 'win': state.balance += m.payout; save(); bump(); notify('success'); toast(`x${m.mult} · +${fmt(m.payout - (myBets[m.color] || 0))} ⭐`); break;
+        if (m.c === 'green') notify('success'); sfx.land(m.c === 'green'); renderBets(); break;
+      case 'win': state.balance += m.payout; save(); bump(); notify('success'); sfx.win(); toast(`x${m.mult} · +${fmt(m.payout - (myBets[m.color] || 0))} ⭐`); break;
       case 'bet':
         bets.set(m.uid + '|' + m.color, { uid: m.uid, name: m.name, photo: m.photo, amount: m.amount, color: m.color, win: null, lost: false });
         if (m.uid === G.me) { myBets[m.color] = m.amount; pending[m.color] = 0; }
@@ -989,7 +1003,7 @@ function rouletteScreen(el) {
     const v = Math.floor(Number(amt.value));
     if (!(v >= R_MIN)) { notify('error'); return toast(`Минимальная ставка ${R_MIN} ⭐`); }
     if (!spend(v)) return;
-    pending[c] = v; net.send({ t: 'bet', amount: v, color: c }); haptic('medium'); renderBets();
+    pending[c] = v; net.send({ t: 'bet', amount: v, color: c }); haptic('medium'); sfx.drop(); renderBets();
   });
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { amt.value = Math.max(R_MIN, Math.floor((Number(amt.value) || R_MIN) * b.dataset.q)); });
   el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { amt.value = b.dataset.v === 'max' ? Math.max(0, Math.floor(state.balance)) : b.dataset.v; haptic(); });
@@ -1016,7 +1030,7 @@ function rouletteScreen(el) {
     if (G.phase === 'spin' && G.spin) {
       const p = Math.min(1, Math.max(0, (srv() - G.t0) / G.dur));
       rot = G.spin.r0 + (G.spin.r1 - G.spin.r0) * (1 - Math.pow(1 - p, 4)); dirty = true;
-      const k = Math.floor(rot / R_SEG); if (k !== lastK) { lastK = k; if (now - lastHap > 80) { lastHap = now; haptic('light'); } }
+      const k = Math.floor(rot / R_SEG); if (k !== lastK) { lastK = k; sfx.tick(.8 + (1 - p) * .0); if (now - lastHap > 80) { lastHap = now; haptic('light'); } }
     }
     if (dirty) { drawWheel(); dirty = false; }
     let txt, cls = 'rcenter';
@@ -1107,7 +1121,7 @@ function plinkoScreen(el) {
     }
   }
   function finish(b, now) {
-    b.done = true; flash[b.k] = now; payBall(b); bump(); haptic('medium');
+    b.done = true; flash[b.k] = now; payBall(b); bump(); haptic('medium'); if (b.win >= b.bet * 2) sfx.win(); else if (b.win >= b.bet) sfx.land(true); else sfx.land(false);
     floats.push({ x: slotX(b.k), y: slotTop - H * .02, t: now, txt: b.win >= b.bet ? `+${fmt(b.win - b.bet)}` : `−${fmt(b.bet - b.win)}`, c: b.win >= b.bet ? '#3ee48f' : '#ff8a96' });
     if (b.win >= b.bet * 2) notify('success');
     for (let n = 0; n < 8; n++) sparks.push({ x: slotX(b.k), y: slotTop, vx: rnd(-1, 1) * dx * .04, vy: -rnd(.4, 1.2) * dx * .08, t: now, c: slotColors[b.k] });
@@ -1130,7 +1144,7 @@ function plinkoScreen(el) {
         // момент касания шипа: сегмент i начинается ударом о шип ряда i
         let cur = -1; for (let i = 0; i < PL_ROWS; i++) if (el_ >= b.t[i] - 0) cur = i;
         if (cur > b.seg) { for (let i = b.seg + 1; i <= cur; i++) { let xo = 0; for (let q = 0; q < i; q++) xo += b.d[q] * .5; const j = Math.round(xo + (i + 2) / 2), p = pegs[i][j];
-            if (p) { p.hit = now; rings.push({ x: p.x, y: p.y, t: now }); for (let q = 0; q < 3; q++) sparks.push({ x: p.x, y: p.y - PR, vx: rnd(-1, 1) * dx * .03, vy: -rnd(.3, 1) * dx * .05, t: now, c: '#bfe8ff' }); }
+            if (p) { sfx.peg(); p.hit = now; rings.push({ x: p.x, y: p.y, t: now }); for (let q = 0; q < 3; q++) sparks.push({ x: p.x, y: p.y - PR, vx: rnd(-1, 1) * dx * .03, vy: -rnd(.3, 1) * dx * .05, t: now, c: '#bfe8ff' }); }
             if (now - lastHap > 70) { lastHap = now; haptic('light'); } } b.seg = cur; }
         const [x, y, fin] = ballPos(b, el_);
         b.trail.push([x, y]); if (b.trail.length > 7) b.trail.shift();
@@ -1156,7 +1170,7 @@ function plinkoScreen(el) {
     const v = Math.floor(Number(betIn.value));
     if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); }
     if (!spend(v)) return;
-    launch(v); haptic('medium');
+    launch(v); haptic('medium'); sfx.drop();
   };
   cleanup = () => { alive = false; cancelAnimationFrame(raf); balls.forEach(b => payBall(b)); };
 }
@@ -1189,22 +1203,22 @@ function minesScreen(el) {
   };
   const end = (won, hit) => {
     live = false; betIn.disabled = false; goB.className = 'btn'; goB.textContent = 'Сделать ставку';
-    if (!won) { mg.classList.remove('shake'); void mg.offsetWidth; mg.classList.add('shake'); notify('error'); toast('💥 Мина!'); }
+    if (!won) { mg.classList.remove('shake'); void mg.offsetWidth; mg.classList.add('shake'); notify('error'); sfx.boom(); toast('💥 Мина!'); }
     const cells = [...mg.children]; let k = 0;
     grid.forEach((b, i) => {
       const c = cells[i]; if (!c || c.classList.contains('safe') || i === hit) return;
       const d = b && !won ? 160 + Math.min(k++, 12) * 70 : 0; // цепная реакция
-      setTimeout(() => { if (!alive) return; c.classList.add(b ? 'bomb' : 'dim'); c.textContent = b ? '💣' : '👑'; if (b && !won) c.classList.add('boom'); }, d);
+      setTimeout(() => { if (!alive) return; c.classList.add(b ? 'bomb' : 'dim'); if (b) c.textContent = '💣'; else c.innerHTML = DIA; if (b && !won) c.classList.add('boom'); }, d);
     });
   };
-  const cash = () => { const w = Math.floor(bet * mult()); state.balance += w; save(); bump(); toast(`${w >= bet ? '+' : ''}${fmt(w - bet)} ⭐`); notify('success'); end(true); };
+  const cash = () => { const w = Math.floor(bet * mult()); state.balance += w; save(); bump(); toast(`${w >= bet ? '+' : ''}${fmt(w - bet)} ⭐`); notify('success'); sfx.cash(); end(true); };
   const click = (i, c) => {
     if (!live || c.classList.contains('safe')) return;
     if (grid[i]) {
       c.classList.add('boom'); c.textContent = '💥'; setTimeout(() => { if (alive) { c.classList.add('bomb'); c.textContent = '💣'; } }, 450);
       return end(false, i);
     }
-    c.classList.add('safe'); c.textContent = '👑'; opened++; mx.textContent = mult().toFixed(2) + 'x'; haptic();
+    c.classList.add('safe'); c.innerHTML = DIA; sfx.gem(opened); opened++; mx.textContent = mult().toFixed(2) + 'x'; haptic();
     goB.textContent = `Забрать ⭐ ${fmt(bet * mult())}`;
     if (opened === size * size - mcount) cash();
   };
