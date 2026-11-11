@@ -47,13 +47,24 @@ const sfx = {
     const g = c.createGain(); g.gain.setValueAtTime(.5, t); g.gain.exponentialRampToValueAtTime(.001, t + .7); n.connect(f); f.connect(g); g.connect(MASTER); n.start(t);
     note(120, t, .6, 'sine', .45, 35); },
   reel(p = 1) { const c = audio(); if (!c) return; const t = c.currentTime; note(2300 * p, t, .03, 'square', .07); note(520 * p, t, .07, 'triangle', .12, 300 * p); },
+  count(sec) { const c = audio(); if (!c) return; const t = c.currentTime;   // отсчёт: ударный бит на каждую секунду, к концу выше
+    note(120, t, .22, 'sine', .5, 45); note(1000 + (5 - sec) * 160, t, .07, 'square', .06); note(sec === 1 ? 1568 : 784, t + .02, .2, 'triangle', .08); },
+  go() { const c = audio(); if (!c) return; const t = c.currentTime; note(90, t, .35, 'sine', .55, 40); note(523, t, .5, 'triangle', .14); note(784, t + .05, .5, 'triangle', .14); note(1047, t + .1, .6, 'triangle', .14);
+    const n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * .5, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    n.buffer = b; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(3000, t + .45); const g = c.createGain(); g.gain.value = .12; n.connect(f); f.connect(g); g.connect(MASTER); n.start(t); },
+  hum: null,
+  humOn() { const c = audio(); if (!c || this.hum) return; const t = c.currentTime, g = c.createGain(), f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.07, t + .6);
+    const o1 = c.createOscillator(), o2 = c.createOscillator(), lf = c.createOscillator(), lg = c.createGain(); o1.type = 'sine'; o2.type = 'triangle'; o1.frequency.value = 196; o2.frequency.value = 294; lf.frequency.value = 4.5; lg.gain.value = .015;
+    lf.connect(lg); lg.connect(g.gain); o1.connect(f); o2.connect(f); f.connect(g); g.connect(MASTER); o1.start(); o2.start(); lf.start(); this.hum = { o1, o2, lf, g, f }; },
+  humSet(m) { const h = this.hum; if (!h || !AC) return; const t = AC.currentTime, k = Math.pow(Math.max(1, m), .38); h.o1.frequency.setTargetAtTime(196 * k, t, .15); h.o2.frequency.setTargetAtTime(294 * k, t, .15); h.f.frequency.setTargetAtTime(Math.min(3000, 900 + m * 90), t, .2); },
+  humOff() { const h = this.hum; if (!h) return; this.hum = null; try { const t = AC.currentTime; h.g.gain.cancelScheduledValues(t); h.g.gain.setTargetAtTime(.0001, t, .08); [h.o1, h.o2, h.lf].forEach(o => o.stop(t + .4)); } catch (e) {} },
   tick(p = 1) { const c = audio(); if (!c) return; note(1500 * p, c.currentTime, .04, 'square', .05); },
   peg(p = 1) { const c = audio(); if (!c) return; note((700 + Math.random() * 500) * p, c.currentTime, .09, 'sine', .09); },
   drop() { const c = audio(); if (!c) return; const t = c.currentTime; note(900, t, .18, 'sine', .15, 300); },
   land(big) { const c = audio(); if (!c) return; const t = c.currentTime; note(big ? 660 : 300, t, .25, 'triangle', .2, big ? 990 : 200); if (big) note(1320, t + .08, .35, 'sine', .12); },
   win() { const c = audio(); if (!c) return; const t = c.currentTime; [523, 659, 784, 1047].forEach((f, i) => { note(f, t + i * .08, .5, 'triangle', .18); note(f * 2, t + i * .08, .3, 'sine', .05); }); },
   lose() { const c = audio(); if (!c) return; const t = c.currentTime; note(330, t, .3, 'sawtooth', .1, 200); note(220, t + .2, .5, 'sawtooth', .1, 110); },
-  crash() { const c = audio(); if (!c) return; const t = c.currentTime;
+  crash() { const c = audio(); if (!c) return; const t = c.currentTime; note(440, t, .6, 'sine', .14, 150); note(330, t + .05, .7, 'triangle', .08, 110); if (1) return;
     const n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * .6, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
     n.buffer = b; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(1800, t); f.frequency.exponentialRampToValueAtTime(90, t + .55);
     const g = c.createGain(); g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .6); n.connect(f); f.connect(g); g.connect(MASTER); n.start(t);
@@ -182,6 +193,7 @@ const CASES = [{
   drops: [[COIN(20), 74.999], [COIN(30), 20], [COIN(50), 3], [COIN(100), 2], [ITEM('Jester Hat'), 0.001], [ITEM('Swiss Watch'), 0]],   // сумма = 100%; Swiss Watch 0% — только мелькает на ленте
   bait: [[ITEM('Swiss Watch'), 14], [ITEM('Jester Hat'), 14], [COIN(100), 10], [COIN(50), 12], [COIN(30), 14], [COIN(20), 16]],
 }];
+{ const ORD = ['DAILY', 'PROMO', 'CHEAP', 'TOXIC']; CASES.sort((x, y) => ORD.indexOf(x.n) - ORD.indexOf(y.n)); }   // порядок: ежедневный и промо закреплены сверху
 CASES.forEach(c => { c.pool = c.drops.map(([it, w]) => ({ it, w })); c.sum = c.pool.reduce((t, o) => t + o.w, 0); });
 function rollCase(c) {
   let x = Math.random() * c.sum;
@@ -225,15 +237,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=43" alt=""><img class="gf g1" src="case_toxic.webp?v=43" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=45" alt=""><img class="gf g1" src="case_toxic.webp?v=45" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=43" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=43" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=45" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=45" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=43" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=45" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -254,7 +266,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=43" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=45" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -290,7 +302,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=43" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=45" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -483,7 +495,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=43';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=45';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -691,7 +703,7 @@ function crashScreen(el) {
   };
 
   cleanup = () => {
-    alive = false; cancelAnimationFrame(raf);
+    alive = false; cancelAnimationFrame(raf); sfx.humOff();
     if (net) {
       if ((myBet && G.phase === 'wait' && !myCashed) || pending) { state.balance += (myBet || pending); save(); net.send({ t: 'cancel' }); }
       setTimeout(() => net && net.close(), 150);
@@ -725,7 +737,7 @@ function crashScreen(el) {
     x.lineTo(ow, c.height); x.closePath(); x.fill(); return c; };
   const mFar = mtn(H * .13, 3, '#1b1245', 1.2), mNear = mtn(H * .085, 4, '#0f0a2e', 3.1);
   const parts = [], rings = [], hit = new Set(), lines = Array.from({ length: light ? 8 : 14 }, () => ({ x: Math.random() * W, y: Math.random() * H, l: rnd(.6, 1.4) }));
-  let prevPhase = '', prevCashed = false, mOff = 0;
+  let prevPhase = '', prevCashed = false, mOff = 0, cdLast = 0;
   const MILES = [2, 3, 5, 10, 25, 50];
   const crashing0 = () => G.phase === 'crash';
   const frame = () => {
@@ -777,6 +789,8 @@ function crashScreen(el) {
       rings.push({ t: 0, c: m >= 10 ? '#ffd23f' : m >= 5 ? '#ff7ac8' : '#7fb2ff' });
       (m >= 10 ? sfx.big : m >= 5 ? sfx.m5 : m >= 3 ? sfx.m3 : sfx.m2).call(sfx); haptic('medium');
       multEl.classList.remove('mpulse'); void multEl.offsetWidth; multEl.classList.add('mpulse'); } } });
+    if (G.phase === 'fly') { if (prevPhase !== 'fly') { sfx.go(); sfx.humOn(); } sfx.humSet(curM); } else if (sfx.hum) sfx.humOff();
+    if (G.phase === 'wait') { const sc = Math.ceil((G.until - srv()) / 1000); if (sc !== cdLast) { cdLast = sc; if (sc >= 1 && sc <= 5) sfx.count(sc); } } else cdLast = 0;
     if (G.phase === 'crash' && prevPhase !== 'crash') sfx.crash();
     if (myCashed && !prevCashed) sfx.cash();
     prevPhase = G.phase; prevCashed = myCashed;
