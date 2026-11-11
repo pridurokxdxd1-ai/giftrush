@@ -38,11 +38,13 @@ const ITEMS = [
   ['Snake Box', 450, 'g_snake.webp', '#2fd6a0'], ['Big Year', 490, 'g_year.webp', '#ff6a6a'], ['Chill Flame', 500, 'g_flame.webp', '#f2c14e'],
   ['Spy Agaric', 570, 'g_agaric.webp', '#9be04e'], ['Love Potion', 1400, 'g_potion.webp', '#7af0a0'], ['Sharp Tongue', 3800, 'g_tongue.webp', '#c6ff3a'],
   ['Jester Hat', 490, 'g_jester.webp', '#ffa23f'], ['Swiss Watch', 4600, 'g_watch.webp', '#7ab0ff'],
+  ['Easter Egg', 480, 'g_egg.webp', '#6f8fe0'], ['Lol Pop', 485, 'g_lolpop.webp', '#ff6fb5'], ['Holiday Drink', 496, 'g_drink.webp', '#ff5d5d'],
+  ['Ice Cream', 500, 'g_icecream.webp', '#c0763c'], ['Light Sword', 530, 'g_sword.webp', '#8a7bff'], ['Toy Bear', 2700, 'g_bear.webp', '#ff7ac8'],
 ].map(([n, p, img, c]) => ({ n, p, img, c, r: rar(p), nc: false }));
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
 /* монеты Rushcoin, выпадающие из кейса (сразу идут на баланс) */
-const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e'], [20, '#5b8def'], [30, '#a06bf0'], [50, '#c06bf0'], [100, '#7aa8ff'], [210, '#a06bf0'], [250, '#c06bf0'], [350, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
+const COINS = [[1, '#9aa3b8'], [2, '#5b8def'], [3, '#5b8def'], [5, '#a06bf0'], [10, '#f2c14e'], [20, '#5b8def'], [30, '#a06bf0'], [50, '#c06bf0'], [75, '#a06bf0'], [100, '#7aa8ff'], [210, '#a06bf0'], [250, '#c06bf0'], [350, '#f2c14e']].map(([p, c]) => ({ n: p + ' Rushcoin', p, c, coin: true }));
 const COIN = p => COINS.find(x => x.p === p);
 const rcI = '<i class="rc"></i>';
 /* иконка предмета: картинка для подарка, монета с числом для Rushcoin */
@@ -109,20 +111,26 @@ try {
 /* ---------- cases & odds ---------- */
 /*ODDS_START*/
 const CASES = [{
-  n: 'Daily', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
+  n: 'DAILY', img: 'case.webp', price: 0, daily: true, cd: 24 * 3600 * 1000,   // бесплатный, раз в сутки
   drops: [[ITEM('Champagne'), 2.3529], [ITEM('Cup'), 0.5882], [ITEM('Swag Bag'), 0.0005], [ITEM('Candy Cane'), 0.005],
     [COIN(10), 8.5905], [COIN(5), 17.0121], [COIN(3), 20.4145], [COIN(2), 8.506], [COIN(1), 42.5303]],   // сумма = 100%
   // что мелькает на ленте при прокрутке (не влияет на реальные шансы)
   bait: [[ITEM('Swag Bag'), 14], [ITEM('Candy Cane'), 14], [ITEM('Cup'), 16], [ITEM('Champagne'), 16], [COIN(10), 8], [COIN(5), 9], [COIN(3), 9], [COIN(2), 8], [COIN(1), 8]],
 }, {
-  n: 'Toxic', img: 'case_toxic.webp', price: 375,
+  n: 'CHEAP', img: 'case_cheap.webp', price: 99,
+  drops: [[COIN(50), 55], [COIN(75), 44.8], [ITEM('Easter Egg'), 0.1], [ITEM('Lol Pop'), 0.09], [ITEM('Jester Hat'), 0], [ITEM('Holiday Drink'), 0],
+    [ITEM('Ice Cream'), 0], [ITEM('Light Sword'), 0.01], [ITEM('Toy Bear'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
+  bait: [[ITEM('Toy Bear'), 12], [ITEM('Light Sword'), 12], [ITEM('Ice Cream'), 12], [ITEM('Holiday Drink'), 12], [ITEM('Jester Hat'), 12], [ITEM('Lol Pop'), 12], [ITEM('Easter Egg'), 12],
+    [COIN(75), 8], [COIN(50), 8]],
+}, {
+  n: 'TOXIC', img: 'case_toxic.webp', price: 375,
   drops: [[COIN(100), 48.4999], [COIN(210), 33], [COIN(250), 0.8], [COIN(350), 0.7], [ITEM('Snake Box'), 10], [ITEM('Big Year'), 5],
     [ITEM('Swag Bag'), 2], [ITEM('Spy Agaric'), 0.0001], [ITEM('Love Potion'), 0], [ITEM('Sharp Tongue'), 0]],   // сумма = 100%; 0% — только мелькают на ленте
   // на ленте дорогие NFT и просто NFT мелькают чаще (на реальные шансы не влияет)
   bait: [[ITEM('Sharp Tongue'), 12], [ITEM('Love Potion'), 12], [ITEM('Spy Agaric'), 12], [ITEM('Swag Bag'), 12], [ITEM('Big Year'), 12], [ITEM('Snake Box'), 12],
     [COIN(350), 6], [COIN(250), 6], [COIN(210), 7], [COIN(100), 9]],
 }, {
-  n: 'Promo', img: 'case_promo.webp', price: 0, promo: true,   // открывается по промокоду
+  n: 'PROMO', img: 'case_promo.webp', price: 0, promo: true,   // открывается по промокоду
   drops: [[COIN(20), 74.999], [COIN(30), 20], [COIN(50), 3], [COIN(100), 2], [ITEM('Jester Hat'), 0.001], [ITEM('Swiss Watch'), 0]],   // сумма = 100%; Swiss Watch 0% — только мелькает на ленте
   bait: [[ITEM('Swiss Watch'), 14], [ITEM('Jester Hat'), 14], [COIN(100), 10], [COIN(50), 12], [COIN(30), 14], [COIN(20), 16]],
 }];
@@ -169,15 +177,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', '👑', '', '👑', '💣', '👑', '', '💣'].map(c => `<i>${c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=35" alt=""><img class="gf g1" src="case_toxic.webp?v=35" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=36" alt=""><img class="gf g1" src="case_toxic.webp?v=36" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=35" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=35" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=36" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=36" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk"><i class="pegs"></i><i class="ball"></i><div class="buck"><i></i><i></i><i></i></div></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=35" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=36" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -198,7 +206,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=35" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=36" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'По промокоду' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -234,7 +242,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=35" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=36" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -426,7 +434,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=35';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=36';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
