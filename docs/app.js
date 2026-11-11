@@ -237,15 +237,15 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=50" alt=""><img class="gf g1" src="case_toxic.webp?v=50" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=51" alt=""><img class="gf g1" src="case_toxic.webp?v=51" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=50" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=50" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=51" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=51" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=50" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=51" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -266,7 +266,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=50" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=51" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -302,7 +302,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=50" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=51" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -495,7 +495,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=50';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=51';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1394,7 +1394,17 @@ setInterval(() => { if (!document.hidden) syncAccount(); }, 20000);   // раз 
 /* ---------- profile ---------- */
 function adminBox(el) {
   el.insertAdjacentHTML('beforeend', `<div class="adm"><h4>Игроки: перевод и списание Rushcoin</h4><div class="row">
-    <input id="xfq" placeholder="ID или @username" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ok" id="xfok">ОК</button></div></div>`);
+    <input id="xfq" placeholder="ID или @username" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ok" id="xfok">ОК</button></div>
+    <button class="ulist-btn" id="ulBtn">Все игроки</button></div>`);
+  $('#ulBtn').onclick = async e => {
+    const b = e.currentTarget; b.disabled = true;
+    try {
+      const d = await api('/api/users', {});
+      if (!d || !d.ok) return toast(apiErr(d));
+      const fmtT = t => t ? new Date(t).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+      modal(`<h3 style="margin:0 0 4px;text-align:center">Игроки: ${d.total}</h3><div class="ul-sub">по последней активности</div><div class="ul-list">${d.users.map((u, i) => `<div class="ul-r"><b class="ul-n">${i + 1}</b><div class="ul-av">${esc((String(u.name).replace('@', '')[0] || '?').toUpperCase())}</div><div class="ul-i"><div class="ul-nm">${esc(u.name)}</div><div class="ul-s">ID ${esc(u.id)} · ${fmtT(u.at)}</div></div><div class="ul-b"><i class="rc"></i>${fmt(u.bal || 0)}</div></div>`).join('')}</div>`);
+    } catch (x) { toast('Нет связи'); } finally { b.disabled = false; }
+  };
   const ok = $('#xfok');
   const run = async () => {
     const q = $('#xfq').value.trim(); if (!q) return toast('Введите ID или юзернейм');
@@ -1450,23 +1460,26 @@ function applyTheme(i) {
 }
 let themeIdx = Number(store.get('gr4_theme', 0)) || 0; if (!THEMES[themeIdx]) themeIdx = 0; applyTheme(themeIdx);
 /* ---------- снег (лёгкий, на весь экран; частота кадров = частоте экрана, до 120 fps) ---------- */
-let SNOW = false; try { SNOW = localStorage.getItem('gr4_snow') === '1'; } catch (e) {}
+let SNOW = false, SNOWC = '#ffffff', SNOWN = 56; try { SNOW = localStorage.getItem('gr4_snow') === '1'; SNOWC = localStorage.getItem('gr4_snowc') || SNOWC; SNOWN = Math.min(160, Math.max(10, Number(localStorage.getItem('gr4_snown')) || SNOWN)); } catch (e) {}
+const SNOWCOLORS = ['#ffffff', '#9fd2ff', '#ffb3d9', '#c9a4ff', '#ffe08a', '#a6f0c6'];
+let snowFix = null;
 let snowEl = null, snowRaf = 0;
 function snowApply() {
-  if (!SNOW) { cancelAnimationFrame(snowRaf); snowRaf = 0; if (snowEl) { snowEl.remove(); snowEl = null; } return; }
+  if (!SNOW) { cancelAnimationFrame(snowRaf); snowRaf = 0; snowFix = null; if (snowEl) { snowEl.remove(); snowEl = null; } return; }
   if (snowEl) return;
   const cv = snowEl = document.createElement('canvas'); cv.id = 'snow'; document.body.appendChild(cv);
   const ctx = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   let W = 0, H = 0, flakes = [];
   const size = () => { W = cv.width = Math.round(innerWidth * dpr); H = cv.height = Math.round(innerHeight * dpr); };
   size(); window.addEventListener('resize', size);
-  const N = document.documentElement.classList.contains('ios') ? 38 : 56;
-  flakes = Array.from({ length: N }, () => ({ x: Math.random() * W, y: Math.random() * H, r: (.8 + Math.random() * 1.9) * dpr, v: (28 + Math.random() * 42) * dpr, ph: Math.random() * 6.283, sw: (10 + Math.random() * 18) * dpr, a: .35 + Math.random() * .5 }));
+  const mk = () => ({ x: Math.random() * W, y: Math.random() * H, r: (.8 + Math.random() * 1.9) * dpr, v: (28 + Math.random() * 42) * dpr, ph: Math.random() * 6.283, sw: (10 + Math.random() * 18) * dpr, a: .35 + Math.random() * .5 });
+  const nOf = () => Math.round(SNOWN * (document.documentElement.classList.contains('ios') ? .7 : 1));
+  snowFix = () => { const n = nOf(); while (flakes.length < n) flakes.push(mk()); flakes.length = Math.min(flakes.length, n); }; snowFix();
   let last = performance.now();
   const tick = now => {
     if (!snowEl) return;
     const dt = Math.min(.05, (now - last) / 1000); last = now;
-    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fff';
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = SNOWC;
     for (const f of flakes) {
       f.y += f.v * dt; f.ph += dt * .9; const x = f.x + Math.sin(f.ph) * f.sw;
       if (f.y > H + 6) { f.y = -6; f.x = Math.random() * W; }
@@ -1482,7 +1495,12 @@ function openSettings() {
     <h4>Цвет приложения</h4><div class="sw-row" id="thRow">${THEMES.map((t, i) => `<button class="th${i === themeIdx ? ' on' : ''}" data-i="${i}" aria-label="${t.n}" style="background:linear-gradient(135deg,${t.a},${t.b})"></button>`).join('')}</div>
     <div class="st-row"><span>Вибрация</span><button class="sw${VIB ? ' on' : ''}" id="vibSw" aria-label="Вибрация"><i></i></button></div>
     <div class="st-row" style="margin-top:10px"><span>Звук</span><button class="sw${SND ? ' on' : ''}" id="sndSw" aria-label="Звук"><i></i></button></div>
-    <div class="st-row" style="margin-top:10px"><span>Снег</span><button class="sw${SNOW ? ' on' : ''}" id="snowSw" aria-label="Снег"><i></i></button></div></div>`);
+    <div class="st-row" style="margin-top:10px"><span>Снег</span><button class="sw${SNOW ? ' on' : ''}" id="snowSw" aria-label="Снег"><i></i></button></div>
+    <h4 style="margin-top:14px">Цвет снега</h4><div class="sw-row" id="snowCol">${SNOWCOLORS.map(c => `<button class="th${c === SNOWC ? ' on' : ''}" data-c="${c}" aria-label="Цвет снега" style="background:${c}"></button>`).join('')}</div>
+    <div class="st-row" style="margin-top:14px"><span>Интенсивность</span><b id="snowNv" style="font:800 12px var(--disp);opacity:.7">${SNOWN}</b></div>
+    <input type="range" class="rng" id="snowN" min="10" max="160" step="2" value="${SNOWN}" aria-label="Интенсивность снега"></div>`);
+  $('#snowCol', m.el).onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; SNOWC = b.dataset.c; try { localStorage.setItem('gr4_snowc', SNOWC); } catch (x) {} m.el.querySelectorAll('#snowCol .th').forEach(x => x.classList.toggle('on', x === b)); haptic(); };
+  $('#snowN', m.el).oninput = e => { SNOWN = Number(e.target.value); $('#snowNv', m.el).textContent = SNOWN; try { localStorage.setItem('gr4_snown', SNOWN); } catch (x) {} if (snowFix) snowFix(); };
   $('#snowSw', m.el).onclick = e => { SNOW = !SNOW; try { localStorage.setItem('gr4_snow', SNOW ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', SNOW); snowApply(); haptic(); };
   $('#sndSw', m.el).onclick = e => { SND = !SND; try { localStorage.setItem('gr4_snd', SND ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', SND); if (SND) { audio(); sfx.m2(); } };
   m.el.querySelectorAll('.th').forEach(b => b.onclick = () => {
