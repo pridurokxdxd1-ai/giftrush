@@ -99,7 +99,7 @@ const ITEMS = [
   ['Llama Float', 600, 'g_llama.webp', '#ff8fc0'],   // только в апгрейде (в кейсах не падает)
   ['Bear', 15, 'g_bear2.webp', '#c98a4a'], ['Heart', 15, 'g_heart.webp', '#ff5fa8'], ['Easter Egg', 480, 'g_egg.webp', '#6f8fe0'], ['Lol Pop', 485, 'g_lolpop.webp', '#ff6fb5'], ['Holiday Drink', 496, 'g_drink.webp', '#ff5d5d'],
   ['Ice Cream', 500, 'g_icecream.webp', '#c0763c'], ['Light Sword', 530, 'g_sword.webp', '#8a7bff'], ['Toy Bear', 2700, 'g_bear.webp', '#ff7ac8'],
-  ['Snow Globe', 555, 'g_snowglobe.webp', '#7fd6c0'], ['Diamond Ring', 2700, 'g_ring.webp', '#ff4fa0'], ['Ginger Cookie', 490, 'g_cookie.webp', '#4aa8ff'], ['Vice Cream', 450, 'g_vice.webp', '#f2c14e'], ['Sky Stilettos', 1500, 'g_shoes.webp', '#ff7ac8'],
+  ['Snow Globe', 555, 'g_snowglobe.webp', '#7fd6c0'], ['Diamond Ring', 2700, 'g_ring.webp', '#ff4fa0'], ['Ginger Cookie', 490, 'g_cookie.webp', '#4aa8ff'], ['Vice Cream', 450, 'g_vice.webp', '#f2c14e'], ['Sky Stilettos', 1500, 'g_shoes.webp', '#ff7ac8'], ['Scared Cat', 30000, 'g_cat.webp', '#5bd33a'],
 ].map(([n, p, img, c]) => ({ n, p, img, c, r: rar(p), nc: false }));
 const BY = {}; ITEMS.forEach(i => { BY[i.n] = i; });
 const ITEM = n => BY[n] || null;
@@ -238,20 +238,22 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=53" alt=""><img class="gf g1" src="case_toxic.webp?v=53" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=55" alt=""><img class="gf g1" src="case_toxic.webp?v=55" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=53" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=53" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=55" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=55" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
+    tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=53" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=55" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
     <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="new">NEW</span>')}</div>
+    ${T('tower', 'wide t-tw', 'TOWER', '<span class="new">NEW</span>')}
   </div>`;
   const rk = $('#hrkt'); loadRocket();
   if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; }, 33); cleanup = () => clearInterval(tm); }
@@ -267,7 +269,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=53" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=55" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -303,7 +305,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=53" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=55" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -496,7 +498,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=53';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=55';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1254,6 +1256,66 @@ function minesScreen(el) {
   draw(); ui();
 }
 
+/* ---------- tower ---------- */
+const TW_ROWS = 8, TW_EDGE = 0.92, TW_MULT = Array.from({ length: TW_ROWS }, (_, i) => Math.floor(TW_EDGE * Math.pow(1.5, i + 1) * 100) / 100);
+const STAR = '<svg class="dia st" viewBox="0 0 24 24"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".55" stop-color="#ffc83d"/><stop offset="1" stop-color="#ff8a1f"/></linearGradient></defs><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="url(#sg)" stroke="#fff0b0" stroke-width=".9" stroke-linejoin="round"/></svg>';
+function towerScreen(el) {
+  bar(el, 'TOWER');
+  let bet = 50, live = false, alive = true, row = 0, mines = [], picks = [];
+  el.insertAdjacentHTML('beforeend', `<div class="mlive"><span class="dot"></span>LIVE <span id="twx" style="margin-left:auto;color:var(--gold)">1.00x</span></div>
+    <div class="tw-box" id="twb"></div>
+    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-m="0.5">½</button><button data-m="2">×2</button><button data-max>MAX</button></div>
+    <button class="btn" id="go">Сделать ставку</button>
+    <div class="odds">8 этажей · на каждом 3 плитки: 1 мина и 2 безопасные · забрать выигрыш можно после любого этажа</div>`);
+  const box = $('#twb'), twx = $('#twx'), goB = $('#go'), betIn = $('#bet');
+  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(20, Math.floor(betIn.value * Number(b.dataset.m))); haptic(); } });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
+  const curMult = () => row ? TW_MULT[row - 1] : 1;
+  const draw = () => {
+    box.innerHTML = '';
+    for (let r = TW_ROWS - 1; r >= 0; r--) {
+      const d = document.createElement('div'); d.className = 'tw-r'; d.dataset.r = r;
+      d.innerHTML = `<span class="tw-m">x${TW_MULT[r].toFixed(2)}</span><div class="tw-c">${[0, 1, 2].map(c => `<button class="tw-t" data-c="${c}"><i></i></button>`).join('')}</div>`;
+      box.append(d);
+    }
+    mark();
+  };
+  const mark = () => [...box.children].forEach(d => { const r = +d.dataset.r; d.classList.toggle('act', live && r === row); d.classList.toggle('past', r < row); d.classList.toggle('lock', !live || r > row); });
+  const end = (won, hitRow, hitCol) => {
+    live = false; betIn.disabled = false; goB.className = 'btn'; goB.textContent = 'Сделать ставку'; mark();
+    box.classList.remove('shake'); if (!won) { void box.offsetWidth; box.classList.add('shake'); }
+    let k = 0;
+    mines.forEach((mc, r) => {
+      const d = box.querySelector(`.tw-r[data-r="${r}"]`); if (!d) return;
+      [...d.querySelectorAll('.tw-t')].forEach((t, c) => {
+        if (t.classList.contains('safe') || t.classList.contains('boom')) return;
+        const delay = 120 + (k++) * 45;
+        setTimeout(() => { if (!alive) return; t.classList.add(c === mc ? 'bomb' : 'dim'); t.innerHTML = c === mc ? '<span>💣</span>' : ''; }, delay);
+      });
+    });
+  };
+  const cash = () => {
+    const w = Math.floor(bet * curMult()); state.balance += w; save(); bump(); toast(`+${fmt(w - bet)} ⭐`); notify('success'); (row >= TW_ROWS ? sfx.win : sfx.cash)(); end(true);
+  };
+  box.onclick = e => {
+    const t = e.target.closest('.tw-t'); if (!t || !live) return;
+    const d = t.closest('.tw-r'); if (+d.dataset.r !== row) return;
+    const c = +t.dataset.c;
+    if (c === mines[row]) { t.classList.add('boom'); t.innerHTML = '<span>💥</span>'; notify('error'); sfx.boom(); toast('💥 Мина!'); return end(false, row, c); }
+    t.classList.add('safe'); t.innerHTML = STAR; sfx.gem(row); haptic(); row++; twx.textContent = curMult().toFixed(2) + 'x';
+    goB.textContent = `Забрать ⭐ ${fmt(bet * curMult())}`; mark();
+    if (row >= TW_ROWS) setTimeout(() => { if (alive && live) cash(); }, 450);
+  };
+  goB.onclick = () => {
+    if (live) { row ? cash() : toast('Поднимитесь хотя бы на один этаж'); return; }
+    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (!spend(bet)) return;
+    mines = Array.from({ length: TW_ROWS }, () => Math.floor(Math.random() * 3)); row = 0; live = true; betIn.disabled = true; twx.textContent = '1.00x';
+    draw(); goB.className = 'btn green'; goB.textContent = 'Забрать'; sfx.drop();
+  };
+  cleanup = () => { live = false; alive = false; };
+  draw();
+}
+
 /* ---------- лидерборд (онлайн, по балансу) ---------- */
 function tourScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>Лидерборд</h2><p class="sub" style="margin-top:6px">Топ-10 игроков по балансу</p><div id="lbBody"><div class="empty lb-ld">Загрузка…</div></div></div>`);
@@ -1620,12 +1682,12 @@ function openGift(g) {
 function marketScreen(el) {
   const list = ITEMS.filter(i => !i.coin).slice().sort((a, b) => a.p - b.p);
   el.innerHTML = `<div class="tour"><h2>Маркет</h2></div><div class="mk-sub">Покупайте NFT-подарки за Rushcoin — они попадут в ваш профиль</div>
-    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=53" alt="" draggable="false" decoding="async" loading="lazy"></div>
+    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=55" alt="" draggable="false" decoding="async" loading="lazy"></div>
       <div class="mk-n">${esc(it.n)}</div><button class="mk-b" data-n="${esc(it.n)}"><i class="rc"></i>${fmt(it.p)}</button></div>`).join('')}</div>`;
   el.querySelectorAll('.mk-b').forEach(b => b.onclick = () => {
     const it = ITEM(b.dataset.n); if (!it) return;
     if (state.balance < it.p) { notify('error'); return toast('Не хватает Rushcoin'); }
-    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=53" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
+    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=55" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
       <div class="g-act"><button class="btn" id="mkno" style="background:#2a3350">Отмена</button><button class="btn green" id="mkyes">Купить</button></div></div>`);
     $('#mkno', m.el).onclick = () => m.close();
     $('#mkyes', m.el).onclick = () => {
@@ -1634,7 +1696,7 @@ function marketScreen(el) {
     };
   });
 }
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, market: marketScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, user: userScreen, soon };
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, market: marketScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tower: towerScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, user: userScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'market'].includes(t) ? t : 'soon');
