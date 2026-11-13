@@ -242,24 +242,22 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=58" alt=""><img class="gf g1" src="case_toxic.webp?v=58" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=59" alt=""><img class="gf g1" src="case_toxic.webp?v=59" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=58" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=58" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=59" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=59" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
-    mansion: '<div class="art a-mn"><i class="d d1"></i><i class="d d2"><b></b></i><i class="d d3"></i><span class="eyes"><u></u><u></u></span></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=58" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=59" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
     <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="new">NEW</span>')}</div>
     ${T('tower', 'wide t-tw', 'TOWER')}
-    ${T('mansion', 'wide t-mn', 'ОСОБНЯК', '<span class="new">NEW</span>')}
   </div>`;
   const rk = $('#hrkt'); loadRocket();
   if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; }, 33); cleanup = () => clearInterval(tm); }
@@ -275,7 +273,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=58" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=59" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -311,7 +309,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=58" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=59" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -504,7 +502,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=58';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=59';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1322,79 +1320,6 @@ function towerScreen(el) {
   draw();
 }
 
-/* ---------- особняк ---------- */
-const MN_FLOORS = 10, MN_EDGE = 0.92, MN_MULT = Array.from({ length: MN_FLOORS }, (_, i) => Math.floor(MN_EDGE * Math.pow(1.5, i + 1) * 100) / 100);
-const MN_HUE = [0, 28, -30, 55, -55, 85, -85, 115, 150, 190];
-const MN_HERO = '<svg viewBox="0 0 60 104"><ellipse cx="30" cy="100" rx="17" ry="3.5" fill="#000" opacity=".4"/><g class="lg a"><rect x="19" y="70" width="10" height="27" rx="4" fill="#1b2140"/><rect x="17" y="92" width="13" height="7" rx="3" fill="#0b0d18"/></g><g class="lg b"><rect x="31" y="70" width="10" height="27" rx="4" fill="#1b2140"/><rect x="30" y="92" width="13" height="7" rx="3" fill="#0b0d18"/></g><g class="ar a"><rect x="7" y="38" width="9" height="30" rx="4.5" fill="#2f48b4"/></g><g class="ar b"><rect x="44" y="38" width="9" height="30" rx="4.5" fill="#2f48b4"/><circle cx="48.5" cy="70" r="4" fill="#ffe9a0"/></g><path d="M13 40 Q30 31 47 40 L50 76 L10 76 Z" fill="#3d5fe0"/><path d="M14 44 Q30 36 46 44" fill="none" stroke="#6f8cff" stroke-width="1.4" opacity=".6"/><ellipse cx="30" cy="25" rx="14.5" ry="15" fill="#2d46a8"/><ellipse cx="30" cy="28" rx="9.5" ry="10" fill="#3d2b22"/><path d="M22 34 Q30 38 38 34" fill="none" stroke="#1d1410" stroke-width="2"/></svg>';
-const MN_MON = '<svg viewBox="0 0 200 230"><defs><radialGradient id="mg" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#4a2f6b"/><stop offset="1" stop-color="#1c1030"/></radialGradient></defs><rect x="46" y="34" width="108" height="150" rx="12" fill="#5a3a22" stroke="#24150b" stroke-width="4"/><rect x="58" y="48" width="84" height="122" rx="6" fill="#6e4829"/><rect x="40" y="176" width="120" height="16" rx="5" fill="#4a2f1b" stroke="#24150b" stroke-width="3"/><path d="M54 226 Q48 128 100 112 Q152 128 146 226Z" fill="url(#mg)"/><path d="M60 132 Q26 176 50 214 L66 208 Q54 176 76 150Z" fill="#33224a"/><path d="M140 132 Q174 176 150 214 L134 208 Q146 176 124 150Z" fill="#33224a"/><g stroke="#33224a" stroke-width="5" stroke-linecap="round"><path d="M44 212l-6 12M52 214l-2 13M60 212l3 12"/><path d="M156 212l6 12M148 214l2 13M140 212l-3 12"/></g><path d="M66 60 L56 22 L82 48Z M134 60 L144 22 L118 48Z" fill="#241538"/><ellipse cx="100" cy="86" rx="40" ry="44" fill="#3d2858"/><ellipse cx="100" cy="86" rx="40" ry="44" fill="none" stroke="#8a5fc4" stroke-width="2" opacity=".35"/><g class="eyes"><ellipse cx="84" cy="80" rx="11" ry="14" fill="#e9ff55"/><ellipse cx="116" cy="80" rx="11" ry="14" fill="#e9ff55"/><ellipse cx="84" cy="82" rx="3.2" ry="10" fill="#14091f"/><ellipse cx="116" cy="82" rx="3.2" ry="10" fill="#14091f"/></g><path d="M66 106 Q100 140 134 106 Q100 120 66 106Z" fill="#120816"/><path d="M68 106 L74 114 L80 108 L86 118 L93 111 L100 121 L107 111 L114 118 L120 108 L126 114 L132 106 Q100 126 68 106Z" fill="#f4efe2"/></svg>';
-function mansionScreen(el) {
-  bar(el, 'ОСОБНЯК');
-  let bet = 50, live = false, busy = false, alive = true, floor = 0, mons = [], timers = [], stepIv = 0;
-  const T = (fn, ms) => { const t = setTimeout(() => { if (alive) fn(); }, ms); timers.push(t); return t; };
-  el.insertAdjacentHTML('beforeend', `<div class="mlive"><span class="dot"></span><span id="mnf">ЭТАЖ 1 / ${MN_FLOORS}</span><span id="mnx" style="margin-left:auto;color:var(--gold)">1.00x</span></div>
-    <div class="mn-scene" id="mns"><div class="mn-zoom" id="mnz"><div class="mn-cam" id="mnc"></div></div>
-      <div class="mn-char" id="mnh">${MN_HERO}</div><div class="mn-vig"></div><div class="mn-hint" id="mnt">Сделайте ставку</div><div class="mn-white" id="mnw"></div><div class="mn-red" id="mnr"></div></div>
-    <div class="mn-lad" id="mnl">${MN_MULT.map((m, i) => `<span data-i="${i}">${i + 1}<b>x${m.toFixed(2)}</b></span>`).join('')}</div>
-    <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-m="0.5">½</button><button data-m="2">×2</button><button data-max>MAX</button></div>
-    <button class="btn" id="go">Сделать ставку</button>
-    <div class="odds">На каждом этаже 3 двери, за одной из них монстр · шанс пройти этаж 66.7% · забрать выигрыш можно на любом этаже</div>`);
-  const scn = $('#mns'), zm = $('#mnz'), cam = $('#mnc'), hero = $('#mnh'), hint = $('#mnt'), wh = $('#mnw'), rd = $('#mnr'), goB = $('#go'), betIn = $('#bet'), mnx = $('#mnx'), mnf = $('#mnf'), lad = $('#mnl');
-  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(20, Math.floor(betIn.value * Number(b.dataset.m))); haptic(); } });
-  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
-  const curMult = () => floor ? MN_MULT[floor - 1] : 1;
-  const room = () => {
-    cam.innerHTML = `<div class="mn-bg" style="filter:hue-rotate(${MN_HUE[Math.min(floor, MN_HUE.length - 1)]}deg)"><div class="mn-wall"></div><div class="mn-wain"></div><div class="mn-floor"></div><div class="mn-rug"></div>
-      <div class="mn-sc" style="left:35%"><i></i></div><div class="mn-sc" style="left:65%"><i></i></div><svg class="mn-web" viewBox="0 0 40 40"><path d="M0 0 L40 0 Q20 8 0 40Z M0 0 L40 14 M0 0 L28 28 M0 0 L14 40" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.3)" stroke-width=".6"/></svg></div>
-      ${[0, 1, 2].map(i => `<div class="mn-door" data-i="${i}" style="left:${7.5 + i * 30}%"><div class="mn-in"></div><div class="mn-leaf"><i class="kn"></i><b class="pn"></b><b class="pn p2"></b></div><div class="mn-no">${floor + 1}</div></div>`).join('')}`;
-    cam.querySelectorAll('.mn-door').forEach(d => d.onclick = () => pick(+d.dataset.i));
-    mark();
-  };
-  const mark = () => {
-    scn.classList.toggle('live', live && !busy); mnx.textContent = curMult().toFixed(2) + 'x'; mnf.textContent = `ЭТАЖ ${Math.min(floor + 1, MN_FLOORS)} / ${MN_FLOORS}`;
-    hint.textContent = !live ? 'Сделайте ставку' : busy ? '' : 'Выберите дверь'; hint.style.opacity = busy ? 0 : 1;
-    [...lad.children].forEach((c, i) => { c.classList.toggle('done', i < floor); c.classList.toggle('cur', live && i === floor); });
-    if (live && floor) goB.textContent = `Забрать ⭐ ${fmt(bet * curMult())}`;
-  };
-  const reset = () => {
-    live = false; busy = false; floor = 0; betIn.disabled = false; goB.className = 'btn'; goB.textContent = 'Сделать ставку';
-    zm.style.transition = 'none'; zm.style.transform = ''; scn.classList.remove('walking', 'dead'); hero.style.cssText = ''; room();
-  };
-  const toNext = () => {          // камера проходит в дверь → новая комната
-    wh.style.opacity = 1; T(() => {
-      zm.style.transition = 'none'; zm.style.transform = ''; scn.classList.remove('walking'); hero.style.cssText = ''; floor++; room();
-      void zm.offsetWidth; wh.style.opacity = 0; busy = false; mark();
-      if (floor >= MN_FLOORS) T(cash, 500);
-    }, 520);
-  };
-  const cash = () => {
-    if (!live || busy) return; const w = Math.floor(bet * curMult()); state.balance += w; save(); bump(); toast(`+${fmt(w - bet)} ⭐`); notify('success'); (floor >= MN_FLOORS ? sfx.win : sfx.cash)();
-    reset();
-  };
-  const pick = i => {
-    if (!live || busy) return; busy = true; const bad = mons[floor] === i; mark(); haptic('medium');
-    const d = cam.querySelector(`.mn-door[data-i="${i}"]`), cx = 7.5 + i * 30 + 12.5, cy = 39, S = 2.9;
-    d.classList.add('pick'); d.querySelector('.mn-in').innerHTML = bad ? `<div class="mn-dark"></div><div class="mn-mon">${MN_MON}</div>` : '<div class="mn-light"></div>';
-    scn.classList.add('walking');
-    zm.style.transition = 'transform 3.4s cubic-bezier(.45,0,.55,1)'; zm.style.transform = `translate(${(50 - cx * S).toFixed(1)}%,${(48 - cy * S).toFixed(1)}%) scale(${S})`;
-    hero.style.transition = 'left 3.4s cubic-bezier(.45,0,.55,1),bottom 3.4s cubic-bezier(.45,0,.55,1),transform 3.4s'; hero.style.left = '50%'; hero.style.bottom = '12%'; hero.style.transform = 'translateX(-50%) scale(1.08)';
-    clearInterval(stepIv); sfx.step(); stepIv = setInterval(() => { if (alive) { sfx.step(); haptic('light'); } }, 430);
-    T(() => { d.classList.add('open'); sfx.creak(); }, 2700);
-    T(() => {
-      clearInterval(stepIv);
-      hero.style.transition = 'transform .6s ease-in,opacity .45s ease-in,bottom .6s ease-in'; hero.style.bottom = '30%'; hero.style.transform = 'translateX(-50%) scale(.55)'; hero.style.opacity = .0;
-      if (bad) { sfx.scare(); notify('error'); scn.classList.add('dead'); T(() => { rd.classList.remove('go'); void rd.offsetWidth; rd.classList.add('go'); }, 650); T(() => { toast('👹 Монстр! Ставка проиграна'); reset(); }, 2100); }
-      else { sfx.joy(); notify('success'); haptic('medium'); T(() => { zm.style.transition = 'transform .6s ease-in'; zm.style.transform = `translate(${(50 - cx * 7).toFixed(1)}%,${(48 - cy * 7).toFixed(1)}%) scale(7)`; toNext(); }, 450); }
-    }, 3450);
-  };
-  goB.onclick = () => {
-    if (live) { floor ? cash() : toast('Пройдите хотя бы один этаж'); return; }
-    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (!spend(bet)) return;
-    mons = Array.from({ length: MN_FLOORS }, () => Math.floor(Math.random() * 3)); floor = 0; live = true; betIn.disabled = true; goB.className = 'btn green'; goB.textContent = 'Забрать'; sfx.drop(); room();
-  };
-  cleanup = () => { alive = false; clearInterval(stepIv); timers.forEach(clearTimeout); };
-  room();
-}
-
 /* ---------- лидерборд (онлайн, по балансу) ---------- */
 function tourScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>Лидерборд</h2><p class="sub" style="margin-top:6px">Топ-10 игроков по балансу</p><div id="lbBody"><div class="empty lb-ld">Загрузка…</div></div></div>`);
@@ -1761,12 +1686,12 @@ function openGift(g) {
 function marketScreen(el) {
   const list = ITEMS.filter(i => !i.coin).slice().sort((a, b) => a.p - b.p);
   el.innerHTML = `<div class="tour"><h2>Маркет</h2></div><div class="mk-sub">Покупайте NFT-подарки за Rushcoin — они попадут в ваш профиль</div>
-    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=58" alt="" draggable="false" decoding="async" loading="lazy"></div>
+    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=59" alt="" draggable="false" decoding="async" loading="lazy"></div>
       <div class="mk-n">${esc(it.n)}</div><button class="mk-b" data-n="${esc(it.n)}"><i class="rc"></i>${fmt(it.p)}</button></div>`).join('')}</div>`;
   el.querySelectorAll('.mk-b').forEach(b => b.onclick = () => {
     const it = ITEM(b.dataset.n); if (!it) return;
     if (state.balance < it.p) { notify('error'); return toast('Не хватает Rushcoin'); }
-    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=58" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
+    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=59" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
       <div class="g-act"><button class="btn" id="mkno" style="background:#2a3350">Отмена</button><button class="btn green" id="mkyes">Купить</button></div></div>`);
     $('#mkno', m.el).onclick = () => m.close();
     $('#mkyes', m.el).onclick = () => {
@@ -1775,7 +1700,7 @@ function marketScreen(el) {
     };
   });
 }
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, market: marketScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tower: towerScreen, mansion: mansionScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, user: userScreen, soon };
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, market: marketScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tower: towerScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, user: userScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'market'].includes(t) ? t : 'soon');
