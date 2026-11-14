@@ -932,7 +932,7 @@ html.lite .rf-n.next .rf-ic,html.lite .rf-warn{animation:none}
 .ring.has .ug-chev{opacity:0}
 .ugc{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
 .ugc .c1{stroke:#6ea0ff;filter:drop-shadow(0 0 5px #4a8bffaa)}.ugc .c2{stroke:#3a4f9a}
-.ring.ug-ring .hand .head{top:2.5%;margin-left:-8px;border:8px solid transparent;border-top:15px solid #fff;border-bottom:0;filter:drop-shadow(0 0 7px #8fb4ff)}
+.ring.ug-ring .hand .head{top:2.5%;margin-left:-8px;border:8px solid transparent;border-top:15px solid #fff;border-bottom:0}
 .ug-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
 .ug-col{display:flex;flex-direction:column;gap:10px;min-width:0}
 .ug-card{position:relative;height:158px;border-radius:22px;border:1px solid #ffffff16;border-top-color:#ffffff2c;background:radial-gradient(circle at 50% 38%,#26335f66,transparent 70%),linear-gradient(180deg,#171d2d,#0f1320);box-shadow:0 8px 22px #0006,inset 0 0 26px #0006;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 8px;transition:transform .25s var(--ease),box-shadow .3s,border-color .3s;overflow:hidden}
@@ -963,7 +963,7 @@ html.lite .ring.ug-ring{filter:none}
 .ring.ug-ring .num{display:block}
 .ring.ug-ring .num b{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;line-height:1;font-variant-numeric:tabular-nums}
 .ring.ug-ring .num small{position:absolute;left:50%;top:calc(50% + 30px);transform:translateX(-50%);white-space:nowrap}
-.ring.ug-ring .hand::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -75deg,#6ea0ff00 0deg,#8fb4ffbb 74deg,#0000 75deg);-webkit-mask:radial-gradient(circle closest-side,transparent 65%,#000 67%,#000 85%,transparent 87%);mask:radial-gradient(circle closest-side,transparent 65%,#000 67%,#000 85%,transparent 87%);opacity:.9}
+.ring.ug-ring .hand::before{display:none}
 .ring.ug-ring .hand{will-change:transform}
 .ug-card.pop{animation:ugpop .38s cubic-bezier(.2,.9,.3,1.3)}
 @keyframes ugpop{0%{transform:scale(.94)}100%{transform:scale(1)}}
