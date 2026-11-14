@@ -142,6 +142,19 @@ function iconify(root) {
 { let sched = 0;
   new MutationObserver(() => { if (!sched) { sched = 1; requestAnimationFrame(() => { sched = 0; iconify(document.body); }); } }).observe(document.body, { childList: true, subtree: true, characterData: true }); }
 
+/* ---------- защита аккаунта: локальные данные принадлежат одному Telegram-аккаунту ---------- */
+const OWNER_ID = (() => { try { const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || INIT_USER; return u && u.id ? String(u.id) : ''; } catch (e) { return ''; } })();
+let DEV_ID = ''; try { DEV_ID = localStorage.getItem('gr5_dev') || ''; if (!DEV_ID) { DEV_ID = (Date.now().toString(36) + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10)).slice(0, 28); localStorage.setItem('gr5_dev', DEV_ID); } } catch (e) { DEV_ID = DEV_ID || Math.random().toString(36).slice(2, 14); }
+let PULL = false;   // true — баланс/инвентарь надо сначала получить с сервера (другой аккаунт на этом устройстве)
+try {
+  if (OWNER_ID) {
+    if (localStorage.getItem('gr5_owner') !== OWNER_ID) {
+      ['gr2_bal', 'gr2_inv', 'gr3_tasks', 'gr2_daily', 'gr4_promo_done', 'gr4_pins', 'gr4_lb'].forEach(k => localStorage.removeItem(k));
+      localStorage.setItem('gr5_owner', OWNER_ID); localStorage.setItem('gr5_pull', '1');
+    }
+    PULL = localStorage.getItem('gr5_pull') === '1';
+  }
+} catch (e) {}
 /* ---------- state ---------- */
 let balanceHook = null;
 const state = {
@@ -265,17 +278,17 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=72" alt=""><img class="gf g1" src="case_toxic.webp?v=72" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=74" alt=""><img class="gf g1" src="case_toxic.webp?v=74" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=72" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=72" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=74" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=74" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=72" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=74" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -298,7 +311,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=72" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=74" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -334,7 +347,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=72" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=74" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -527,7 +540,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=72';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=74';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -724,8 +737,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0;
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=72`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=72" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=74`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=74" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -1556,9 +1569,10 @@ const API = 'https://giftrush-bot.thekerv666.workers.dev';
 const ADMIN_ID = 5093384439;
 const TGU = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || INIT_USER || null;
 async function api(path, body) {
+  if (PULL && path === '/api/sync' && !(body && body.pull)) return { ok: false, err: 'pull' };   // пока не получили данные аккаунта — свои не отправляем
   // text/plain — «простой» запрос без предварительного CORS-запроса (работает надёжнее в Telegram)
   const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
-    keepalive: true, body: JSON.stringify(Object.assign({ initData: INIT }, body || {})) });
+    keepalive: true, body: JSON.stringify(Object.assign({ initData: INIT, dev: DEV_ID }, body || {})) });
   let d; try { d = await r.json(); } catch (e) { throw new Error('http ' + r.status); }
   return d;
 }
@@ -1572,16 +1586,27 @@ async function syncAccount() {
   syncing = true;
   try {
     let bal = Math.floor(state.balance);
-    const tj = JSON.stringify(tasks), body = { bal, inv: invSummary(), pins: pinNames() };
-    if (tj !== lastTasksSent) body.tasks = tasks;   // задания шлём только когда они изменились (экономим чтение на сервере)
+    const tj = JSON.stringify(tasks), body = PULL ? { pull: 1, tasks: {} } : { bal, inv: invSummary(), pins: pinNames() };
+    if (!PULL && tj !== lastTasksSent) body.tasks = tasks;   // задания шлём только когда они изменились (экономим чтение на сервере)
     const d = await api('/api/sync', body); if (d && d.ok && body.tasks) lastTasksSent = tj;
     if (d && d.ok) {
       let ch = false;
+      const pulled = PULL && d.pull;
       if (d.tasks && typeof d.tasks === 'object') {   // задания выполняются раз и навсегда: берём лучшее из устройства и сервера
         const rk = { claimed: 2, done: 1 }; let tch = false;
         Object.keys(d.tasks).forEach(k => { if ((rk[d.tasks[k]] || 0) > (rk[tasks[k]] || 0)) { tasks[k] = d.tasks[k]; tch = true; } });
         if (tch) { saveTasks(); if (taskPaint) taskPaint(); }
       }
+      if (pulled) {                                   // данные этого аккаунта с сервера (баланс, инвентарь, закрепы)
+        state.balance = Math.max(0, Math.floor(Number(d.pull.bal) || 0)); state.inv = [];
+        Object.keys(d.pull.inv || {}).forEach(n => { if (BY[n]) for (let i = 0, c = Math.min(500, Number(d.pull.inv[n]) || 0); i < c; i++) state.inv.push({ id: uid(), n }); });
+        PINS = []; (d.pull.pins || []).forEach(n => { const g = state.inv.find(x => x.n === n && !PINS.includes(x.id)); if (g) PINS.push(g.id); }); savePins();
+        PULL = false; try { localStorage.removeItem('gr5_pull'); } catch (x) {}
+        save(); lastPushed = Math.floor(state.balance); lastTasksSent = ''; if (d.welcome > 0) toast(`🎁 Приветственный бонус: ${fmt(d.welcome)} ⭐`);
+        { const sc = document.querySelector('.screen'), sm = sc && sc.dataset.mode; if (sm === 'profile' || sm === 'cases' || sm === 'ref') go(sm); }
+        return;
+      }
+      if (d.gifts && d.gifts.length) { d.gifts.forEach(n => { if (BY[n]) { addGift(n); toast(`🎁 Награда за друга: ${n}`); } }); ch = true; }
       if (d.welcome > 0) { state.balance += d.welcome; ch = true; toast(`🎁 Приветственный бонус: ${fmt(d.welcome)} ⭐`); }
       if (d.credit > 0) { state.balance += d.credit; ch = true; toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); }
       if (d.debit > 0) { const t = Math.min(d.debit, Math.floor(state.balance)); state.balance -= t; ch = true; if (t) toast(`С баланса списано ${fmt(t)} ⭐`); }
@@ -1848,27 +1873,67 @@ function openGift(g) {
   };
 }
 
-/* ---------- маркет ---------- */
-function marketScreen(el) {
-  const list = ITEMS.filter(i => !i.coin && !['Bear', 'Champagne', 'Cup', 'Heart'].includes(i.n)).slice().sort((a, b) => a.p - b.p);
-  el.innerHTML = `<div class="tour"><h2>Маркет</h2></div><div class="mk-sub">Покупайте NFT-подарки за Rushcoin — они попадут в ваш профиль</div>
-    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=72" alt="" draggable="false" decoding="async" loading="lazy"></div>
-      <div class="mk-n">${esc(it.n)}</div><button class="mk-b" data-n="${esc(it.n)}"><i class="rc"></i>${fmt(it.p)}</button></div>`).join('')}</div>`;
-  el.querySelectorAll('.mk-b').forEach(b => b.onclick = () => {
-    const it = ITEM(b.dataset.n); if (!it) return;
-    if (state.balance < it.p) { notify('error'); return toast('Не хватает Rushcoin'); }
-    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=72" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
-      <div class="g-act"><button class="btn" id="mkno" style="background:#2a3350">Отмена</button><button class="btn green" id="mkyes">Купить</button></div></div>`);
-    $('#mkno', m.el).onclick = () => m.close();
-    $('#mkyes', m.el).onclick = () => {
-      if (state.balance < it.p) { m.close(); return toast('Не хватает Rushcoin'); }
-      state.balance -= it.p; addGift(it.n); save(); bump(); m.close(); notify('success'); sfx.win(); toast(`✅ ${it.n} в вашем профиле`);
-    };
-  });
+/* ---------- реферальная система ---------- */
+const BOT_NAME = 'GiftRush_App';
+const REF_STEPS = [{ c: 1000, t: '1 друг' }, { g: 'Toy Bear', t: '2 друга' }, { c: 4000, t: '3 друга' }, { g: 'Swiss Watch', t: '4 друга' }, { c: 10000, t: '5 друзей' }];
+function copyText(t) {
+  const ok = () => { toast('Скопировано'); notify('success'); haptic(); };
+  try { if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(ok, () => fb()); } catch (e) {}
+  return fb();
+  function fb() { try { const a = document.createElement('textarea'); a.value = t; a.style.cssText = 'position:fixed;opacity:0;left:-999px'; document.body.appendChild(a); a.select(); a.setSelectionRange(0, 9999); document.execCommand('copy'); a.remove(); ok(); } catch (e) { toast('Не удалось скопировать'); } }
 }
-const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, market: marketScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tower: towerScreen, ladder: ladderScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, user: userScreen, soon };
+function shareText(text, link) {
+  const u = 'https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent(text);
+  try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(u); } catch (e) {}
+  window.open(u, '_blank');
+}
+function refScreen(el) {
+  const uidv = TGU && TGU.id ? String(TGU.id) : '', link = uidv ? `https://t.me/${BOT_NAME}?start=ref_${uidv}` : '';
+  const cache = store.get('gr5_ref', null) || { n: 0, earned: 0, list: [] };
+  const MSG = [
+    `🎰 Залетай в GiftRush — крути кейсы, лови иксы в Crash и забирай NFT-подарки! На старте дарят 500 Rushcoin 🎁`,
+    `Нашёл бота, где можно выиграть NFT-подарки 🎁 Заходи по моей ссылке — получишь 500 Rushcoin на старт!`,
+    `🚀 GiftRush: Crash, Mines, Tower, Plinko и кейсы с NFT. Заходи — бонус 500 Rushcoin уже ждёт!`,
+  ];
+  el.innerHTML = `<div class="rf-top"><h2>Приглашай друзей в бота<br>и получай призы</h2></div>
+    <div class="rf-link"><input id="rfIn" readonly value="${esc(link || 'Откройте игру через бота')}" aria-label="Реферальная ссылка"><button id="rfCopy">Копировать</button></div>
+    <div class="rf-acts"><button id="rfShare">✈️ Поделиться в Telegram</button></div>
+    <div class="rf-chain" id="rfChain"></div>
+    <div class="rf-bar"><div class="rf-fill" id="rfFill"></div></div><div class="rf-bt" id="rfBt"></div>
+    <div class="rf-warn">⚠️ ПРИГЛАШАТЬ ТВИНКИ ЗАПРЕЩЕНО,<br>КАРАЕТСЯ БАНОМ</div>
+    <div class="rf-stats"><div><b id="rfN">0</b><span>Приглашено</span></div><div><b id="rfE">0</b><span>Получено ⭐</span></div><div><b id="rfC">1</b><span>Круг</span></div></div>
+    <h4 class="rf-h4">Как это работает</h4>
+    <div class="rf-steps"><div><i>1</i><b>Отправь ссылку</b><span>другу в Telegram</span></div><div><i>2</i><b>Друг заходит</b><span>впервые, по твоей ссылке</span></div><div><i>3</i><b>Получай приз</b><span>сразу на баланс</span></div></div>
+    <h4 class="rf-h4">Готовые сообщения</h4>
+    ${MSG.map((m, i) => `<div class="rf-msg"><p>${esc(m)}</p><div><button data-c="${i}">Копировать</button><button data-s="${i}">Отправить</button></div></div>`).join('')}
+    <h4 class="rf-h4">Правила</h4>
+    <ul class="rf-rules"><li>Друг засчитывается, если он впервые зашёл в бота по твоей ссылке</li><li>На 6-м друге цепочка наград начинается заново</li><li>Аккаунты с одного устройства или сети проверяются — такие приглашения не засчитываются</li><li>Награды приходят автоматически: Rushcoin на баланс, NFT — в профиль</li></ul>
+    <h4 class="rf-h4">Мои приглашённые</h4><div id="rfList" class="rf-list"></div>`;
+  const paint = d => {
+    const n = d.n || 0, p = n % 5, done = n > 0 && p === 0 ? 5 : p;
+    $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
+    $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
+      const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
+      const body = it ? `<img src="${it.img}?v=74" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
+    }).join('');
+    $('#rfFill', el).style.width = (done / 5 * 100) + '%';
+    const nx = REF_STEPS[done % 5], left = 5 - done;
+    $('#rfBt', el).textContent = done >= 5 ? 'Круг пройден! Следующий друг начнёт новую цепочку' : `Следующий друг принесёт: ${nx.g ? 'NFT ' + nx.g : fmt(nx.c) + ' ⭐'} · до конца круга ${left}`;
+    const L = d.list || [];
+    $('#rfList', el).innerHTML = L.length ? L.map(x => `<div class="rf-row"><span>${esc(x.name || '—')}</span><em class="${x.ok ? 'ok' : 'no'}">${x.ok ? 'засчитан' : 'не засчитан'}</em></div>`).join('') : '<div class="empty" style="padding:18px 10px">Пока никого нет — отправь ссылку другу 👆</div>';
+  };
+  paint(cache);
+  api('/api/ref', {}).then(d => { if (d && d.ok) { store.set('gr5_ref', d); if (el.isConnected) paint(d); } }).catch(() => {});
+  $('#rfCopy', el).onclick = () => link ? copyText(link) : toast('Откройте игру через бота');
+  $('#rfIn', el).onclick = e => { if (link) { e.target.select(); copyText(link); } };
+  $('#rfShare', el).onclick = () => link ? shareText(MSG[0], link) : toast('Откройте игру через бота');
+  el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => link ? copyText(MSG[+b.dataset.c] + '\n' + link) : toast('Откройте игру через бота'));
+  el.querySelectorAll('[data-s]').forEach(b => b.onclick = () => link ? shareText(MSG[+b.dataset.s], link) : toast('Откройте игру через бота'));
+}
+const SCREENS = { games: home, cases: casesList, case: caseScreen, upgrade: upgradeScreen, pick: pickScreen, ref: refScreen, crash: crashScreen, plinko: plinkoScreen, roulette: rouletteScreen, mines: minesScreen, tower: towerScreen, ladder: ladderScreen, tour: tourScreen, tasks: tasksScreen, profile: profileScreen, user: userScreen, soon };
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-  const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'market'].includes(t) ? t : 'soon');
+  const t = b.dataset.tab; go(['games', 'tour', 'tasks', 'profile', 'ref'].includes(t) ? t : 'soon');
 });
 save(); go('games'); autoIncome(); syncAccount();
