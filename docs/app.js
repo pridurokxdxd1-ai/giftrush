@@ -278,17 +278,17 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=74" alt=""><img class="gf g1" src="case_toxic.webp?v=74" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=75" alt=""><img class="gf g1" src="case_toxic.webp?v=75" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=74" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=74" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=75" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=75" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=74" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=75" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -311,7 +311,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=74" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=75" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -347,7 +347,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=74" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=75" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -540,7 +540,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=74';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=75';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -737,8 +737,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0;
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=74`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=74" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=75`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=75" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -1581,6 +1581,17 @@ const apiErr = (d, e) => e ? 'Сервер недоступен. Вставь н
 let syncing = false, lastPushed = -1, taskPaint = null, lastTasksSent = '';
 const invSummary = () => { const o = {}; state.inv.forEach(g => { o[g.n] = (o[g.n] || 0) + 1; }); return o; };
 const pinNames = () => cleanPins().map(id => { const g = invGift(id); return g ? g.n : null; }).filter(Boolean);
+/* ---------- блокировка ---------- */
+let banEl = null;
+function showBan(on) {
+  try { if (on) localStorage.setItem('gr5_ban', '1'); else localStorage.removeItem('gr5_ban'); } catch (e) {}
+  if (!on) { if (banEl) { banEl.remove(); banEl = null; } return; }
+  if (banEl) return;
+  banEl = document.createElement('div'); banEl.id = 'banned';
+  banEl.innerHTML = '<div><b>🚫</b><h2>Вы заблокированы</h2><p>Администратор ограничил вам доступ к GiftRush.</p></div>';
+  document.body.appendChild(banEl);
+}
+try { if (localStorage.getItem('gr5_ban') === '1') setTimeout(() => showBan(true), 0); } catch (e) {}
 async function syncAccount() {
   if (syncing || !TGU || !INIT) return;
   syncing = true;
@@ -1588,7 +1599,10 @@ async function syncAccount() {
     let bal = Math.floor(state.balance);
     const tj = JSON.stringify(tasks), body = PULL ? { pull: 1, tasks: {} } : { bal, inv: invSummary(), pins: pinNames() };
     if (!PULL && tj !== lastTasksSent) body.tasks = tasks;   // задания шлём только когда они изменились (экономим чтение на сервере)
-    const d = await api('/api/sync', body); if (d && d.ok && body.tasks) lastTasksSent = tj;
+    const d = await api('/api/sync', body);
+    if (d && d.err === 'banned') { showBan(true); return; }
+    if (d && d.ok && banEl) showBan(false);
+    if (d && d.ok && body.tasks) lastTasksSent = tj;
     if (d && d.ok) {
       let ch = false;
       const pulled = PULL && d.pull;
@@ -1605,6 +1619,12 @@ async function syncAccount() {
         save(); lastPushed = Math.floor(state.balance); lastTasksSent = ''; if (d.welcome > 0) toast(`🎁 Приветственный бонус: ${fmt(d.welcome)} ⭐`);
         { const sc = document.querySelector('.screen'), sm = sc && sc.dataset.mode; if (sm === 'profile' || sm === 'cases' || sm === 'ref') go(sm); }
         return;
+      }
+      if (d.rmg && !pulled) {                          // админ удалил подарки — убираем у себя (сначала незакреплённые)
+        const pinned = new Set(cleanPins()); let cnt = 0;
+        Object.keys(d.rmg).forEach(n => { let k = Number(d.rmg[n]) || 0; const mine = state.inv.filter(g => g.n === n).sort((a, b) => pinned.has(a.id) - pinned.has(b.id));
+          mine.slice(0, k).forEach(g => { state.inv = state.inv.filter(x => x.id !== g.id); cnt++; }); });
+        if (cnt) { cleanPins(); ch = true; toast('Администратор удалил подарки из инвентаря'); }
       }
       if (d.gifts && d.gifts.length) { d.gifts.forEach(n => { if (BY[n]) { addGift(n); toast(`🎁 Награда за друга: ${n}`); } }); ch = true; }
       if (d.welcome > 0) { state.balance += d.welcome; ch = true; toast(`🎁 Приветственный бонус: ${fmt(d.welcome)} ⭐`); }
@@ -1807,11 +1827,35 @@ function userScreen(el, d) {
     <div class="invhd"><h3>Инвентарь</h3><span>${cnt} шт · ⭐ ${fmt(total)}</span></div><div class="inv" id="inv"></div>`);
   const av = $('#pfav'), fb = () => { av.innerHTML = `<span>${esc(ini)}</span>`; };
   if (d.photo) { const im = new Image(); im.alt = ''; im.referrerPolicy = 'no-referrer'; im.onerror = fb; im.src = d.photo; av.append(im); } else fb();
-  const inv = $('#inv');
+  const inv = $('#inv'), adm = TGU && TGU.id === ADMIN_ID && String(d.id) !== String(ADMIN_ID);
+  if (adm) {
+    el.querySelector('.invhd').insertAdjacentHTML('beforebegin', `<button class="btn ban-btn${d.ban ? ' un' : ''}" id="banBtn">${d.ban ? '✅ Разбанить игрока' : '🚫 Забанить игрока'}</button>`);
+    $('#banBtn').onclick = () => {
+      const on = !d.ban, m = modal(`<div class="g-n" style="margin-top:4px">${on ? 'Забанить игрока?' : 'Разбанить игрока?'}</div><div class="g-p">${esc(name)} · ID ${esc(d.id)}</div>
+        <div class="wd-msg" style="opacity:1;animation:none">${on ? 'Он не сможет пользоваться ботом: при входе увидит экран блокировки, пропадёт из лидерборда.' : 'Доступ к боту будет восстановлен.'}</div>
+        <div class="g-act"><button class="btn" id="bno">Отмена</button><button class="btn ${on ? 'red' : 'green'}" id="byes">${on ? 'Забанить' : 'Разбанить'}</button></div>`);
+      $('#bno', m.el).onclick = () => m.close();
+      $('#byes', m.el).onclick = async () => {
+        try { const r = await api('/api/ban', { to: String(d.id), on }); if (r && r.ok) { d.ban = on; m.close(); toast(on ? '🚫 Игрок забанен' : '✅ Игрок разбанен'); notify('success'); go('user', d); } else toast(apiErr(r)); }
+        catch (e) { toast('Нет связи'); }
+      };
+    };
+  }
   if (!rows.length) { inv.innerHTML = '<div class="empty"><b>🎁</b>Инвентарь пуст или ещё не синхронизирован</div>'; return; }
   rows.forEach((o, i) => {
     const b = document.createElement('div'); b.className = 'tile'; b.style.setProperty('--c', o.it.c); b.style.animationDelay = Math.min(i, 12) * 30 + 'ms';
-    b.innerHTML = `<b>${ico(o.it)}</b><small>⭐ ${fmt(o.it.p)}</small>${o.n > 1 ? `<i class="cnt">×${o.n}</i>` : ''}`; inv.append(b);
+    b.innerHTML = `<b>${ico(o.it)}</b><small>⭐ ${fmt(o.it.p)}</small>${o.n > 1 ? `<i class="cnt">×${o.n}</i>` : ''}${adm ? '<button class="rmx" aria-label="Удалить">✕</button>' : ''}`; inv.append(b);
+    if (adm) $('.rmx', b).onclick = e => {
+      e.stopPropagation();
+      const m = modal(`<div style="text-align:center"><div class="mk-big" style="margin:0 auto">${ico(o.it)}</div><h3 style="margin:8px 0 2px">${esc(o.it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Удалить у ${esc(name)}${o.n > 1 ? ` (есть ×${o.n})` : ''}?</div>
+        <div class="g-act" style="grid-template-columns:1fr"><button class="btn red" id="rm1">Удалить 1 шт</button>${o.n > 1 ? `<button class="btn red" id="rmA">Удалить все ×${o.n}</button>` : ''}<button class="btn" id="rmN">Отмена</button></div></div>`);
+      const del = async cnt => {
+        try { const r = await api('/api/rmgift', { to: String(d.id), name: o.it.n, count: cnt });
+          if (r && r.ok) { d.inv = r.inv || {}; m.close(); toast(`🗑 Удалено: ${o.it.n} ×${r.removed}`); notify('success'); go('user', d); } else toast(r && r.err === 'none' ? 'У игрока уже нет такого подарка' : apiErr(r)); }
+        catch (x) { toast('Нет связи'); }
+      };
+      $('#rm1', m.el).onclick = () => del(1); const a = $('#rmA', m.el); if (a) a.onclick = () => del(o.n); $('#rmN', m.el).onclick = () => m.close();
+    };
   });
 }
 function profileScreen(el) {
@@ -1914,7 +1958,7 @@ function refScreen(el) {
     $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
     $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
       const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
-      const body = it ? `<img src="${it.img}?v=74" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      const body = it ? `<img src="${it.img}?v=75" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
       return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
     }).join('');
     $('#rfFill', el).style.width = (done / 5 * 100) + '%';

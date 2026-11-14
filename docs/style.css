@@ -902,3 +902,13 @@ html.lite .ring::before{animation:none}
 .rf-row em{font-style:normal;font:900 10px var(--disp);padding:4px 9px;border-radius:99px}.rf-row em.ok{background:#3ee48f22;color:#3ee48f}.rf-row em.no{background:#e8485f22;color:#ff6a7a}
 .screen[data-mode=ref]{--ac:#a06bf0}
 html.lite .rf-n.next .rf-ic,html.lite .rf-warn{animation:none}
+
+/* ===== админ: удаление подарков, бан ===== */
+.ban-btn{background:linear-gradient(180deg,#e8485f,#b02439)!important;margin:14px 0 4px;box-shadow:0 4px 0 #6d1220,0 0 18px #e8485f44!important}
+.ban-btn.un{background:linear-gradient(180deg,#3ee48f,#2fbf7c)!important;box-shadow:0 4px 0 #0b5a30!important;color:#06251d}
+.btn.red{background:linear-gradient(180deg,#e8485f,#b02439);box-shadow:0 3px 0 #6d1220}
+.tile .rmx{position:absolute;left:5px;top:5px;width:22px;height:22px;border-radius:50%;background:#e8485f;color:#fff;font:900 11px/22px var(--disp);text-align:center;box-shadow:0 2px 6px #000a;z-index:3}
+#banned{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#4a0f1a,#0b0508 70%);text-align:center;padding:30px}
+#banned b{font-size:72px;display:block;margin-bottom:10px;filter:drop-shadow(0 0 24px #e8485f)}
+#banned h2{font:900 22px var(--disp);color:#ff6a7a;margin-bottom:10px}
+#banned p{font:700 14px/1.5 var(--body);color:#d8b8bd;max-width:280px;margin:0 auto}
