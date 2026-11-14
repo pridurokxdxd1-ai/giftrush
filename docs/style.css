@@ -834,3 +834,25 @@ html.lite .ld-r.act .ld-t,html.lite .ld-me svg{animation:none}
 .btn.nftbtn .nft-t{text-align:center;line-height:1.25}
 .btn.nftbtn .nft-i{position:absolute;right:12px;top:50%;width:42px;height:42px;margin-top:-21px;object-fit:contain;filter:drop-shadow(0 3px 5px #0008);animation:nftpop .35s cubic-bezier(.2,.9,.3,1.5)}
 @keyframes nftpop{from{transform:scale(.5) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== лёгкий декор (v72): цветное свечение режима, акцент у заголовков, мелкие детали ===== */
+.screen{position:relative;isolation:isolate}
+.screen::before{content:"";position:absolute;left:-16px;right:-16px;top:-18px;height:320px;background:radial-gradient(ellipse 72% 100% at 50% 0,var(--ac,#3a63ff) 0,transparent 70%);opacity:.17;pointer-events:none;z-index:-1}
+.screen[data-mode=games]{--ac:#4a7bff}.screen[data-mode=cases],.screen[data-mode=case]{--ac:#f2a93e}
+.screen[data-mode=crash]{--ac:#7a5cff}.screen[data-mode=mines]{--ac:#27c9a0}.screen[data-mode=tower]{--ac:#ffb62e}
+.screen[data-mode=ladder]{--ac:#2fc4a0}.screen[data-mode=plinko]{--ac:#3aa0ff}.screen[data-mode=roulette]{--ac:#e8485f}
+.screen[data-mode=upgrade],.screen[data-mode=pick]{--ac:#2fbf7c}.screen[data-mode=market]{--ac:#a06bf0}
+.screen[data-mode=profile],.screen[data-mode=user]{--ac:#7c5ce0}.screen[data-mode=tour]{--ac:#ffc83d}.screen[data-mode=tasks]{--ac:#3ee48f}
+.ttl::after,.tour h2::after{content:"";display:block;width:24px;height:2px;margin:6px auto 0;border-radius:2px;background:var(--ac,#5b8def);box-shadow:0 0 10px var(--ac,#5b8def)}
+.hd{background:linear-gradient(90deg,#fff 30%,#a9bcff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{position:relative;overflow:hidden}
+.btn:not(:disabled)::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:40%;background:linear-gradient(100deg,transparent,#ffffff2e,transparent);transform:skewX(-18deg);animation:sheen 5s ease-in-out infinite;pointer-events:none}
+@keyframes sheen{0%,70%{left:-70%}100%{left:140%}}
+html.lite .btn::after{display:none}
+#nav button.on::after{content:"";position:absolute;left:50%;bottom:-6px;width:16px;height:3px;margin-left:-8px;border-radius:3px;background:#7fb0ff;box-shadow:0 0 8px #7fb0ff}
+.empty{background:#ffffff06;border:1px dashed #ffffff14;border-radius:16px}
+.mk-c,.task,.tw-box,.ld-box,.st-row{border-top-color:#ffffff24}
+.pf-av{box-shadow:0 0 0 7px #ffffff08,0 0 44px #6a7dff66}
+.ring::before{content:"";position:absolute;inset:-10px;border-radius:50%;border:1px dashed #ffffff22;animation:spin 48s linear infinite;pointer-events:none}
+html.lite .ring::before{animation:none}
+.odds{opacity:.85}
