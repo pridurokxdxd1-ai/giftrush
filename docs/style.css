@@ -998,3 +998,14 @@ html.lite .ring.ug-ring{filter:none}
 .ws-b button:active{transform:translateY(3px);box-shadow:none}
 .ws-cf{position:absolute;top:-10px;width:7px;height:12px;border-radius:2px;pointer-events:none;opacity:0;animation:wscf 2s linear infinite}
 @keyframes wscf{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),420px) rotate(var(--r))}}
+/* тёмно-синий градиентный фон: рулетка / tower / ladder */
+html body.bgb,html[data-theme] body.bgb{background:radial-gradient(520px 340px at 50% 18%,#1d3cae66 0,transparent 70%),linear-gradient(180deg,#112679 0%,#0a1a55 42%,#050c2c 100%) fixed,#050c2c}
+html[data-theme] body.bgb{background:radial-gradient(520px 340px at 50% 18%,#1d3cae66 0,transparent 70%),linear-gradient(180deg,#112679 0%,#0a1a55 42%,#050c2c 100%) fixed,#050c2c}
+body.bgb #app{background:none!important}
+/* рулетка: синяя подсветка колеса и новая стрелка */
+.rwheel{filter:drop-shadow(0 0 22px #3a7bffaa) drop-shadow(0 10px 22px #000a)}
+.rwheel::before{content:"";position:absolute;inset:-9%;border-radius:50%;background:radial-gradient(circle,#3a7bff55 52%,#3a7bff22 64%,transparent 72%);animation:rgl 3s ease-in-out infinite;pointer-events:none}
+@keyframes rgl{50%{opacity:.65;transform:scale(1.04)}}
+.rwheel canvas{box-shadow:0 0 0 3px #1c3fa8,0 0 34px #4d8dffcc,inset 0 0 20px #4d8dff55}
+.rptr{top:-20px;width:34px;height:46px;border:0;background:linear-gradient(180deg,#fff 0%,#cfe0ff 55%,#7fa8ff 100%);clip-path:polygon(50% 100%,6% 38%,6% 12%,16% 2%,84% 2%,94% 12%,94% 38%);filter:drop-shadow(0 0 8px #6aa0ff) drop-shadow(0 3px 5px #0009)}
+.rptr::after{content:"";position:absolute;left:50%;top:9px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#6ea0ff,#1c3fa8);box-shadow:inset 0 0 0 1.5px #fff}
