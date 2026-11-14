@@ -168,6 +168,12 @@ function sellGift(id) {
   const it = ITEM(state.inv[i].n); state.inv.splice(i, 1);
   state.balance += it.p; save(); bump(); return it.p;
 }
+const MAXBET = 10000;
+function crashPrize(w) {                                              // NFT, ближайший к сумме выигрыша (не дороже её)
+  if (!(w >= 450)) return null;
+  let best = 0; ITEMS.forEach(i => { if (!i.coin && i.p >= 450 && i.p <= w && i.p > best) best = i.p; });
+  const pool = ITEMS.filter(i => !i.coin && i.p === best); return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+}   // максимальная ставка во всех режимах
 function spend(n) {
   if (!(n > 0)) { toast('Введите ставку'); return false; }
   if (state.balance < n) { toast('Недостаточно ⭐'); notify('error'); return false; }
@@ -259,17 +265,17 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=69" alt=""><img class="gf g1" src="case_toxic.webp?v=69" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=70" alt=""><img class="gf g1" src="case_toxic.webp?v=70" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=69" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=69" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=70" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=70" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=69" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=70" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -292,7 +298,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=69" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=70" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -328,7 +334,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=69" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=70" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -413,7 +419,7 @@ const stakeOf = () => {
 const chanceOf = (S, w) => Math.min(UP_MAX, Math.max(0.01, (S / w.p) * 90));
 function upgradeScreen(el) {
   bar(el, 'UPGRADER');
-  up.bal = Math.min(Math.max(0, Math.floor(up.bal || 0)), Math.floor(state.balance));
+  up.bal = Math.min(Math.max(0, Math.floor(up.bal || 0)), Math.floor(state.balance), MAXBET);
   let { gs: mgs, its: mis, S } = stakeOf();
   let wi = up.want ? ITEM(up.want) : null;
   if (wi && wi.p <= S) { wi = null; up.want = null; }
@@ -440,7 +446,7 @@ function upgradeScreen(el) {
     rnum.textContent = chance ? (chance < 1 ? chance.toFixed(2) : chance.toFixed(1)) + '%' : '—'; rx.textContent = chance ? `x${wi.p / S >= 1000 ? fmt(Math.round(wi.p / S)) : (wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
     goB.textContent = !S ? 'Добавьте подарок или Rushcoin' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
   };
-  const setBal = v => { up.bal = Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.floor(state.balance)); paint(); };
+  const setBal = v => { up.bal = Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.floor(state.balance), MAXBET); paint(); };
   ubal.addEventListener('input', () => setBal(ubal.value));
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { setBal(Math.max(20, (up.bal || 20) * b.dataset.q)); ubal.value = up.bal || ''; });
   $('#umax').onclick = () => { setBal(state.balance); ubal.value = up.bal || ''; haptic(); };
@@ -474,7 +480,7 @@ function upgradeScreen(el) {
     notify(ok ? 'success' : 'error'); ok ? sfx.win() : sfx.lose();
     toast(ok ? `🎉 Успех! ${wi.n}` : '💥 Неудача, ставка сгорела');
     up.items = [];                                    // подарки-ставка использованы; желаемый предмет и сумма остаются
-    up.bal = Math.min(up.bal || 0, Math.floor(state.balance)); ubal.value = up.bal || '';
+    up.bal = Math.min(up.bal || 0, Math.floor(state.balance), MAXBET); ubal.value = up.bal || '';
     await sleep(1300);
     if (!el.isConnected) return;
     ring.classList.remove('win', 'lose'); hand.classList.remove('on'); hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)';
@@ -521,7 +527,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=69';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=70';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -622,7 +628,7 @@ function crashScreen(el) {
   cv.width = Math.max(10, cv.offsetWidth) * dpr; cv.height = Math.max(10, cv.offsetHeight) * dpr;
   const W = cv.width, H = cv.height;
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
-  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.min(MAXBET, Math.max(0, Math.floor(state.balance))); haptic(); } });
 
   const autoIn = $('#auto'), autoSw = $('#autoSw');
   let AU = store.get('gr2_auto', { on: false, v: 2 }); if (!AU || typeof AU !== 'object') AU = { on: false, v: 2 };
@@ -684,9 +690,11 @@ function crashScreen(el) {
       case 'unbet': bets.delete(m.uid); if (m.uid === G.me) myBet = 0; renderBets(); break;
       case 'refund': state.balance += m.amount; save(); break;
       case 'cash': { const b = bets.get(m.uid); if (b) b.mult = m.mult; renderBets(); break; }
-      case 'cash_ok':
-        state.balance += m.payout; save(); bump(); myCashed = true; myPayout = m.payout;
-        notify('success'); toast(`+${fmt(m.payout - myBet)} ⭐`); break;
+      case 'cash_ok': {
+        const pz = crashPrize(m.payout);                                 // от 450 ⭐ выигрыш выдаётся NFT-подарком (ближайшим по цене), остаток — монетами
+        if (pz) { addGift(pz.n); state.balance += m.payout - pz.p; } else state.balance += m.payout;
+        save(); bump(); myCashed = true; myPayout = m.payout;
+        notify('success'); toast(pz ? `🎁 ${pz.n}${m.payout - pz.p > 0 ? ' + ' + fmt(m.payout - pz.p) + ' ⭐' : ''}` : `+${fmt(m.payout - myBet)} ⭐`); if (pz) sfx.win(); break; }
       case 'online': setNet(!net || !net.local, m.n); break;
       case 'err':
         if (m.code === 'bet' && pending) { state.balance += pending; save(); pending = 0; }
@@ -720,7 +728,7 @@ function crashScreen(el) {
     if (G.phase === 'wait') {
       if (!myBet && !pending) {
         const v = Math.floor(Number(betIn.value));
-        if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); }
+        if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (v > MAXBET) { notify('error'); return toast('Максимальная ставка 10 000 ⭐'); }
         if (!spend(v)) return;
         pending = v; net.send({ t: 'bet', amount: v }); haptic('medium');
       } else if (myBet) toast('Ставку отменить нельзя');
@@ -1043,12 +1051,12 @@ function rouletteScreen(el) {
     if (pending[c]) return;
     if (Object.keys({ ...myBets, ...pending }).some(k => (myBets[k] || pending[k]) && rGroup(k) !== rGroup(c))) { notify('error'); return toast('Нельзя ставить и цвет, и чёт/нечет'); }
     const v = Math.floor(Number(amt.value));
-    if (!(v >= R_MIN)) { notify('error'); return toast(`Минимальная ставка ${R_MIN} ⭐`); }
+    if (!(v >= R_MIN)) { notify('error'); return toast(`Минимальная ставка ${R_MIN} ⭐`); } if (v > MAXBET) { notify('error'); return toast('Максимальная ставка 10 000 ⭐'); }
     if (!spend(v)) return;
     pending[c] = v; net.send({ t: 'bet', amount: v, color: c }); haptic('medium'); sfx.drop(); renderBets();
   });
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { amt.value = Math.max(R_MIN, Math.floor((Number(amt.value) || R_MIN) * b.dataset.q)); });
-  el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { amt.value = b.dataset.v === 'max' ? Math.max(0, Math.floor(state.balance)) : b.dataset.v; haptic(); });
+  el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { amt.value = b.dataset.v === 'max' ? Math.min(MAXBET, Math.max(0, Math.floor(state.balance))) : b.dataset.v; haptic(); });
 
   cleanup = () => {
     alive = false; cancelAnimationFrame(raf);
@@ -1103,7 +1111,7 @@ function plinkoScreen(el) {
   cv.width = W; cv.height = H;
   let alive = true, raf = 0, lastHap = 0, dirty = true;
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { betIn.value = Math.max(20, Math.floor((Number(betIn.value) || 20) * b.dataset.m)); });
-  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { betIn.value = Math.min(MAXBET, Math.max(0, Math.floor(state.balance))); haptic(); });
 
   /* геометрия */
   const COLS = PL_ROWS + 2, dx = W / (COLS + 1), PR = dx * .13, BR = dx * .2;
@@ -1214,7 +1222,7 @@ function plinkoScreen(el) {
   $('#drop').onclick = () => {
     if (balls.length >= 8) return toast('Слишком много шаров в игре');
     const v = Math.floor(Number(betIn.value));
-    if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); }
+    if (!(v >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (v > MAXBET) { notify('error'); return toast('Максимальная ставка 10 000 ⭐'); }
     if (!spend(v)) return;
     launch(v); haptic('medium'); sfx.drop();
   };
@@ -1233,7 +1241,7 @@ function minesScreen(el) {
     <div class="betrow"><input id="bet" type="number" inputmode="numeric" value="50" min="20"><button data-max>MAX</button></div>
     <button class="btn" id="go">Сделать ставку</button>`);
   const mg = $('#mg'), mx = $('#mx'), goB = $('#go'), betIn = $('#bet');
-  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.min(MAXBET, Math.max(0, Math.floor(state.balance))); haptic(); } });
   const mult = () => { let m = 1; const T = size * size; for (let i = 0; i < opened; i++) m *= (T - i) / (T - mcount - i); return m * MINE_EDGE; };
   const draw = () => {
     mg.style.gridTemplateColumns = `repeat(${size},1fr)`; mg.innerHTML = '';
@@ -1270,7 +1278,7 @@ function minesScreen(el) {
   };
   goB.onclick = () => {
     if (live) { opened ? cash() : toast('Откройте хотя бы одну ячейку'); return; }
-    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (!spend(bet)) return;
+    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (bet > MAXBET) { notify('error'); return toast('Максимальная ставка 10 000 ⭐'); } if (!spend(bet)) return;
     grid = Array(size * size).fill(0); let k = 0;
     while (k < mcount) { const r = Math.floor(Math.random() * grid.length); if (!grid[r]) { grid[r] = 1; k++; } }
     opened = 0; live = true; betIn.disabled = true; mx.textContent = '1.00x'; draw(); goB.className = 'btn green'; goB.textContent = 'Забрать';
@@ -1292,7 +1300,7 @@ function towerScreen(el) {
     <div class="odds">8 этажей · на каждом 3 плитки: 1 мина и 2 безопасные · забрать выигрыш можно после любого этажа</div>`);
   const box = $('#twb'), twx = $('#twx'), goB = $('#go'), betIn = $('#bet');
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(20, Math.floor(betIn.value * Number(b.dataset.m))); haptic(); } });
-  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.min(MAXBET, Math.max(0, Math.floor(state.balance))); haptic(); } });
   const curMult = () => row ? TW_MULT[row - 1] : 1;
   const draw = () => {
     box.innerHTML = '';
@@ -1331,7 +1339,7 @@ function towerScreen(el) {
   };
   goB.onclick = () => {
     if (live) { row ? cash() : toast('Поднимитесь хотя бы на один этаж'); return; }
-    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (!spend(bet)) return;
+    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (bet > MAXBET) { notify('error'); return toast('Максимальная ставка 10 000 ⭐'); } if (!spend(bet)) return;
     mines = Array.from({ length: TW_ROWS }, () => Math.floor(Math.random() * 3)); row = 0; live = true; betIn.disabled = true; twx.textContent = '1.00x';
     draw(); goB.className = 'btn green'; goB.textContent = 'Забрать'; sfx.drop();
   };
@@ -1360,7 +1368,7 @@ function ladderScreen(el) {
   const box = $('#ldb'), ldx = $('#ldx'), goB = $('#go'), betIn = $('#bet');
   const T = []; const later = (f, ms) => { const t = setTimeout(() => { if (alive) f(); }, ms); T.push(t); };
   el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(20, Math.floor(betIn.value * Number(b.dataset.m))); haptic(); } });
-  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.max(0, Math.floor(state.balance)); haptic(); } });
+  el.querySelectorAll('[data-max]').forEach(b => b.onclick = () => { if (!betIn.disabled) { betIn.value = Math.min(MAXBET, Math.max(0, Math.floor(state.balance))); haptic(); } });
   const curMult = () => row ? mult[row - 1] : 1;
   const fm = m => m >= 1000 ? (m / 1000).toFixed(m >= 10000 ? 0 : 1).replace('.0', '') + 'k' : m.toFixed(2);
   const draw = () => {
@@ -1432,7 +1440,7 @@ function ladderScreen(el) {
   goB.onclick = () => {
     if (busy) return;
     if (live) { row ? cash() : toast('Поднимитесь хотя бы на один этаж'); return; }
-    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (!spend(bet)) return;
+    bet = Math.floor(Number(betIn.value)); if (!(bet >= 20)) { notify('error'); return toast('Минимальная ставка 20 ⭐'); } if (bet > MAXBET) { notify('error'); return toast('Максимальная ставка 10 000 ⭐'); } if (!spend(bet)) return;
     row = 0; live = true; betIn.disabled = true; ldx.textContent = '1.00x'; el.querySelectorAll('[data-n]').forEach(b => b.disabled = true);
     draw(); goB.className = 'btn green'; goB.textContent = 'Забрать'; sfx.drop();
   };
@@ -1838,12 +1846,12 @@ function openGift(g) {
 function marketScreen(el) {
   const list = ITEMS.filter(i => !i.coin && !['Bear', 'Champagne', 'Cup', 'Heart'].includes(i.n)).slice().sort((a, b) => a.p - b.p);
   el.innerHTML = `<div class="tour"><h2>Маркет</h2></div><div class="mk-sub">Покупайте NFT-подарки за Rushcoin — они попадут в ваш профиль</div>
-    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=69" alt="" draggable="false" decoding="async" loading="lazy"></div>
+    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=70" alt="" draggable="false" decoding="async" loading="lazy"></div>
       <div class="mk-n">${esc(it.n)}</div><button class="mk-b" data-n="${esc(it.n)}"><i class="rc"></i>${fmt(it.p)}</button></div>`).join('')}</div>`;
   el.querySelectorAll('.mk-b').forEach(b => b.onclick = () => {
     const it = ITEM(b.dataset.n); if (!it) return;
     if (state.balance < it.p) { notify('error'); return toast('Не хватает Rushcoin'); }
-    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=69" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
+    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=70" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
       <div class="g-act"><button class="btn" id="mkno" style="background:#2a3350">Отмена</button><button class="btn green" id="mkyes">Купить</button></div></div>`);
     $('#mkno', m.el).onclick = () => m.close();
     $('#mkyes', m.el).onclick = () => {
