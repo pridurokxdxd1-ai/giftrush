@@ -255,28 +255,28 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=66" alt=""><img class="gf g1" src="case_toxic.webp?v=66" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=67" alt=""><img class="gf g1" src="case_toxic.webp?v=67" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=66" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=66" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=67" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=67" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
-    ladder: '<div class="art a-ld"><div><i></i><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i><i></i></div></div>',
+    ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=66" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=67" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
     ${T('upgrade', 'wide t-up', 'UPGRADER')}
     <div class="row2">${T('roulette', 'sq t-roul', 'ROULETTE', LIVE_BADGE)}${T('plinko', 'sq t-plk', 'PLINKO', '<span class="new">NEW</span>')}</div>
     ${T('tower', 'wide t-tw', 'TOWER')}
-    ${T('ladder', 'wide t-ld', 'LADDER', '<span class="new">NEW</span>')}
+    <div class="row2">${T('ladder', 'sq t-ld', 'LADDER', '<span class="new">NEW</span>')}<div class="tile sq t-soon"><span>?</span><em>СКОРО</em></div></div>
   </div>`;
   const rk = $('#hrkt'); loadRocket();
   if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; }, 33); cleanup = () => clearInterval(tm); }
-  el.querySelectorAll('.tile').forEach((b, i) => {
+  el.querySelectorAll('.tile[data-id]').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
     b.onclick = () => go(b.dataset.id);
   });
@@ -288,7 +288,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=66" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=67" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -324,7 +324,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=66" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=67" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -517,7 +517,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=66';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=67';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1363,7 +1363,7 @@ function ladderScreen(el) {
     box.innerHTML = '';
     for (let r = mult.length - 1; r >= 0; r--) {
       const d = document.createElement('div'); d.className = 'ld-r'; d.dataset.r = r;
-      d.innerHTML = `<span class="ld-m">x${fm(mult[r])}</span><div class="ld-c">${Array.from({ length: LD_COLS }, (_, c) => `<button class="ld-t" data-c="${c}"></button>`).join('')}</div>`;
+      d.innerHTML = `<span class="ld-m">x${fm(mult[r])}</span><div class="ld-c">${Array.from({ length: LD_COLS }, (_, c) => `<button class="ld-t" data-c="${c}" style="--i:${c}"></button>`).join('')}</div>`;
       box.append(d);
     }
     box.insertAdjacentHTML('beforeend', '<div class="ld-start"><span>СТАРТ</span></div><div class="ld-me" id="ldme">' + LD_MAN + '</div>');
@@ -1379,31 +1379,48 @@ function ladderScreen(el) {
     m.style.transform = `translate(${x - 13}px,${y - 30}px)`;
     if (walk) { m.classList.add('walk'); later(() => m.classList.remove('walk'), 480); }
   };
+  const popAt = (cell, txt, cls) => {                              // всплывающая надпись над ячейкой
+    const b = box.getBoundingClientRect(), r = cell.getBoundingClientRect(), e = document.createElement('span');
+    e.className = 'ld-pop ' + (cls || ''); e.textContent = txt; e.style.left = (r.left - b.left + r.width / 2) + 'px'; e.style.top = (r.top - b.top) + 'px';
+    box.append(e); later(() => e.remove(), 1100);
+  };
+  const sparks = () => {                                           // салют при выигрыше
+    const b = box.getBoundingClientRect(), x = b.width / 2, y = b.height * .45;
+    for (let i = 0; i < 18; i++) {
+      const e = document.createElement('i'), a = Math.random() * 6.283, d = 60 + Math.random() * 110;
+      e.className = 'ld-sp'; e.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d - 30}px;background:${['#ffd23f', '#3ee48f', '#7af0d0', '#fff', '#ff9d2e'][i % 5]}`;
+      box.append(e); later(() => e.remove(), 1000);
+    }
+    box.classList.add('win'); later(() => box.classList.remove('win'), 900);
+  };
   const end = won => {
     live = false; busy = false; betIn.disabled = false; goB.className = 'btn'; goB.textContent = 'Сделать ставку'; mark();
     el.querySelectorAll('[data-n]').forEach(b => b.disabled = false);
     if (!won) { box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
   };
   const cash = () => {
-    const w = Math.floor(bet * curMult()); state.balance += w; save(); bump(); toast(`+${fmt(w - bet)} ⭐`); notify('success'); (row >= mult.length ? sfx.win : sfx.cash)(); end(true);
+    const w = Math.floor(bet * curMult()); state.balance += w; save(); bump(); toast(`+${fmt(w - bet)} ⭐`); notify('success'); (row >= mult.length ? sfx.win : sfx.cash)(); sparks(); end(true);
   };
   box.onclick = e => {
     const t = e.target.closest('.ld-t'); if (!t || !live || busy) return;
     const d = t.closest('.ld-r'); if (+d.dataset.r !== row) return;
     const c = +t.dataset.c, cells = [...d.querySelectorAll('.ld-t')];
-    busy = true; haptic(); sfx.tick(.8); t.classList.add('mine'); place(t, true);
+    busy = true; haptic(); sfx.tick(.8); t.classList.add('mine'); place(t, true); later(() => me().classList.add('land'), 470); later(() => me().classList.remove('land'), 760);
     const cols = Array.from({ length: LD_COLS }, (_, i) => i); for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
     const rocks = cols.slice(0, n), hit = rocks.includes(c);          // n разных камней падают в случайные ячейки этого этажа
+    later(() => { rocks.forEach(rc => cells[rc].classList.add('warn')); sfx.tick(1.3); }, 520);      // сначала подсвечиваем, куда упадут камни
+    const T0 = 980;
     rocks.forEach((rc, k) => later(() => {
-      const cell = cells[rc]; cell.insertAdjacentHTML('beforeend', LD_ROCK); cell.classList.add('rocked'); sfx.peg(.7 + k * .08);
-      if (rc === c && hit) { cell.classList.add('crush'); me().classList.add('dead'); notify('error'); sfx.boom(); }
-    }, 560 + k * 110));
+      const cell = cells[rc]; cell.classList.remove('warn'); cell.insertAdjacentHTML('beforeend', LD_ROCK); cell.classList.add('rocked');
+      later(() => { cell.classList.add('imp'); sfx.peg(.7 + k * .08); box.classList.remove('thud'); void box.offsetWidth; box.classList.add('thud'); }, 300);
+      if (rc === c && hit) later(() => { cell.classList.add('crush'); me().classList.add('dead'); box.classList.add('hurt'); later(() => box.classList.remove('hurt'), 700); notify('error'); sfx.boom(); }, 300);
+    }, T0 + k * 120));
     later(() => {
       if (hit) { toast('🪨 Камень!'); return end(false); }
-      t.classList.add('safe'); sfx.gem(row); row++; busy = false; ldx.textContent = curMult().toFixed(2) + 'x';
+      t.classList.add('safe'); sfx.gem(row); popAt(t, 'x' + fm(mult[row]), 'up'); row++; busy = false; ldx.textContent = curMult().toFixed(2) + 'x'; ldx.classList.remove('pop'); void ldx.offsetWidth; ldx.classList.add('pop');
       goB.textContent = `Забрать ⭐ ${fmt(bet * curMult())}`; mark();
       if (row >= mult.length) later(() => { if (live) cash(); }, 500);
-    }, 560 + n * 110 + 380);
+    }, T0 + n * 120 + 700);
   };
   el.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
     if (live) return; n = +b.dataset.n; mult = ladderMults(n); row = 0;
@@ -1785,12 +1802,12 @@ function openGift(g) {
 function marketScreen(el) {
   const list = ITEMS.filter(i => !i.coin).slice().sort((a, b) => a.p - b.p);
   el.innerHTML = `<div class="tour"><h2>Маркет</h2></div><div class="mk-sub">Покупайте NFT-подарки за Rushcoin — они попадут в ваш профиль</div>
-    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=66" alt="" draggable="false" decoding="async" loading="lazy"></div>
+    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=67" alt="" draggable="false" decoding="async" loading="lazy"></div>
       <div class="mk-n">${esc(it.n)}</div><button class="mk-b" data-n="${esc(it.n)}"><i class="rc"></i>${fmt(it.p)}</button></div>`).join('')}</div>`;
   el.querySelectorAll('.mk-b').forEach(b => b.onclick = () => {
     const it = ITEM(b.dataset.n); if (!it) return;
     if (state.balance < it.p) { notify('error'); return toast('Не хватает Rushcoin'); }
-    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=66" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
+    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=67" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
       <div class="g-act"><button class="btn" id="mkno" style="background:#2a3350">Отмена</button><button class="btn green" id="mkyes">Купить</button></div></div>`);
     $('#mkno', m.el).onclick = () => m.close();
     $('#mkyes', m.el).onclick = () => {
