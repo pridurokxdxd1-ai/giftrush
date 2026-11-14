@@ -279,17 +279,17 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=76" alt=""><img class="gf g1" src="case_toxic.webp?v=76" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=78" alt=""><img class="gf g1" src="case_toxic.webp?v=78" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=76" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=76" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=78" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=78" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=76" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=78" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -312,7 +312,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=76" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=78" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -348,7 +348,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=76" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=78" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -437,32 +437,55 @@ function upgradeScreen(el) {
   let { gs: mgs, its: mis, S } = stakeOf();
   let wi = up.want ? ITEM(up.want) : null;
   if (wi && wi.p <= S) { wi = null; up.want = null; }
-  const slot = i => i ? `${ico(i)}<small>⭐ ${fmt(i.p)}</small>` : '<small>＋ Добавить</small>';
-  const mslot = its => its.length ? `<span class="mi">${its.slice(0, 4).map(i => ico(i)).join('')}</span><small>${its.length} шт · ⭐ ${fmt(its.reduce((t, i) => t + i.p, 0))}</small>` : '<small>＋ Добавить подарки</small>';
-  el.insertAdjacentHTML('beforeend', `<p class="sub">Ставьте подарок и/или Rushcoin. Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
-    <div class="slot"><h4>Ваши подарки (до 3)</h4><button class="pick ${mis.length ? 'has' : ''}" id="mine">${mslot(mis)}</button></div>
-    <div class="slot"><h4>Добавить Rushcoin</h4><div class="betrow" style="margin:0"><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div>
-    <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#2a2c33" stroke-width="9"/>
-      <defs><linearGradient id="ug" gradientUnits="userSpaceOnUse" x1="94" y1="0" x2="6" y2="0"><stop offset="0" stop-color="#c6ff4a"/><stop offset=".5" stop-color="#6fe66a"/><stop offset="1" stop-color="#0fae52"/></linearGradient></defs><circle id="rarc" cx="50" cy="50" r="44" fill="none" stroke="url(#ug)" stroke-width="9" stroke-dasharray="0 276.46" style="transition:stroke-dasharray .4s var(--ease)"/></svg>
-      <div class="hand" id="hand"><i class="head"></i></div><div class="num"><b id="rnum">—</b><small id="rx"></small></div></div>
-    <div class="slot"><h4>Желаемый подарок</h4><button class="pick" id="want"></button></div>
-    <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>`);
+  const CH = '<svg viewBox="0 0 24 24" class="ugc"><path class="c1" d="M5 11.5l7-7 7 7" /><path class="c2" d="M5 19l7-7 7 7"/></svg>';
+  const ticks = Array.from({ length: 60 }, (_, i) => { const a = i * 6 * Math.PI / 180, r1 = i % 5 ? 46.2 : 45, r2 = 47.8; return `<line x1="${50 + r1 * Math.cos(a)}" y1="${50 + r1 * Math.sin(a)}" x2="${50 + r2 * Math.cos(a)}" y2="${50 + r2 * Math.sin(a)}"/>`; }).join('');
+  el.insertAdjacentHTML('beforeend', `<div class="ug">
+    <div class="ug-tools">${TURBO_BTN}<span>Быстрый апгрейд</span></div>
+    <div class="ring ug-ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="ug" gradientUnits="userSpaceOnUse" x1="10" y1="90" x2="90" y2="10"><stop offset="0" stop-color="#3ee4c7"/><stop offset=".55" stop-color="#4a8bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+      <g stroke="#7f9cff" stroke-opacity=".28" stroke-width=".4">${ticks}</g>
+      <circle cx="50" cy="50" r="43.4" fill="none" stroke="#5b8def" stroke-opacity=".35" stroke-width=".35" style="stroke:#5b8def"/>
+      <circle cx="50" cy="50" r="38" fill="none" style="stroke:#161d2f" stroke-width="9"/>
+      <circle id="rarc" cx="50" cy="50" r="38" fill="none" stroke="url(#ug)" stroke-width="9" stroke-linecap="butt" stroke-dasharray="0 238.76" style="transition:stroke-dasharray .45s var(--ease)"/>
+      <circle cx="50" cy="50" r="29" style="fill:#0d1220;stroke:#ffffff14" stroke-width=".5"/></svg>
+      <div class="ug-chev">${CH}</div>
+      <div class="hand" id="hand"><i class="head"></i></div><div class="num"><b id="rnum"></b><small id="rx"></small></div></div>
+    <div class="ug-cards">
+      <div class="ug-col"><button class="ug-card" id="mine"></button>
+        <div class="ug-money"><label>＋ Rushcoin к ставке</label><input id="ubal" type="number" inputmode="numeric" min="20" placeholder="0" value="${up.bal || ''}"><div class="ug-q"><button data-q="0.5">½</button><button data-q="2">×2</button><button id="umax">MAX</button></div></div></div>
+      <div class="ug-col"><button class="ug-card" id="want"></button>
+        <div class="ug-stat"><div><span>Шанс</span><b id="ugch">—</b></div><div><span>Множитель</span><b id="ugx">—</b></div></div></div>
+    </div>
+    <p class="sub" style="margin:14px 0 12px">Чем больше ставка, тем выше шанс (максимум ${UP_MAX}%)</p>
+    <button class="btn ug-go" id="go"></button></div>`);
   bindTurbo(el);
-  const ubal = $('#ubal'), rnum = $('#rnum'), rx = $('#rx'), goB = $('#go'), wantB = $('#want');
-  let chance = 0;
+  const ubal = $('#ubal'), rnum = $('#rnum'), rx = $('#rx'), goB = $('#go'), wantB = $('#want'), ringEl = $('.ring', el);
+  const CHV = '<svg viewBox="0 0 24 24" class="ugc"><path class="c1" d="M5 11.5l7-7 7 7"/><path class="c2" d="M5 19l7-7 7 7"/></svg>';
+  const mineHtml = its => its.length ? `<span class="mi">${its.slice(0, 3).map(i => ico(i)).join('')}</span><b>${its.length > 1 ? its.length + ' шт' : esc(its[0].n)}</b><small>⭐ ${fmt(its.reduce((t, i) => t + i.p, 0))}</small>` : `${CHV}<b>Твой предмет</b><small>выбрать из инвентаря</small>`;
+  const wantHtml = i => i ? `<span class="mi">${ico(i)}</span><b>${esc(i.n)}</b><small>⭐ ${fmt(i.p)}</small>` : `${CHV}<b>Что получить</b><small>выбрать цель</small>`;
+  let chance = 0, shownC = 0, tw = 0;
+  const fmtC = c => c ? (c < 1 ? c.toFixed(2) : c.toFixed(1)) + '%' : '';
+  const setPct = c => {                                     // проценты плавно «пересчитываются» к новому значению
+    cancelAnimationFrame(tw); const from = shownC, t0 = performance.now();
+    if (!c || !from || Math.abs(c - from) < .05) { shownC = c; rnum.textContent = fmtC(c); return; }
+    const step = now => { const k = Math.min(1, (now - t0) / 420), e = 1 - Math.pow(1 - k, 3); shownC = from + (c - from) * e; rnum.textContent = fmtC(k < 1 ? shownC : c); if (k < 1 && rnum.isConnected) tw = requestAnimationFrame(step); else shownC = c; };
+    tw = requestAnimationFrame(step);
+  };
+  let lastM = '', lastW = '';
   const paint = () => {
     ({ gs: mgs, its: mis, S } = stakeOf());
     if (wi && wi.p <= S) { wi = null; up.want = null; }
-    $('#mine').className = 'pick ' + (mis.length ? 'has' : ''); $('#mine').innerHTML = mslot(mis);
-    wantB.className = 'pick ' + (wi ? 'has' : ''); wantB.innerHTML = slot(wi);
+    { const h = mineHtml(mis); if (h !== lastM) { lastM = h; $('#mine').innerHTML = h; $('#mine').classList.remove('pop'); void $('#mine').offsetWidth; $('#mine').classList.add('pop'); } $('#mine').classList.toggle('has', !!mis.length); }
+    { const h = wantHtml(wi); if (h !== lastW) { lastW = h; wantB.innerHTML = h; wantB.classList.remove('pop'); void wantB.offsetWidth; wantB.classList.add('pop'); } wantB.classList.toggle('has', !!wi); }
     chance = S ? (wi ? chanceOf(S, wi) : 0) : 0;
-    $('#rarc').style.strokeDasharray = `${chance / 100 * 276.46} 276.46`;
-    rnum.textContent = chance ? (chance < 1 ? chance.toFixed(2) : chance.toFixed(1)) + '%' : '—'; rx.textContent = chance ? `x${wi.p / S >= 1000 ? fmt(Math.round(wi.p / S)) : (wi.p / S).toFixed(2)}` : (S ? `ставка ⭐ ${fmt(S)}` : '');
-    goB.textContent = !S ? 'Добавьте подарок или Rushcoin' : !wi ? 'Выбрать желаемый подарок' : 'Апгрейд';
+    $('#rarc').style.strokeDasharray = `${chance / 100 * 238.76} 238.76`;
+    const pc = chance ? (chance < 1 ? chance.toFixed(2) : chance.toFixed(1)) + '%' : '', xs = chance ? `x${wi.p / S >= 1000 ? fmt(Math.round(wi.p / S)) : (wi.p / S).toFixed(2)}` : '';
+    setPct(chance); rx.textContent = xs || (S ? `ставка ⭐ ${fmt(S)}` : ''); ringEl.classList.toggle('has', !!chance);
+    $('#ugch').textContent = pc || '—'; $('#ugx').textContent = xs || '—';
+    goB.innerHTML = !S ? 'Добавьте предмет или Rushcoin' : !wi ? 'Выберите, что получить' : `${CHV}<span>Улучшить</span>`; goB.classList.toggle('rdy', !!(S && wi));
   };
   const setBal = v => { up.bal = Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.floor(state.balance), MAXBET); paint(); };
   ubal.addEventListener('input', () => setBal(ubal.value));
-  el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { setBal(Math.max(20, (up.bal || 20) * b.dataset.q)); ubal.value = up.bal || ''; });
+  el.querySelectorAll('.ug-q [data-q]').forEach(b => b.onclick = () => { setBal(Math.max(20, (up.bal || 20) * b.dataset.q)); ubal.value = up.bal || ''; });
   $('#umax').onclick = () => { setBal(state.balance); ubal.value = up.bal || ''; haptic(); };
   $('#mine').onclick = () => go('pick', 'mine');
   wantB.onclick = () => S ? go('pick', 'want') : toast('Сначала добавьте подарок или Rushcoin');
@@ -487,9 +510,9 @@ function upgradeScreen(el) {
     const th = ok ? rnd(mg6, arc - mg6) : rnd(arc + 6, 354);
     hand.style.transition = 'none'; hand.style.transform = 'rotate(0deg)'; void hand.offsetWidth;
     const fast = isTurbo();
-    hand.style.willChange = 'transform'; hand.style.transition = fast ? 'transform 1.3s cubic-bezier(.25,.55,.35,1)' : 'transform 4.6s cubic-bezier(.25,.55,.35,1)'; hand.style.transform = `rotate(${360 * (fast ? 3 : 5) + th}deg)`;
+    hand.style.willChange = 'transform'; hand.style.transition = fast ? 'transform 1.5s cubic-bezier(.2,.7,.2,1)' : 'transform 5.2s cubic-bezier(.16,.72,.14,1)'; hand.style.transform = `rotate(${360 * (fast ? 3 : 5) + th}deg)`;
     ring.classList.add('spin'); try { tg.HapticFeedback.impactOccurred('medium'); } catch (e) {}
-    await sleep(fast ? 1450 : 4800);
+    await sleep(fast ? 1620 : 5350);
     hand.style.willChange = ''; ring.classList.remove('spin'); ring.classList.add(ok ? 'win' : 'lose'); if (ok) burst(ring);
     notify(ok ? 'success' : 'error'); ok ? sfx.win() : sfx.lose();
     toast(ok ? `🎉 Успех! ${wi.n}` : '💥 Неудача, ставка сгорела');
@@ -541,7 +564,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=76';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=78';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -738,8 +761,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0;
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=76`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=76" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=78`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=78" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -1959,7 +1982,7 @@ function refScreen(el) {
     $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
     $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
       const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
-      const body = it ? `<img src="${it.img}?v=76" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      const body = it ? `<img src="${it.img}?v=78" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
       return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
     }).join('');
     $('#rfFill', el).style.width = (done / 5 * 100) + '%';
