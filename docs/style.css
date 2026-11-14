@@ -970,3 +970,4 @@ html.lite .ring.ug-ring{filter:none}
 .ring.ug-ring.win #rarc{animation:ugwin .9s ease-out}
 @keyframes ugwin{0%{filter:drop-shadow(0 0 4px #4a8bffaa)}40%{filter:drop-shadow(0 0 16px #6effd0)}100%{filter:drop-shadow(0 0 5px #4a8bffaa)}}
 .ring.ug-ring .num b{transition:opacity .25s}
+.ring.ug-ring .hand{backface-visibility:hidden;transform:translateZ(0)}
