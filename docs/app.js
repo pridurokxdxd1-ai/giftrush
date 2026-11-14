@@ -310,12 +310,13 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 
 /* ---------- home ---------- */
 function home(el) {
-  const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
+  const MN = '<svg class="mn" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#1a0a12" stroke="#ff4d6d" stroke-width="1.6"/><circle cx="12" cy="12" r="1.8" fill="#ff4d6d"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="#ff4d6d" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  const cells = [MN, '', 'D', '', 'D', MN, 'D', '', MN].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=83" alt=""><img class="gf g1" src="case_toxic.webp?v=83" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=84" alt=""><img class="gf g1" src="case_toxic.webp?v=84" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="cgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b5cff" stop-opacity=".55"/><stop offset="1" stop-color="#8b5cff" stop-opacity="0"/></linearGradient><linearGradient id="cgl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5b7cff"/><stop offset="1" stop-color="#d9b8ff"/></linearGradient></defs><path class="cf" d="M0 58 C 30 56, 52 44, 100 4 L100 60 L0 60 Z" fill="url(#cgf)"/><path class="cl" d="M0 58 C 30 56, 52 44, 100 4" fill="none" stroke="url(#cgl)" stroke-width="2.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><i class="cdot"></i><em>x2.45</em><span class="rkt" id="hrkt"></span></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=83" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=83" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=84" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=84" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
@@ -323,7 +324,7 @@ function home(el) {
   };
   const SUB = { cases: 'NFT-подарки', crash: 'лови иксы', mines: 'до x24', upgrade: 'умножай подарки', roulette: 'до x12', plinko: 'до x11', tower: 'до x23', ladder: 'обходи камни' };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3><span class="sb">${SUB[id] || ''}</span>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=83" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=84" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -346,7 +347,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=83" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=84" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -382,7 +383,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=83" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=84" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -604,7 +605,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=83';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=84';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -801,8 +802,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0;
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=83`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=83" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=84`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=84" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -2023,7 +2024,7 @@ function refScreen(el) {
     $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
     $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
       const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
-      const body = it ? `<img src="${it.img}?v=83" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      const body = it ? `<img src="${it.img}?v=84" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
       return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
     }).join('');
     $('#rfFill', el).style.width = (done / 5 * 100) + '%';

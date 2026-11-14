@@ -1080,3 +1080,23 @@ html body.bgb,html[data-theme] body.bgb{background:radial-gradient(520px 340px a
 html[data-theme] .rwheel{filter:drop-shadow(0 0 22px color-mix(in srgb,var(--tgl) 70%,transparent)) drop-shadow(0 10px 22px #000a)}
 html[data-theme] .rwheel::before{background:radial-gradient(circle,color-mix(in srgb,var(--tgl) 33%,transparent) 52%,color-mix(in srgb,var(--tgl) 13%,transparent) 64%,transparent 72%)}
 html[data-theme] .rwheel canvas{box-shadow:0 0 0 3px var(--tb),0 0 34px color-mix(in srgb,var(--tgl) 80%,transparent),inset 0 0 20px color-mix(in srgb,var(--tgl) 33%,transparent)}
+/* mines banner fix */
+.hub .tile.t-mines .a-mines{position:absolute!important;inset:auto 18px 16px 18px!important;height:96px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px;padding:0!important}
+.hub .tile.t-mines .a-mines i{animation:none!important;transform:none!important;margin:0}
+.a-mines i .dia{width:60%;height:60%}
+.a-mines i .mn{width:78%;height:78%;filter:drop-shadow(0 0 5px #ff4d6d88)}
+/* ===== лёгкий неон по всему приложению ===== */
+.balance{box-shadow:0 0 0 1px #4d8dff33,0 0 16px #4d8dff22!important}
+.btn{box-shadow:0 6px 16px #0006,0 0 20px color-mix(in srgb,var(--ta,#5d90e6) 30%,transparent)!important}
+.btn.green{box-shadow:0 6px 16px #0006,0 0 20px #27d98044!important}.btn.red{box-shadow:0 6px 16px #0006,0 0 20px #ff3b5744!important}
+.chip.on{box-shadow:0 0 14px color-mix(in srgb,var(--ta,#5d90e6) 55%,transparent)!important}
+input:focus{outline:none;border-color:var(--ta,#5d90e6)!important;box-shadow:0 0 0 1px var(--ta,#5d90e6),0 0 16px color-mix(in srgb,var(--ta,#5d90e6) 35%,transparent)!important}
+.ttl,.hd{text-shadow:0 0 18px color-mix(in srgb,var(--ac,#5b8def) 55%,transparent)}
+.back{border-color:color-mix(in srgb,var(--ac,#5b8def) 35%,#ffffff1c)!important}
+#nav{border-top:1px solid #4d8dff26;box-shadow:0 -8px 24px #4d8dff0f}
+html[data-theme] #nav{border-top-color:color-mix(in srgb,var(--tgl) 30%,transparent);box-shadow:0 -8px 24px color-mix(in srgb,var(--tgl) 9%,transparent)}
+#nav button.on{box-shadow:0 0 16px color-mix(in srgb,var(--ta,#4d8dff) 35%,transparent)}
+.mcard,.ws-card{box-shadow:0 20px 60px #000a,0 0 30px color-mix(in srgb,var(--ta,#4d8dff) 18%,transparent)!important}
+.case,.t-card{border-color:color-mix(in srgb,var(--ta,#4d8dff) 22%,#ffffff1c)!important}
+.cell,.tw-t{border-color:#4d8dff22}
+.hub .tile.t-mines .a-mines{height:84px;inset:auto 22px 14px 22px!important;gap:5px}
