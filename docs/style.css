@@ -827,3 +827,5 @@ html.lite .ld-r.act .ld-t{animation:none}
 html.lite .ld-r.act .ld-t,html.lite .ld-me svg{animation:none}
 .hub .tile.t-soon span,.hub .tile.t-soon em{position:static!important;background:none!important;box-shadow:none!important;padding:0!important;transform:none!important;color:#ffffff40!important;text-align:center}
 .hub .tile.t-soon{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
+
+#fog{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:49}

@@ -72,6 +72,10 @@ const sfx = {
   tick(p = 1) { const c = audio(); if (!c) return; note(1500 * p, c.currentTime, .04, 'square', .05); },
   peg(p = 1) { const c = audio(); if (!c) return; note((700 + Math.random() * 500) * p, c.currentTime, .09, 'sine', .09); },
   drop() { const c = audio(); if (!c) return; const t = c.currentTime; note(900, t, .18, 'sine', .15, 300); },
+  hop() { const c = audio(); if (!c) return; const t = c.currentTime; note(380, t, .14, 'square', .05, 760); note(760, t + .2, .08, 'triangle', .07, 520); },
+  whoosh() { const c = audio(); if (!c) return; note(1200, c.currentTime, .3, 'sine', .06, 160); },
+  thud() { const c = audio(); if (!c) return; const t = c.currentTime; note(150, t, .18, 'triangle', .24, 55); note(95, t + .02, .14, 'sine', .2, 40); note(2200, t, .03, 'square', .04); },
+  squash() { const c = audio(); if (!c) return; const t = c.currentTime; note(280, t, .4, 'sawtooth', .1, 50); note(90, t + .05, .35, 'sine', .2, 35); },
   land(big) { const c = audio(); if (!c) return; const t = c.currentTime; note(big ? 660 : 300, t, .25, 'triangle', .2, big ? 990 : 200); if (big) note(1320, t + .08, .35, 'sine', .12); },
   win() { const c = audio(); if (!c) return; const t = c.currentTime; [523, 659, 784, 1047].forEach((f, i) => { note(f, t + i * .08, .5, 'triangle', .18); note(f * 2, t + i * .08, .3, 'sine', .05); }); },
   lose() { const c = audio(); if (!c) return; const t = c.currentTime; note(330, t, .3, 'sawtooth', .1, 200); note(220, t + .2, .5, 'sawtooth', .1, 110); },
@@ -255,17 +259,17 @@ function soon(el) { el.innerHTML = '<div class="soon"><b>🛠</b>В разраб
 function home(el) {
   const cells = ['💣', '', 'D', '', 'D', '💣', 'D', '', '💣'].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=68" alt=""><img class="gf g1" src="case_toxic.webp?v=68" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=69" alt=""><img class="gf g1" src="case_toxic.webp?v=69" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 90 C 32 88, 54 68, 88 16" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/></svg><span class="rkt" id="hrkt"></span><em>x2.45</em></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=68" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=68" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=69" alt=""></span><b>→</b><span class="u u3"><img src="g_swag.webp?v=69" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
     plinko: '<div class="art a-plk2"><svg class="plsvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="43" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="24" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="35" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="46" r="2" fill="#fff" opacity=".92"/><circle cx="22" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="36" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="50" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="64" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="78" cy="57" r="2" fill="#fff" opacity=".92"/><circle cx="15" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="29" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="43" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="57" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="71" cy="68" r="2" fill="#fff" opacity=".92"/><circle cx="85" cy="68" r="2" fill="#fff" opacity=".92"/><rect x="8.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><rect x="20.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="32.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="44.8" y="86" width="10.4" height="9" rx="3" fill="#3ee48f" opacity=".85"/><rect x="56.8" y="86" width="10.4" height="9" rx="3" fill="#ffc83d" opacity=".85"/><rect x="68.8" y="86" width="10.4" height="9" rx="3" fill="#ff8a4a" opacity=".85"/><rect x="80.8" y="86" width="10.4" height="9" rx="3" fill="#ff5a6e" opacity=".85"/><circle class="plb" cx="50" cy="8" r="3.4" fill="#fff6b0" stroke="#ffb800" stroke-width="1"/></svg></div>',
   };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=68" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=69" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -288,7 +292,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=68" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=69" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -324,7 +328,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=68" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=69" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -517,7 +521,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=68';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=69';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -1405,14 +1409,14 @@ function ladderScreen(el) {
     const t = e.target.closest('.ld-t'); if (!t || !live || busy) return;
     const d = t.closest('.ld-r'); if (+d.dataset.r !== row) return;
     const c = +t.dataset.c, cells = [...d.querySelectorAll('.ld-t')];
-    busy = true; haptic(); sfx.tick(.8); t.classList.add('mine'); place(t, true); later(() => me().classList.add('land'), 470); later(() => me().classList.remove('land'), 760);
+    busy = true; haptic(); sfx.hop(); t.classList.add('mine'); place(t, true); later(() => me().classList.add('land'), 470); later(() => me().classList.remove('land'), 760);
     const cols = Array.from({ length: LD_COLS }, (_, i) => i); for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
     const rocks = cols.slice(0, n), hit = rocks.includes(c);          // n разных камней падают в случайные ячейки этого этажа
     const T0 = 560;
     rocks.forEach((rc, k) => later(() => {
-      const cell = cells[rc]; cell.insertAdjacentHTML('beforeend', LD_ROCK); cell.classList.add('rocked');
-      later(() => { cell.classList.add('imp'); sfx.peg(.7 + k * .08); box.classList.remove('thud'); void box.offsetWidth; box.classList.add('thud'); }, 300);
-      if (rc === c && hit) later(() => { cell.classList.add('crush'); me().classList.add('dead'); box.classList.add('hurt'); later(() => box.classList.remove('hurt'), 700); notify('error'); sfx.boom(); }, 300);
+      const cell = cells[rc]; cell.insertAdjacentHTML('beforeend', LD_ROCK); cell.classList.add('rocked'); sfx.whoosh();
+      later(() => { cell.classList.add('imp'); sfx.thud(); sfx.peg(.9 + k * .1); box.classList.remove('thud'); void box.offsetWidth; box.classList.add('thud'); }, 300);
+      if (rc === c && hit) later(() => { cell.classList.add('crush'); me().classList.add('dead'); box.classList.add('hurt'); later(() => box.classList.remove('hurt'), 700); notify('error'); sfx.squash(); sfx.boom(); }, 300);
     }, T0 + k * 120));
     later(() => {
       if (hit) { toast('🪨 Камень!'); return end(false); }
@@ -1676,6 +1680,34 @@ function snowApply() {
   snowRaf = requestAnimationFrame(tick);
 }
 snowApply();
+/* ---------- туман ---------- */
+let FOG = false, FOGN = 50; try { FOG = localStorage.getItem('gr4_fog') === '1'; FOGN = Math.min(100, Math.max(10, Number(localStorage.getItem('gr4_fogn')) || FOGN)); } catch (e) {}
+let fogEl = null, fogRaf = 0;
+function fogApply() {
+  if (!FOG) { cancelAnimationFrame(fogRaf); fogRaf = 0; if (fogEl) { fogEl.remove(); fogEl = null; } return; }
+  if (fogEl) return;
+  const cv = fogEl = document.createElement('canvas'); cv.id = 'fog'; document.body.appendChild(cv);
+  const ctx = cv.getContext('2d'), dpr = 1;   // туман мягкий — разрешение можно не повышать
+  let W = 0, H = 0; const size = () => { W = cv.width = Math.round(innerWidth * dpr); H = cv.height = Math.round(innerHeight * dpr); };
+  size(); window.addEventListener('resize', size);
+  const spr = document.createElement('canvas'); spr.width = spr.height = 256; const sx = spr.getContext('2d'), g = sx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  g.addColorStop(0, 'rgba(214,224,242,1)'); g.addColorStop(.5, 'rgba(214,224,242,.45)'); g.addColorStop(1, 'rgba(214,224,242,0)'); sx.fillStyle = g; sx.fillRect(0, 0, 256, 256);
+  const blobs = Array.from({ length: 14 }, (_, i) => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: 150 + Math.random() * 170, v: (6 + Math.random() * 14) * (i % 2 ? 1 : -1), ph: Math.random() * 6.283, a: .6 + Math.random() * .4 }));
+  let last = performance.now();
+  const tick = now => {
+    if (!fogEl) return;
+    const dt = Math.min(.05, (now - last) / 1000); last = now; ctx.clearRect(0, 0, W, H);
+    const k = FOGN / 100, n = Math.max(3, Math.round(blobs.length * (.3 + .7 * k)));
+    for (let i = 0; i < n; i++) {
+      const b = blobs[i]; b.x += b.v * dt; b.ph += dt * .25; if (b.x > innerWidth + b.r) b.x = -b.r; if (b.x < -b.r) b.x = innerWidth + b.r;
+      ctx.globalAlpha = Math.min(.9, (.1 + .6 * k) * b.a * (.8 + .2 * Math.sin(b.ph)));
+      const r = b.r * (1 + .08 * Math.sin(b.ph * 1.3)); ctx.drawImage(spr, b.x - r, b.y + Math.sin(b.ph) * 14 - r, r * 2, r * 2);
+    }
+    fogRaf = requestAnimationFrame(tick);
+  };
+  fogRaf = requestAnimationFrame(tick);
+}
+fogApply();
 function openSettings() {
   const m = modal(`<div class="st"><h3>Настройки</h3>
     <h4>Цвет приложения</h4><div class="sw-row" id="thRow">${THEMES.map((t, i) => `<button class="th${i === themeIdx ? ' on' : ''}" data-i="${i}" aria-label="${t.n}" style="background:linear-gradient(135deg,${t.a},${t.b})"></button>`).join('')}</div>
@@ -1684,7 +1716,12 @@ function openSettings() {
     <div class="st-row" style="margin-top:10px"><span>Снег</span><button class="sw${SNOW ? ' on' : ''}" id="snowSw" aria-label="Снег"><i></i></button></div>
     <h4 style="margin-top:14px">Цвет снега</h4><div class="sw-row" id="snowCol">${SNOWCOLORS.map(c => `<button class="th${c === SNOWC ? ' on' : ''}" data-c="${c}" aria-label="Цвет снега" style="background:${c}"></button>`).join('')}</div>
     <div class="st-row" style="margin-top:14px"><span>Интенсивность</span><b id="snowNv" style="font:800 12px var(--disp);opacity:.7">${SNOWN}</b></div>
-    <input type="range" class="rng" id="snowN" min="10" max="160" step="2" value="${SNOWN}" aria-label="Интенсивность снега"></div>`);
+    <input type="range" class="rng" id="snowN" min="10" max="160" step="2" value="${SNOWN}" aria-label="Интенсивность снега">
+    <div class="st-row" style="margin-top:18px"><span>Туман</span><button class="sw${FOG ? ' on' : ''}" id="fogSw" aria-label="Туман"><i></i></button></div>
+    <div class="st-row" style="margin-top:14px"><span>Интенсивность тумана</span><b id="fogNv" style="font:800 12px var(--disp);opacity:.7">${FOGN}</b></div>
+    <input type="range" class="rng" id="fogN" min="10" max="100" step="2" value="${FOGN}" aria-label="Интенсивность тумана"></div>`);
+  $('#fogN', m.el).oninput = e => { FOGN = Number(e.target.value); $('#fogNv', m.el).textContent = FOGN; try { localStorage.setItem('gr4_fogn', FOGN); } catch (x) {} };
+  $('#fogSw', m.el).onclick = e => { FOG = !FOG; try { localStorage.setItem('gr4_fog', FOG ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', FOG); fogApply(); haptic(); };
   $('#snowCol', m.el).onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; SNOWC = b.dataset.c; try { localStorage.setItem('gr4_snowc', SNOWC); } catch (x) {} m.el.querySelectorAll('#snowCol .th').forEach(x => x.classList.toggle('on', x === b)); haptic(); };
   $('#snowN', m.el).oninput = e => { SNOWN = Number(e.target.value); $('#snowNv', m.el).textContent = SNOWN; try { localStorage.setItem('gr4_snown', SNOWN); } catch (x) {} if (snowFix) snowFix(); };
   $('#snowSw', m.el).onclick = e => { SNOW = !SNOW; try { localStorage.setItem('gr4_snow', SNOW ? '1' : '0'); } catch (x) {} e.currentTarget.classList.toggle('on', SNOW); snowApply(); haptic(); };
@@ -1799,14 +1836,14 @@ function openGift(g) {
 
 /* ---------- маркет ---------- */
 function marketScreen(el) {
-  const list = ITEMS.filter(i => !i.coin && !['Bear', 'Champagne', 'Cup'].includes(i.n)).slice().sort((a, b) => a.p - b.p);
+  const list = ITEMS.filter(i => !i.coin && !['Bear', 'Champagne', 'Cup', 'Heart'].includes(i.n)).slice().sort((a, b) => a.p - b.p);
   el.innerHTML = `<div class="tour"><h2>Маркет</h2></div><div class="mk-sub">Покупайте NFT-подарки за Rushcoin — они попадут в ваш профиль</div>
-    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=68" alt="" draggable="false" decoding="async" loading="lazy"></div>
+    <div class="grid2 mk-list">${list.map(it => `<div class="mk-c" style="--c:${it.c}"><div class="mk-im"><img src="${it.img}?v=69" alt="" draggable="false" decoding="async" loading="lazy"></div>
       <div class="mk-n">${esc(it.n)}</div><button class="mk-b" data-n="${esc(it.n)}"><i class="rc"></i>${fmt(it.p)}</button></div>`).join('')}</div>`;
   el.querySelectorAll('.mk-b').forEach(b => b.onclick = () => {
     const it = ITEM(b.dataset.n); if (!it) return;
     if (state.balance < it.p) { notify('error'); return toast('Не хватает Rushcoin'); }
-    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=68" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
+    const m = modal(`<div style="text-align:center"><img class="mk-big" src="${it.img}?v=69" alt=""><h3 style="margin:8px 0 2px">${esc(it.n)}</h3><div style="opacity:.7;margin-bottom:14px">Купить за <i class="rc"></i> ${fmt(it.p)}?</div>
       <div class="g-act"><button class="btn" id="mkno" style="background:#2a3350">Отмена</button><button class="btn green" id="mkyes">Купить</button></div></div>`);
     $('#mkno', m.el).onclick = () => m.close();
     $('#mkyes', m.el).onclick = () => {
