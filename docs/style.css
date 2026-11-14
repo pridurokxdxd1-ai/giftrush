@@ -747,3 +747,47 @@ html.lite .tw-r.act .tw-t{animation:none}
 .hub .tile.t-tw h3{left:22px;right:auto;top:26px;bottom:auto;text-align:left;font-size:30px;letter-spacing:1px}
 .hub .tile.t-tw .art.a-tw{inset:14px 18px 14px 52%!important;flex-direction:column;gap:5px}
 .hub .tile.t-tw .new{left:22px;right:auto;top:72px;bottom:auto}
+
+/* LADDER */
+.t-ld{background:linear-gradient(135deg,#0f2a3a,#0a1620)!important;border-color:#3ee4c744}
+.hub .tile.t-ld{text-align:left}
+.hub .tile.t-ld h3{left:22px;right:auto;top:26px;bottom:auto;text-align:left;font-size:30px;letter-spacing:1px}
+.hub .tile.t-ld .new{left:22px;right:auto;top:72px;bottom:auto}
+.a-ld{position:absolute!important;inset:14px 18px 14px 46%!important;display:flex;flex-direction:column;gap:6px;padding:0!important}
+.a-ld div{display:flex;gap:4px;flex:1}
+.a-ld i{flex:1;border-radius:99px;background:#ffffff2a;border:1px solid #ffffff14}
+.a-ld i.ok{background:linear-gradient(180deg,#7af0d0,#2fc4a0)}
+.a-ld i.stn{background:#8a93a8}
+.a-ld i.hl{background:#fff;animation:twp 1.4s infinite}
+.a-ld i.me{background:#ffb62e;box-shadow:0 0 10px #ffb62e99}
+.ld-box{position:relative;display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px 10px 54px;border-radius:22px;background:linear-gradient(180deg,#171b2c,#0d101c);border:1px solid #ffffff12;box-shadow:inset 0 0 40px #00000099,0 10px 26px #0007}
+.ld-r{display:flex;align-items:center;gap:8px;transition:opacity .25s}
+.ld-m{width:56px;flex:none;text-align:center;font:900 12px var(--disp);color:#8f9bb8;padding:6px 0;border-radius:10px;background:#ffffff0a}
+.ld-c{flex:1;display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.ld-t{position:relative;height:26px;border-radius:99px;border:1px solid #ffffff10;background:#2a2f44;box-shadow:0 2px 0 #0a0d1a;transition:background .2s,transform .12s}
+.ld-r.lock:not(.past){opacity:.5}
+.ld-r.act .ld-m{color:#111;background:linear-gradient(180deg,#7af0d0,#2fc4a0);box-shadow:0 0 14px #2fc4a088}
+.ld-r.act .ld-t{background:linear-gradient(180deg,#3a5bd8,#1f3aa8);border-color:#9fb4ff55;animation:twp 1.3s ease-in-out infinite}
+.ld-r.act .ld-t:active{transform:translateY(2px)}
+.ld-t.mine{animation:none!important;background:linear-gradient(180deg,#ffd23f,#e09a10)!important;border-color:#fff3b0}
+.ld-t.safe{background:linear-gradient(180deg,#3ee48f,#1fa860)!important;border-color:#b6ffd8}
+.ld-t.crush{background:linear-gradient(180deg,#ff5a6e,#a01428)!important;border-color:#ffb0b8}
+.ld-t .ldrock{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;pointer-events:none;z-index:3;animation:ldfall .38s cubic-bezier(.5,0,.9,.6) both}
+@keyframes ldfall{0%{transform:translateY(-150px) rotate(-120deg);opacity:0}25%{opacity:1}85%{transform:translateY(0) rotate(0)}100%{transform:translateY(0) rotate(0);opacity:1}}
+.ld-r.past .ld-m{color:#2fc4a0}
+.ld-start{position:absolute;left:78px;right:10px;bottom:12px;height:28px;border-radius:12px;border:2px dashed #ffffff22;display:grid;place-items:center;font:900 10px var(--disp);letter-spacing:2px;color:#ffffff44}
+.ld-me{position:absolute;left:0;top:0;width:26px;height:32px;z-index:5;pointer-events:none;transition:transform .45s cubic-bezier(.4,.1,.3,1);filter:drop-shadow(0 3px 3px #0009)}
+.ld-me svg{width:100%;height:100%;overflow:visible;transform-origin:50% 100%}
+.ld-me .lg{transform-box:fill-box;transform-origin:50% 0}
+.ld-me.walk svg{animation:ldbob .24s ease-in-out infinite}
+.ld-me.walk .l1{animation:ldleg .24s ease-in-out infinite alternate}.ld-me.walk .l2{animation:ldleg .24s ease-in-out infinite alternate-reverse}
+@keyframes ldbob{50%{transform:translateY(-3px)}}
+@keyframes ldleg{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}
+.ld-me.dead svg{transform:scaleY(.28);filter:hue-rotate(-30deg) saturate(1.4);transition:transform .15s}
+.ld-box.shake{animation:quake .45s}
+.ld-n{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.ld-n span{font:800 12px var(--disp);color:var(--mut);margin-right:4px}
+.ld-n button{flex:1;height:38px;border-radius:12px;border:1px solid #ffffff14;background:#ffffff0d;color:#cfd6ea;font:900 15px var(--disp)}
+.ld-n button.on{background:linear-gradient(180deg,#7af0d0,#2fc4a0);color:#06251d;border-color:transparent}
+.ld-n button:disabled{opacity:.5}
+html.lite .ld-r.act .ld-t{animation:none}
