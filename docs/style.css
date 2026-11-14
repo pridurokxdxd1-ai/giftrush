@@ -1100,3 +1100,7 @@ html[data-theme] #nav{border-top-color:color-mix(in srgb,var(--tgl) 30%,transpar
 .case,.t-card{border-color:color-mix(in srgb,var(--ta,#4d8dff) 22%,#ffffff1c)!important}
 .cell,.tw-t{border-color:#4d8dff22}
 .hub .tile.t-mines .a-mines{height:84px;inset:auto 22px 14px 22px!important;gap:5px}
+/* неоновые рамки игровых полей */
+.crash-box{border:1.5px solid #8b5cffcc!important;box-shadow:0 0 0 1px #8b5cff33,0 0 22px #8b5cff66,inset 0 0 26px #8b5cff2a!important}
+.pl-box{border:1.5px solid #22c7e8cc!important;border-radius:26px;box-shadow:0 0 0 1px #22c7e833,0 0 22px #22c7e866,inset 0 0 26px #22c7e82a!important}
+.mgrid{padding:10px;border:1.5px solid #2fd48acc;border-radius:26px;background:linear-gradient(180deg,#2fd48a0f,#2fd48a05);box-shadow:0 0 0 1px #2fd48a33,0 0 22px #2fd48a55,inset 0 0 26px #2fd48a22}
