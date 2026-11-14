@@ -829,3 +829,8 @@ html.lite .ld-r.act .ld-t,html.lite .ld-me svg{animation:none}
 .hub .tile.t-soon{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
 
 #fog{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:49}
+
+.btn.nftbtn{position:relative;padding:12px 64px;display:flex;align-items:center;justify-content:center;min-height:54px}
+.btn.nftbtn .nft-t{text-align:center;line-height:1.25}
+.btn.nftbtn .nft-i{position:absolute;right:12px;top:50%;width:42px;height:42px;margin-top:-21px;object-fit:contain;filter:drop-shadow(0 3px 5px #0008);animation:nftpop .35s cubic-bezier(.2,.9,.3,1.5)}
+@keyframes nftpop{from{transform:scale(.5) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
