@@ -1084,7 +1084,7 @@ html[data-theme] .rwheel canvas{box-shadow:0 0 0 3px var(--tb),0 0 34px color-mi
 .hub .tile.t-mines .a-mines{position:absolute!important;inset:auto 18px 16px 18px!important;height:96px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px;padding:0!important}
 .hub .tile.t-mines .a-mines i{animation:none!important;transform:none!important;margin:0}
 .a-mines i .dia{width:60%;height:60%}
-.a-mines i .mn{width:78%;height:78%;filter:drop-shadow(0 0 5px #ff4d6d88)}
+.a-mines i .mn{width:84%;height:84%;filter:drop-shadow(0 0 5px #ff4d6d66)}
 /* ===== лёгкий неон по всему приложению ===== */
 .balance{box-shadow:0 0 0 1px #4d8dff33,0 0 16px #4d8dff22!important}
 .btn{box-shadow:0 6px 16px #0006,0 0 20px color-mix(in srgb,var(--ta,#5d90e6) 30%,transparent)!important}
@@ -1104,3 +1104,24 @@ html[data-theme] #nav{border-top-color:color-mix(in srgb,var(--tgl) 30%,transpar
 .crash-box{border:1.5px solid #8b5cffcc!important;box-shadow:0 0 0 1px #8b5cff33,0 0 22px #8b5cff66,inset 0 0 26px #8b5cff2a!important}
 .pl-box{border:1.5px solid #22c7e8cc!important;border-radius:26px;box-shadow:0 0 0 1px #22c7e833,0 0 22px #22c7e866,inset 0 0 26px #22c7e82a!important}
 .mgrid{padding:10px;border:1.5px solid #2fd48acc;border-radius:26px;background:linear-gradient(180deg,#2fd48a0f,#2fd48a05);box-shadow:0 0 0 1px #2fd48a33,0 0 22px #2fd48a55,inset 0 0 26px #2fd48a22}
+/* crash: ставка подарком / Rushcoin */
+.stk{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stk-b{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;min-height:54px;padding:10px 12px;border-radius:18px;font-family:var(--disp);font-weight:800;font-size:15px;color:#d8dde8;border:1px solid #ffffff1c;transition:transform .15s,box-shadow .2s}
+.stk-b:active{transform:translateY(2px)}.stk-b:disabled{opacity:.5}
+.stk-g{background:linear-gradient(180deg,#141922,#0b0e14);box-shadow:0 4px 12px #0007,inset 0 1px 0 #ffffff12}
+.stk-g .stk-ic{width:22px;height:22px;color:#2f8bff;filter:drop-shadow(0 0 6px #2f8bff88)}
+.stk-g.has{border-color:#2f8bffaa;box-shadow:0 0 18px #2f8bff44,0 4px 12px #0007}
+.stk-g em{flex-basis:100%;font-style:normal;font-size:11px;font-weight:700;color:#9fc4ff;margin-top:-4px;text-align:center}
+.stk-g em:empty{display:none}
+.stk-r{background:linear-gradient(180deg,#1b8cff,#0b5fd6);color:#fff;border-color:#6fb2ff99;box-shadow:0 4px 14px #0b5fd688,0 0 22px #1b8cff55,inset 0 1px 0 #ffffff44}
+.stk-r .rc{width:22px;height:22px;margin:0}
+.stk-r em{flex-basis:100%;font-style:normal;font-size:11px;font-weight:700;color:#dff0ff;margin-top:-4px;text-align:center}.stk-r em:empty{display:none}.stk-r em .rc{width:12px;height:12px;vertical-align:-2px}.stk-g em .rc{width:12px;height:12px;vertical-align:-2px}
+.stk-in{width:100%;background:#07104a;border:1px solid #ffffff1c;border-radius:14px;padding:13px;color:#fff;font-family:var(--disp);font-weight:800;font-size:20px;text-align:center;outline:none;user-select:text;-webkit-user-select:text}
+.stk-q{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.stk-q button{flex:1 0 28%;padding:10px 0;border-radius:12px;background:linear-gradient(180deg,#222c42,#161c28);border:1px solid #ffffff1c;font-family:var(--disp);font-weight:800;font-size:12px}
+.stk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:46vh;overflow:auto;padding:2px}
+.stk-it{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:16px;background:#ffffff0c;border:1.5px solid #ffffff14;color:#fff}
+.stk-it .stk-art{width:62px;height:62px;display:grid;place-items:center}
+.stk-it .stk-art img,.stk-it .stk-art svg{max-width:100%;max-height:100%}
+.stk-it b{font-size:11px;font-family:var(--disp)}.stk-it small{font-size:11px;color:#9fb0ff}
+.stk-it.sel{border-color:#2f8bff;background:#2f8bff22;box-shadow:0 0 14px #2f8bff55}
