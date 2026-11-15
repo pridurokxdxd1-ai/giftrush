@@ -72,6 +72,19 @@ const sfx = {
   tick(p = 1) { const c = audio(); if (!c) return; note(1500 * p, c.currentTime, .04, 'square', .05); },
   peg(p = 1) { const c = audio(); if (!c) return; note((700 + Math.random() * 500) * p, c.currentTime, .09, 'sine', .09); },
   drop() { const c = audio(); if (!c) return; const t = c.currentTime; note(900, t, .18, 'sine', .15, 300); },
+  tap() { const c = audio(); if (!c) return; note(1100, c.currentTime, .035, 'sine', .035, 820); },
+  nav() { const c = audio(); if (!c) return; const t = c.currentTime; note(660, t, .06, 'triangle', .04, 880); note(990, t + .05, .08, 'sine', .03); },
+  pop() { const c = audio(); if (!c) return; const t = c.currentTime; note(420, t, .09, 'sine', .05, 760); note(900, t + .06, .08, 'sine', .025); },
+  tog() { const c = audio(); if (!c) return; const t = c.currentTime; note(520, t, .05, 'square', .02, 720); },
+  tile(id) { const c = audio(); if (!c) return; const t = c.currentTime;
+    if (id === 'cases') { this.chime([659, 880]); }
+    else if (id === 'crash') { this.whoosh(); note(300, t, .3, 'sawtooth', .03, 900); }
+    else if (id === 'mines') { this.gem(0); }
+    else if (id === 'upgrade') { this.upg(); }
+    else if (id === 'roulette') { [0, .07, .15].forEach((d, i) => note(1400 - i * 160, t + d, .04, 'square', .035)); }
+    else if (id === 'plinko') { this.peg(1); setTimeout(() => this.peg(1.2), 70); }
+    else if (id === 'tower') { this.step(); }
+    else if (id === 'ladder') { this.hop(); } },
   upg() { const c = audio(); if (!c) return; const t = c.currentTime; note(520, t, .12, 'triangle', .05, 700); note(780, t + .07, .16, 'sine', .05, 1040); note(1560, t + .12, .1, 'sine', .018); },
   hop() { const c = audio(); if (!c) return; const t = c.currentTime; note(380, t, .14, 'square', .05, 760); note(760, t + .2, .08, 'triangle', .07, 520); },
   whoosh() { const c = audio(); if (!c) return; note(1200, c.currentTime, .3, 'sine', .06, 160); },
@@ -270,11 +283,20 @@ function modal(html) {
   closeModals();
   const o = document.createElement('div'); o.className = 'ovl';
   o.innerHTML = `<div class="mcard">${html}</div>`; document.body.append(o);
-  requestAnimationFrame(() => o.classList.add('show'));
+  requestAnimationFrame(() => o.classList.add('show')); sfx.pop();
   const close = () => { o.classList.remove('show'); setTimeout(() => o.remove(), 260); };
   o.addEventListener('click', e => { if (e.target === o) close(); });
   return { el: o.firstElementChild, close };
 }
+
+/* ---------- общие звуки интерфейса ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('button,.tile,.case,.chip,.sw,.stk-it'); if (!t || t.disabled) return;
+  if (t.closest('#nav')) return sfx.nav();
+  if (t.classList.contains('tile') || t.id === 'go' || t.id === 'drop') return;
+  if (t.classList.contains('sw')) return sfx.tog();
+  sfx.tap();
+}, true);
 
 /* ---------- окно выигрыша (bottom-sheet) ---------- */
 // o: {title, item (NFT или null), amount (Rushcoin, если без NFT), plus (доп. Rushcoin к NFT), chip, items:[имена] (несколько призов), sell: fn}
@@ -313,10 +335,10 @@ function home(el) {
   const MN = '<svg class="mn" viewBox="0 0 24 24"><defs><radialGradient id="mng" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#6b7390"/><stop offset=".55" stop-color="#2a2f45"/><stop offset="1" stop-color="#0d101c"/></radialGradient></defs><g stroke="#5a6283" stroke-width="2.4" stroke-linecap="round"><path d="M12 2.5v3.2M12 18.3v3.2M2.5 12h3.2M18.3 12h3.2M5.3 5.3l2.2 2.2M16.5 16.5l2.2 2.2M18.7 5.3l-2.2 2.2M7.5 16.5l-2.2 2.2"/></g><circle cx="12" cy="12" r="6.2" fill="url(#mng)" stroke="#8791b5" stroke-width=".6"/><circle cx="12" cy="12" r="1.7" fill="#ff4d6d"/><circle cx="12" cy="12" r="1.7" fill="#ff4d6d" opacity=".5" filter="blur(1)"/></svg>';
   const cells = [MN, '', 'D', '', 'D', MN, 'D', '', MN].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=86" alt=""><img class="gf g1" src="case_toxic.webp?v=86" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
-    crash: '<div class="art a-crash"><svg viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="cgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b5cff" stop-opacity=".55"/><stop offset="1" stop-color="#8b5cff" stop-opacity="0"/></linearGradient><linearGradient id="cgl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5b7cff"/><stop offset="1" stop-color="#d9b8ff"/></linearGradient></defs><path class="cf" d="M0 58 C 30 56, 52 44, 100 4 L100 60 L0 60 Z" fill="url(#cgf)"/><path class="cl" d="M0 58 C 30 56, 52 44, 100 4" fill="none" stroke="url(#cgl)" stroke-width="2.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><i class="cdot"></i><em>x2.45</em><span class="rkt" id="hrkt"></span></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=89" alt=""><img class="gf g1" src="case_toxic.webp?v=89" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    crash: '<div class="art a-crash"><svg viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="cgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a8bff" stop-opacity=".5"/><stop offset="1" stop-color="#3a8bff" stop-opacity="0"/></linearGradient><linearGradient id="cgl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a8bff"/><stop offset="1" stop-color="#bfe0ff"/></linearGradient></defs><path class="cf" d="M0 58 C 30 56, 52 44, 100 4 L100 60 L0 60 Z" fill="url(#cgf)"/><path class="cl" d="M0 58 C 30 56, 52 44, 100 4" fill="none" stroke="url(#cgl)" stroke-width="2.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><em id="hx">x1.00</em><span class="rkt" id="hrkt"></span></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_champagne.webp?v=14" alt=""></span><b>→</b><span class="u u2"><img src="g_cup.webp?v=86" alt=""></span><b>→</b><span class="u u3"><img src="g_potion.webp?v=14" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_cup.webp?v=89" alt=""><small>100</small></span><b>→</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""><small>450</small></span><b>→</b><span class="u u3"><img src="g_shoes.webp?v=14" alt=""><small>1500</small></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
@@ -324,7 +346,7 @@ function home(el) {
   };
   const SUB = { cases: 'NFT-подарки', crash: 'лови иксы', mines: 'до x24', upgrade: 'умножай подарки', roulette: 'до x12', plinko: 'до x11', tower: 'до x23', ladder: 'обходи камни' };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3><span class="sb">${SUB[id] || ''}</span>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=86" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=89" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -333,11 +355,11 @@ function home(el) {
     ${T('tower', 'wide t-tw', 'TOWER')}
     <div class="row2">${T('ladder', 'sq t-ld', 'LADDER', '<span class="new">NEW</span>')}<div class="tile sq t-soon"><span>?</span><em>СКОРО</em></div></div>
   </div>`;
-  const rk = $('#hrkt'); loadRocket();
-  if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; }, 33); cleanup = () => clearInterval(tm); }
+  const rk = $('#hrkt'), hx = $('#hx'); loadRocket();
+  if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; if (hx && f % 3 === 0) hx.textContent = 'x' + Math.exp(Math.min(f, 70) * .0128).toFixed(2); }, 33); cleanup = () => clearInterval(tm); }
   el.querySelectorAll('.tile[data-id]').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
-    b.onclick = () => go(b.dataset.id);
+    b.onclick = () => { (sfx.tile || (() => {}))(b.dataset.id); go(b.dataset.id); };
   });
 }
 
@@ -347,7 +369,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=86" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=89" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -383,7 +405,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=86" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=89" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -605,7 +627,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=86';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=89';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -839,8 +861,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0; stkLock();
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=86`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=86" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=89`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=89" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -2063,7 +2085,7 @@ function refScreen(el) {
     $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
     $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
       const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
-      const body = it ? `<img src="${it.img}?v=86" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      const body = it ? `<img src="${it.img}?v=89" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
       return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
     }).join('');
     $('#rfFill', el).style.width = (done / 5 * 100) + '%';

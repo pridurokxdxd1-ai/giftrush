@@ -1125,3 +1125,56 @@ html[data-theme] #nav{border-top-color:color-mix(in srgb,var(--tgl) 30%,transpar
 .stk-it .stk-art img,.stk-it .stk-art svg{max-width:100%;max-height:100%}
 .stk-it b{font-size:11px;font-family:var(--disp)}.stk-it small{font-size:11px;color:#9fb0ff}
 .stk-it.sel{border-color:#2f8bff;background:#2f8bff22;box-shadow:0 0 14px #2f8bff55}
+
+/* ===== v87: новые цвета баннеров, ракета, анимации ===== */
+.hub .tile.t-crash{--ac:#3a8bff}.hub .tile.t-mines{--ac:#a35cff}.hub .tile.t-up{--ac:#2fd48a}.hub .tile.t-ld{--ac:#e052c8}
+/* mines: фиолетовый */
+.a-mines i{background:#a35cff16!important;border-color:#a35cff44!important;box-shadow:inset 0 0 10px #a35cff1a!important;animation:mpl 3.6s ease-in-out infinite!important}
+.a-mines i:nth-child(1){animation-delay:0s!important}.a-mines i:nth-child(2){animation-delay:.3s!important}.a-mines i:nth-child(3){animation-delay:.6s!important}.a-mines i:nth-child(4){animation-delay:.9s!important}.a-mines i:nth-child(5){animation-delay:1.2s!important}.a-mines i:nth-child(6){animation-delay:1.5s!important}.a-mines i:nth-child(7){animation-delay:1.8s!important}.a-mines i:nth-child(8){animation-delay:2.1s!important}.a-mines i:nth-child(9){animation-delay:2.4s!important}
+@keyframes mpl{0%,62%,100%{transform:none;background:#a35cff16;box-shadow:inset 0 0 10px #a35cff1a}72%{transform:scale(1.1);background:#a35cff44;box-shadow:0 0 14px #a35cffaa}}
+.a-mines i .dia{filter:drop-shadow(0 0 7px #c8a0ff)!important}
+.mgrid{border-color:#a35cffcc!important;background:linear-gradient(180deg,#a35cff10,#a35cff05)!important;box-shadow:0 0 0 1px #a35cff33,0 0 22px #a35cff66,inset 0 0 26px #a35cff2a!important}
+/* crash: синий + ракета едет по кривой */
+.crash-box{border-color:#3a8bffcc!important;box-shadow:0 0 0 1px #3a8bff33,0 0 22px #3a8bff66,inset 0 0 26px #3a8bff2a!important}
+.a-crash svg{filter:drop-shadow(0 0 8px #3a8bffaa)!important}
+.a-crash .cdot{display:none!important}
+.hub .tile.t-crash .a-crash .rkt{display:block!important;position:absolute;left:-32px;top:114px;width:84px;height:84px;scale:.78;background:url(rocket.webp?v=62) 0 0/840px auto no-repeat;animation:rkfly 3s linear infinite!important;filter:drop-shadow(0 0 10px #3a8bffaa);z-index:2}
+@keyframes rkfly{0%{left:-32px;top:114px;opacity:0}8%{opacity:1}40%{left:18px;top:108px}70%{left:66px;top:86px}92%{left:118px;top:28px;opacity:1}100%{left:124px;top:20px;opacity:0}}
+.a-crash em{transition:none}
+/* upgrade: цепочка с ценами */
+.a-up{gap:6px!important}
+.a-up .u{position:relative;background:#2fd48a1a!important;border-color:#2fd48a55!important;box-shadow:0 0 18px #2fd48a33!important;animation:upf 3.2s ease-in-out infinite}
+.a-up .u2{animation-delay:.35s}.a-up .u3{animation-delay:.7s;background:#2fd48a30!important;border-color:#8cf0c0!important;box-shadow:0 0 26px #2fd48a77!important;overflow:hidden}
+.a-up .u small{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);padding:2px 7px;border-radius:999px;background:#0b1220;border:1px solid #2fd48a66;font-family:var(--disp);font-weight:800;font-size:9px;color:#9af0c8;line-height:1.2}
+.a-up .u3::after{content:"";position:absolute;top:-20%;bottom:-20%;width:26px;left:-40px;background:linear-gradient(90deg,transparent,#ffffff66,transparent);transform:skewX(-20deg);animation:ush 3.2s ease-in-out infinite}
+@keyframes ush{0%,55%{left:-40px}85%,100%{left:120%}}
+@keyframes upf{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.a-up b{color:#6be0a8!important;animation:uar 1.6s ease-in-out infinite}.a-up b:nth-of-type(2){animation-delay:.4s}
+@keyframes uar{0%,100%{transform:translateX(-2px);opacity:.5}50%{transform:translateX(3px);opacity:1}}
+/* roulette: крутится колесо, дрожит стрелка */
+.a-roul .wheel{animation:rspin 10s linear infinite!important}
+@keyframes rspin{to{transform:rotate(360deg)}}
+.a-roul .ptr{animation:rptw 1.2s ease-in-out infinite!important;transform-origin:50% 0}
+@keyframes rptw{0%,100%{transform:rotate(0)}50%{transform:rotate(-9deg)}}
+/* tower: подсветка ярусов снизу вверх */
+.a-tw>div:nth-child(4) i.ok{animation:twc 3.2s ease-in-out infinite}
+.a-tw>div:nth-child(3) i.ok{animation:twc 3.2s ease-in-out infinite .5s}
+.a-tw>div:nth-child(2) i.ok{animation:twc 3.2s ease-in-out infinite 1s}
+.a-tw>div:nth-child(1) i.hl{animation:twc 3.2s ease-in-out infinite 1.5s}
+@keyframes twc{0%,55%,100%{filter:none;transform:none}68%{filter:brightness(1.5) drop-shadow(0 0 8px #ffb36b);transform:scale(1.07)}}
+/* ladder: человечек прыгает */
+.a-ld i.me{animation:ldh 1.6s ease-in-out infinite}
+@keyframes ldh{0%,100%{transform:translateY(0)}35%{transform:translateY(-7px) scale(1.1)}60%{transform:translateY(0) scale(.94)}}
+.a-ld i.ok{animation:ldo 3.2s ease-in-out infinite}.a-ld>div:nth-child(2) i.ok{animation-delay:.8s}.a-ld>div:nth-child(1) i.hl{animation:ldo 3.2s ease-in-out infinite 1.6s}
+@keyframes ldo{0%,60%,100%{filter:none}75%{filter:brightness(1.5) drop-shadow(0 0 8px #e052c8)}}
+/* cases: покачивание и мерцание */
+.a-cs .gf{animation:float 3.6s ease-in-out infinite reverse}
+.a-cs .dot{box-shadow:0 0 8px #fff}
+/* слабые телефоны */
+html.lite .hub .art *,html.lite .hub .art{animation:none!important}
+@media (prefers-reduced-motion:reduce){.hub .art *{animation:none!important}}
+.a-up .u3{overflow:visible!important;animation:upf 3.2s ease-in-out infinite .7s,ugl 2.4s ease-in-out infinite!important}
+.a-up .u3::after{display:none}
+@keyframes ugl{50%{box-shadow:0 0 38px #2fd48aaa}}
+.hub .tile.t-crash .a-crash em{left:auto!important;right:14px!important;top:16px!important;bottom:auto!important;font-size:22px!important}
+.hub .tile.t-crash .a-crash em{top:auto!important;bottom:12px!important;right:12px!important;font-size:19px!important;z-index:1}
