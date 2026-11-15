@@ -335,10 +335,10 @@ function home(el) {
   const MN = '<svg class="mn" viewBox="0 0 24 24"><defs><radialGradient id="mng" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#6b7390"/><stop offset=".55" stop-color="#2a2f45"/><stop offset="1" stop-color="#0d101c"/></radialGradient></defs><g stroke="#5a6283" stroke-width="2.4" stroke-linecap="round"><path d="M12 2.5v3.2M12 18.3v3.2M2.5 12h3.2M18.3 12h3.2M5.3 5.3l2.2 2.2M16.5 16.5l2.2 2.2M18.7 5.3l-2.2 2.2M7.5 16.5l-2.2 2.2"/></g><circle cx="12" cy="12" r="6.2" fill="url(#mng)" stroke="#8791b5" stroke-width=".6"/><circle cx="12" cy="12" r="1.7" fill="#ff4d6d"/><circle cx="12" cy="12" r="1.7" fill="#ff4d6d" opacity=".5" filter="blur(1)"/></svg>';
   const cells = [MN, '', 'D', '', 'D', MN, 'D', '', MN].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=96" alt=""><img class="gf g1" src="case_toxic.webp?v=96" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=97" alt=""><img class="gf g1" src="case_toxic.webp?v=97" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="cgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a8bff" stop-opacity=".5"/><stop offset="1" stop-color="#3a8bff" stop-opacity="0"/></linearGradient><linearGradient id="cgl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a8bff"/><stop offset="1" stop-color="#bfe0ff"/></linearGradient></defs><path class="cf" d="M0 58 C 30 56, 52 44, 100 4 L100 60 L0 60 Z" fill="url(#cgf)"/><path class="cl" d="M0 58 C 30 56, 52 44, 100 4" fill="none" stroke="url(#cgl)" stroke-width="2.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><em id="hx">x1.00</em><span class="rkt" id="hrkt"></span></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_cup.webp?v=96" alt=""></span><b>→</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""></span><b>→</b><span class="u u3"><img src="g_shoes.webp?v=14" alt=""></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_cup.webp?v=97" alt=""></span><b>→</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""></span><b>→</b><span class="u u3"><img src="g_shoes.webp?v=14" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
@@ -346,7 +346,7 @@ function home(el) {
   };
   const SUB = { cases: 'NFT-подарки', crash: 'лови иксы', mines: 'до x24', upgrade: 'умножай подарки', roulette: 'до x12', plinko: 'до x11', tower: 'до x23', ladder: 'обходи камни' };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3><span class="sb">${SUB[id] || ''}</span>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=96" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=97" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -383,7 +383,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=96" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=97" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -429,7 +429,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=96" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=97" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -651,7 +651,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=96';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=97';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -885,8 +885,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0; stkLock();
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=96`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=96" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=97`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=97" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -1675,6 +1675,7 @@ function openTG(url) { try { if (tg && tg.openTelegramLink) return tg.openTelegr
 
 function tasksScreen(el) {
   el.insertAdjacentHTML('beforeend', `<div class="tour"><h2>✅ Задания</h2><p class="sub" style="margin-top:6px">Выполняй и получай Rushcoin</p></div>
+    <div class="task wide nick" id="t8"><div class="ti"><h3>Поставь @GiftRush в ник</h3><span class="rew">+⭐ 100 000 / сутки</span></div><div class="ta two"><button class="pbtn ghost" id="t8a">Выполнить</button><button class="pbtn" id="t8b">Проверить</button></div></div>
     ${subTask(SUBS[0])}${subTask(SUBS[1])}
     <div class="task" id="t1"><div class="ti"><h3>Зайти в Gift Rush</h3><span class="rew">+⭐ 1</span></div><div class="ta"><button class="pbtn" id="t1b"></button></div></div>
     <div class="task wide" id="t2"><div class="ti"><h3>Написать комплимент владельцу</h3><span class="rew">+⭐ 5</span></div><div class="ta two"><button class="pbtn ghost" id="t2a">Выполнить</button><button class="pbtn" id="t2b"></button></div></div>
@@ -1711,7 +1712,37 @@ function tasksScreen(el) {
       tasks[s.id] = 'claimed'; saveTasks(); grant(s.rew); paint();
     };
   });
-  balanceHook = paint; taskPaint = paint; cleanup = () => { balanceHook = null; taskPaint = null; };
+  const b8a = $('#t8a'), b8b = $('#t8b');
+  let nickBusy = false;
+  const paintNick = () => {
+    const now = Date.now();
+    if (nickBusy) { b8b.textContent = 'Проверяем…'; b8b.disabled = true; }
+    else if (nick.pending) { b8b.textContent = 'На проверке у админа'; b8b.disabled = true; }
+    else if (nick.next > now) { const ms = nick.next - now, h = Math.floor(ms / 3600000), mm = Math.floor(ms % 3600000 / 60000); b8b.textContent = `Через ${h} ч ${mm} мин`; b8b.disabled = true; }
+    else { b8b.textContent = 'Проверить'; b8b.disabled = false; }
+  };
+  b8a.onclick = () => {
+    const mo = modal(`<div class="g-n" style="margin-top:4px">Поставь @GiftRush в ник</div>
+      <div style="font-size:13px;color:var(--mut);line-height:1.6;margin:8px 0 14px;text-align:left">
+      1. Откройте настройки Telegram → «Изменить профиль».<br>2. В поле «Имя» или «Фамилия» допишите <b>@GiftRush</b>, например: «Вася @GiftRush».<br>3. Сохраните изменения.<br>4. Вернитесь сюда и нажмите «Проверить» — заявку рассмотрит администратор.<br><br>Награда начисляется каждые 24 часа, пока ник установлен.</div>
+      <button class="btn" id="nkOk">Понятно</button>`);
+    mo.el.querySelector('#nkOk').onclick = mo.close;
+  };
+  b8b.onclick = async () => {
+    if (nickBusy || b8b.disabled) return;
+    nickBusy = true; paintNick();
+    try {
+      const d = await api('/api/nickcheck', {});
+      if (d && d.ok && d.pending) { nick.pending = true; notify('success'); toast('Заявка отправлена администратору, ждите подтверждения'); }
+      else if (d && d.err === 'notfound') toast('Не нашли @GiftRush в вашем имени — проверьте настройки и попробуйте снова');
+      else if (d && d.err === 'wait') { nick.next = d.next || (Date.now() + 1000); toast('Уже получено сегодня, попробуйте позже'); }
+      else toast(apiErr(d));
+    } catch (e) { toast(apiErr(null, true)); }
+    nickBusy = false; paintNick();
+  };
+  paintNick();
+  const nickTimer = setInterval(() => { if (!nickBusy) paintNick(); }, 30000);
+  balanceHook = paint; taskPaint = () => { paint(); paintNick(); }; cleanup = () => { balanceHook = null; taskPaint = null; clearInterval(nickTimer); };
   paint(); syncAccount();
 }
 
@@ -1730,6 +1761,7 @@ async function api(path, body) {
 const apiErr = (d, e) => e ? 'Сервер недоступен. Вставь новый worker.js в Cloudflare и нажми Deploy' :
   d && d.err === 'nokv' ? 'К воркеру не привязан KV (имя DB)' : d && d.err === 'auth' ? (d.why === 'stale' ? 'Сессия устарела — закройте игру и откройте заново через бота' : d.why === 'empty' || d.why === 'nohash' ? 'Telegram не передал данные входа — закройте игру и откройте заново через бота (кнопка «Играть»)' : 'Не удалось подтвердить вход — закройте игру и откройте заново через бота') : d && d.err === 'forbidden' ? 'Нет прав' : d && d.err === 'quota' ? 'Лимит записей Cloudflare KV на сегодня исчерпан — сбросится в 03:00 по Минску' : d && d.err === 'srv' ? 'Ошибка воркера: ' + (d.msg || '') : 'Ошибка, попробуйте ещё раз';
 let syncing = false, lastPushed = -1, taskPaint = null, lastTasksSent = '';
+let nick = { next: 0, pending: false };
 const invSummary = () => { const o = {}; state.inv.forEach(g => { o[g.n] = (o[g.n] || 0) + 1; }); return o; };
 const pinNames = () => cleanPins().map(id => { const g = invGift(id); return g ? g.n : null; }).filter(Boolean);
 /* ---------- блокировка ---------- */
@@ -1781,6 +1813,7 @@ async function syncAccount() {
       if (d.welcome > 0) { state.balance += d.welcome; ch = true; toast(`🎁 Приветственный бонус: ${fmt(d.welcome)} ⭐`); }
       if (d.credit > 0) { state.balance += d.credit; ch = true; toast(`🎁 Вам пришло ${fmt(d.credit)} ⭐`); }
       if (d.debit > 0) { const t = Math.min(d.debit, Math.floor(state.balance)); state.balance -= t; ch = true; if (t) toast(`С баланса списано ${fmt(t)} ⭐`); }
+      if (d.nick) { nick = d.nick; if (taskPaint) taskPaint(); }
       if (ch) { save(); bump(); notify('success'); bal = Math.floor(state.balance); api('/api/sync', { bal }).catch(() => {}); }
       lastPushed = bal;
     }
@@ -2109,7 +2142,7 @@ function refScreen(el) {
     $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
     $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
       const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
-      const body = it ? `<img src="${it.img}?v=96" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      const body = it ? `<img src="${it.img}?v=97" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
       return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
     }).join('');
     $('#rfFill', el).style.width = (done / 5 * 100) + '%';

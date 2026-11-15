@@ -1197,3 +1197,6 @@ html.lite .hub .art *,html.lite .hub .art{animation:none!important}
 .screen[data-mode=mines] .btn:not(.green):not(.red){background:linear-gradient(180deg,#b57bff,#8a42f0);box-shadow:0 6px 16px #0006,0 0 20px #a35cff55!important}
 .screen[data-mode=mines] .mlive .dot{background:#a35cff;box-shadow:0 0 8px #a35cff}
 .screen[data-mode=mines] .ttl::after{background:#a35cff!important;box-shadow:0 0 12px #a35cff!important}
+/* задание «Поставь @GiftRush в ник» */
+.task.nick{border-color:#ffd54faa!important;background:linear-gradient(135deg,#ffd54f14,transparent 60%)!important;box-shadow:0 0 18px #ffd54f22!important}
+.task.nick .rew{color:#ffd54f!important}
