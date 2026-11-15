@@ -1178,3 +1178,5 @@ html.lite .hub .art *,html.lite .hub .art{animation:none!important}
 @keyframes ugl{50%{box-shadow:0 0 38px #2fd48aaa}}
 .hub .tile.t-crash .a-crash em{left:auto!important;right:14px!important;top:16px!important;bottom:auto!important;font-size:22px!important}
 .hub .tile.t-crash .a-crash em{top:auto!important;bottom:12px!important;right:12px!important;font-size:19px!important;z-index:1}
+.hub .tile.t-crash .a-crash .rkt{left:0!important;top:0!important;animation:none!important;will-change:transform,opacity;transform-origin:50% 50%;scale:1!important;filter:none!important}
+.a-crash svg{filter:none!important}

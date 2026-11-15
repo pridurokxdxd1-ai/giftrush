@@ -335,10 +335,10 @@ function home(el) {
   const MN = '<svg class="mn" viewBox="0 0 24 24"><defs><radialGradient id="mng" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#6b7390"/><stop offset=".55" stop-color="#2a2f45"/><stop offset="1" stop-color="#0d101c"/></radialGradient></defs><g stroke="#5a6283" stroke-width="2.4" stroke-linecap="round"><path d="M12 2.5v3.2M12 18.3v3.2M2.5 12h3.2M18.3 12h3.2M5.3 5.3l2.2 2.2M16.5 16.5l2.2 2.2M18.7 5.3l-2.2 2.2M7.5 16.5l-2.2 2.2"/></g><circle cx="12" cy="12" r="6.2" fill="url(#mng)" stroke="#8791b5" stroke-width=".6"/><circle cx="12" cy="12" r="1.7" fill="#ff4d6d"/><circle cx="12" cy="12" r="1.7" fill="#ff4d6d" opacity=".5" filter="blur(1)"/></svg>';
   const cells = [MN, '', 'D', '', 'D', MN, 'D', '', MN].map(c => `<i>${c === 'D' ? DIA : c}</i>`).join('');
   const art = {
-    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=89" alt=""><img class="gf g1" src="case_toxic.webp?v=89" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
+    cases: '<div class="art a-cs"><img class="chest" src="case.webp?v=92" alt=""><img class="gf g1" src="case_toxic.webp?v=92" alt=""><i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i></div>',
     crash: '<div class="art a-crash"><svg viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="cgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a8bff" stop-opacity=".5"/><stop offset="1" stop-color="#3a8bff" stop-opacity="0"/></linearGradient><linearGradient id="cgl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a8bff"/><stop offset="1" stop-color="#bfe0ff"/></linearGradient></defs><path class="cf" d="M0 58 C 30 56, 52 44, 100 4 L100 60 L0 60 Z" fill="url(#cgf)"/><path class="cl" d="M0 58 C 30 56, 52 44, 100 4" fill="none" stroke="url(#cgl)" stroke-width="2.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><em id="hx">x1.00</em><span class="rkt" id="hrkt"></span></div>',
     mines: `<div class="art a-mines">${cells}</div>`,
-    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_cup.webp?v=89" alt=""><small>100</small></span><b>→</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""><small>450</small></span><b>→</b><span class="u u3"><img src="g_shoes.webp?v=14" alt=""><small>1500</small></span></div>',
+    upgrade: '<div class="art a-up"><span class="u u1"><img src="g_cup.webp?v=92" alt=""></span><b>→</b><span class="u u2"><img src="g_candy.webp?v=14" alt=""></span><b>→</b><span class="u u3"><img src="g_shoes.webp?v=14" alt=""></span></div>',
     roulette: '<div class="art a-roul"><i class="wheel"></i><i class="ptr"></i></div>',
     ladder: '<div class="art a-ld"><div><i></i><i class="hl"></i><i></i><i></i><i></i></div><div><i></i><i class="stn"></i><i class="ok"></i><i></i><i></i></div><div><i class="ok"></i><i></i><i></i><i class="stn"></i><i></i></div><div><i></i><i class="me"></i><i></i><i></i><i class="stn"></i></div></div>',
     tower: '<div class="art a-tw"><div><i></i><i class="hl"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div><div><i></i><i class="ok"></i><i></i></div><div><i class="ok"></i><i></i><i></i></div></div>',
@@ -346,7 +346,7 @@ function home(el) {
   };
   const SUB = { cases: 'NFT-подарки', crash: 'лови иксы', mines: 'до x24', upgrade: 'умножай подарки', roulette: 'до x12', plinko: 'до x11', tower: 'до x23', ladder: 'обходи камни' };
   const T = (id, cls, name, extra = '') => `<button class="tile ${cls}" data-id="${id}">${art[id]}<h3>${name}</h3><span class="sb">${SUB[id] || ''}</span>${extra}</button>`;
-  const strip = ITEMS.map(i => `<img src="${i.img}?v=89" alt="" draggable="false">`).join('');
+  const strip = ITEMS.map(i => `<img src="${i.img}?v=92" alt="" draggable="false">`).join('');
   el.innerHTML = `<div class="mq home"><div class="mq-t">${strip}${strip}</div></div><h2 class="hd">Игры</h2><div class="hub">
     ${T('cases', 'wide t-cases', 'CASES')}
     <div class="row2">${T('crash', 'sq t-crash', 'CRASH', LIVE_BADGE)}${T('mines', 'sq t-mines', 'MINES', '<span class="new">NEW</span>')}</div>
@@ -356,7 +356,21 @@ function home(el) {
     <div class="row2">${T('ladder', 'sq t-ld', 'LADDER', '<span class="new">NEW</span>')}<div class="tile sq t-soon"><span>?</span><em>СКОРО</em></div></div>
   </div>`;
   const rk = $('#hrkt'), hx = $('#hx'); loadRocket();
-  if (rk) { let f = 0; const tm = setInterval(() => { if (document.hidden) return; f = (f + 1) % 90; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; if (hx && f % 3 === 0) hx.textContent = 'x' + Math.exp(Math.min(f, 70) * .0128).toFixed(2); }, 33); cleanup = () => clearInterval(tm); }
+  if (rk) {   // ракета на баннере: один rAF (позиция по кривой + кадры спрайта + множитель), только пока баннер на экране
+    const box = rk.parentElement; let raf = 0, vis = true, t0 = performance.now(), lastF = -1, lastX = '';
+    const loop = now => {
+      raf = requestAnimationFrame(loop); if (!vis || document.hidden) return;
+      const W = box.offsetWidth || 174, H = box.offsetHeight || 160, T = 3000, k = ((now - t0) % T) / T;
+      const u = Math.min(1, k / .92), x = W * (.08 + .76 * u), y = H * (.97 - .56 * u * u), ang = Math.atan2(-H * .56 * 2 * u, W * .76) * 180 / Math.PI * .6 + 20;
+      const al = k < .06 ? k / .06 : k > .92 ? Math.max(0, 1 - (k - .92) / .08) : 1;
+      rk.style.transform = `translate3d(${(x - 42).toFixed(1)}px,${(y - 42).toFixed(1)}px,0) rotate(${ang.toFixed(1)}deg) scale(.78)`; rk.style.opacity = al.toFixed(2);
+      const f = Math.floor(now / 33) % 90; if (f !== lastF) { lastF = f; rk.style.backgroundPosition = `${-(f % 10) * 84}px ${-Math.floor(f / 10) * 84}px`; }
+      if (hx) { const tx = 'x' + Math.exp(Math.min(u, 1) * .9).toFixed(2); if (tx !== lastX) { lastX = tx; hx.textContent = tx; } }
+    };
+    raf = requestAnimationFrame(loop);
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver(e => { vis = e[0].isIntersecting; }) : null; if (io) io.observe(box);
+    cleanup = () => { cancelAnimationFrame(raf); io && io.disconnect(); };
+  }
   el.querySelectorAll('.tile[data-id]').forEach((b, i) => {
     b.style.animationDelay = i * 70 + 'ms';
     b.onclick = () => { (sfx.tile || (() => {}))(b.dataset.id); go(b.dataset.id); };
@@ -369,7 +383,7 @@ function casesList(el) {
   const g = document.createElement('div'); g.className = 'grid2 cs-list'; el.append(g);
   CASES.forEach((c, i) => {
     const d = document.createElement('button'); d.className = 'case'; d.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=89" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
+    d.innerHTML = `${c.daily ? '<span class="tag">Бесплатно</span>' : c.promo ? '<span class="tag">Промокод</span>' : ''}<span class="em"><img class="gi" src="${c.img}?v=92" alt="" draggable="false"></span><div class="nm"><span>${esc(c.n)}</span><span class="pr">${c.price ? '⭐ ' + fmt(c.price) : c.promo ? 'Промо' : '24 ч'}</span></div>`;
     d.onclick = () => go('case', c); g.append(d);
   });
 }
@@ -405,7 +419,7 @@ function caseScreen(el, c) {
   bar(el, c.n, 'cases');
   const mk = it => `<div class="it" style="--c:${it.c}">${ico(it)}</div>`;
   let cnt = c.daily || c.promo ? 1 : Math.min(3, Math.max(1, Number(store.get('gr2_cnt', 1)) || 1));
-  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=89" alt=""><div class="reels" id="reels"></div>
+  el.insertAdjacentHTML('beforeend', `<img class="case-hero" src="${c.img}?v=92" alt=""><div class="reels" id="reels"></div>
     <div class="win" id="win">${c.daily ? 'Бесплатный ежедневный кейс' : c.promo ? 'Открывается по промокоду' : 'Цена: ⭐ ' + fmt(c.price)}</div><div id="act"></div>
     ${c.daily || c.promo ? '' : `<div class="chips" id="cnt">${[1, 2, 3].map(n => `<button class="chip" data-n="${n}">x${n}</button>`).join('')}</div>`}
     <div class="openrow"><button class="btn" id="go"></button>${TURBO_BTN}</div>
@@ -627,7 +641,7 @@ function pickScreen(el, kind) {
 /* ---------- ракета (спрайт из видео) ---------- */
 const RK = { img: null, ok: false, FR: 360, COLS: 10, N: 90, FPS: 30 };
 function loadRocket() {
-  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=89';
+  if (RK.img) return; RK.img = new Image(); RK.img.onload = () => { RK.ok = true; }; RK.img.onerror = () => {}; RK.img.src = 'rocket.webp?v=92';
 }
 function drawRocket(ctx, x, y, size, t, alpha, rot) {
   if (!RK.ok) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `${size * .55}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚀', x, y); ctx.restore(); return; }
@@ -861,8 +875,8 @@ function crashScreen(el) {
     betIn.disabled = G.phase !== 'wait' || !!myBet || pending > 0; stkLock();
     const key = txt + '|' + cls + '|' + dis; if (key === lastBtn) return; lastBtn = key;
     const oi = pz && goBtn.querySelector('.nft-i');
-    if (oi && oi.getAttribute('src') === `${pz.img}?v=89`) goBtn.querySelector('.nft-t').textContent = txt;
-    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=89" alt="" draggable="false">`; else goBtn.textContent = txt;
+    if (oi && oi.getAttribute('src') === `${pz.img}?v=92`) goBtn.querySelector('.nft-t').textContent = txt;
+    else if (pz) goBtn.innerHTML = `<span class="nft-t">${esc(txt)}</span><img class="nft-i" src="${pz.img}?v=92" alt="" draggable="false">`; else goBtn.textContent = txt;
     goBtn.className = cls; goBtn.disabled = dis;
   }
 
@@ -1711,14 +1725,14 @@ const pinNames = () => cleanPins().map(id => { const g = invGift(id); return g ?
 /* ---------- блокировка ---------- */
 let banEl = null;
 function showBan(on) {
-  try { if (on) localStorage.setItem('gr5_ban', '1'); else localStorage.removeItem('gr5_ban'); } catch (e) {}
+  try { if (on) localStorage.setItem('gr5_ban', String(TGU && TGU.id || '1')); else localStorage.removeItem('gr5_ban'); } catch (e) {}   // флаг привязан к id аккаунта, а не к устройству
   if (!on) { if (banEl) { banEl.remove(); banEl = null; } return; }
   if (banEl) return;
   banEl = document.createElement('div'); banEl.id = 'banned';
   banEl.innerHTML = '<div><b>🚫</b><h2>Вы заблокированы</h2><p>Администратор ограничил вам доступ к GiftRush.</p></div>';
   document.body.appendChild(banEl);
 }
-try { if (localStorage.getItem('gr5_ban') === '1') setTimeout(() => showBan(true), 0); } catch (e) {}
+try { const bf = localStorage.getItem('gr5_ban'); if (bf && TGU && bf === String(TGU.id)) setTimeout(() => showBan(true), 0); else if (bf) localStorage.removeItem('gr5_ban'); } catch (e) {}
 async function syncAccount() {
   if (syncing || !TGU || !INIT) return;
   syncing = true;
@@ -2085,7 +2099,7 @@ function refScreen(el) {
     $('#rfN', el).textContent = n; $('#rfE', el).textContent = fmt(d.earned || 0); $('#rfC', el).textContent = Math.floor(Math.max(0, n - 1) / 5) + 1;
     $('#rfChain', el).innerHTML = REF_STEPS.map((st, i) => {
       const it = st.g ? ITEM(st.g) : null, cls = i < done ? 'done' : (i === done && !(n > 0 && p === 0 && done === 5) ? 'next' : '');
-      const body = it ? `<img src="${it.img}?v=89" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
+      const body = it ? `<img src="${it.img}?v=92" alt="" draggable="false">` : `<b>${fmt(st.c)}</b><i class="rc"></i>`;
       return `${i ? `<u class="${i <= done ? 'on' : ''}"></u>` : ''}<div class="rf-n ${cls}${it ? ' nft' : ''}"><div class="rf-ic">${body}${cls === 'done' ? '<em>✓</em>' : ''}</div><span>${esc(it ? it.n : 'Rushcoin')}</span><small>${st.t}</small></div>`;
     }).join('');
     $('#rfFill', el).style.width = (done / 5 * 100) + '%';
